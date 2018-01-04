@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- If true, a Holds tab is shown. -->
+  <!-- This can be disabled for book collections that do not have holds. -->
+  <bool name="feature_holds_enabled">false</bool>
+  <!-- The default Adobe vendor ID -->
+  <string name="feature_adobe_vendor_id"></string>
+
+  <!-- qa or prod  - currently used only in card creator -->
+  <string name="feature_environment"></string>
+
+  <!-- authentication providers -->
+  <!-- default authentication provider -->
+  <bool name="feature_default_auth_provider">false</bool>
+  <string name="feature_default_auth_provider_name">Library</string>
+  <bool name="feature_default_auth_provider_request_new_code">false</bool>
+  <string name="feature_default_auth_provider_request_new_code_uri"></string>
+
+  <!-- clever authentication provider -->
+  <bool name="feature_auth_provider_clever">false</bool>
+  <string name="feature_auth_provider_clever_name"></string>
+  <string name="feature_auth_provider_clever_uri"> </string>
+
+  <!-- The initial catalog loans URI that will be used to sync accounts -->
+  <string name="feature_catalog_loans_uri_component">loans/</string>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+  <style name="GdlTheme" parent="android:Theme.Holo.Light">
+    <item name="android:activatedBackgroundIndicator">@drawable/drawer_list_selector</item>
+    <item name="android:icon">@drawable/ic_menu</item>
+    <item name="button_foreground">@color/gdl_primary</item>
+    <item name="list_item_foreground">@color/gdl_primary</item>
+    <item name="downloading_background">@color/gdl_primary</item>
+    <item name="notification_background">@color/gdl_primary</item>
+    <item name="main_color">@color/gdl_primary</item>
+  </style>
+
+</resources>

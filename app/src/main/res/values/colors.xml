@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Primary colors-->
+    <color name="gdl_primary">#20588F</color>
+    <color name="gdl_secondary">#507AA4</color>
+    <color name="gdl_tertiary">#A5BCD3</color>
+
+    <color name="gdl_light">#CEDDEA</color>
+    <color name="gdl_highlight">#EDF7FF</color>
+    <color name="gdl_dark">#184673</color>
+
+    <!--Support colors-->
+    <color name="red_primary">#FE5F55</color>
+    <color name="red_secondary">#FFA29A</color>
+    <color name="red_light">#FFD4D1</color>
+    <color name="red_dark">#DA3D34</color>
+
+    <color name="link">#1566B6</color>
+
+    <color name="green_primary">#5CBC80</color>
+    <color name="green_secondary">#85CC9F</color>
+    <color name="green_light">#C0E7CF</color>
+    <color name="green_highlight">#EDFFF4</color>
+    <color name="green_dark">#5CBC80</color>
+
+    <color name="yellow_primary">#EAD854</color>
+
+    <!--Grays-->
+    <color name="dark_text">#444444</color>
+    <color name="white">#FFFFFF</color>
+
+    <color name="gray_steel">#666666</color>
+    <color name="gray_jumbo">#888888</color>
+    <color name="silver_sand">#BBBBBB</color>
+    <color name="gray_platinum">#E3E3E3</color>
+    <color name="gray_gallery">#EFF0F2</color>
+    <color name="gray_desert_storm">#F8F8F8</color>
+
+    <!--Gradients-->
+    <color name="gradient_1_start">#20588F</color>
+    <color name="gradient_1_end">#4884BE</color>
+    <color name="gradient_2_start">#58BD7E</color>
+    <color name="gradient_3_end">#309356</color>
+    <color name="gradient_4_start">#004B91</color>
+    <color name="gradient_4_end">#5ABC7F</color>
+
+    <color name="wrong_to_be_changed">#EFF0F2</color>
+    <color name="wrong_to_be_changed2">#8b551a</color>
+
+    <color name="divider">#eee</color>
+
+    <!--Navigation drawer-->
+    <color name="navigation_drawer_background">#444444</color>
+    <color name="navigation_drawer_item_background">#575757</color>
+    <color name="navigation_drawer_item_background_pressed">#7C7C7C</color>
+    <color name="navigation_drawer_text">#FFFFFF</color>
+</resources>

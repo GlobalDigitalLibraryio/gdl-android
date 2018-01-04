@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Global Digital Library</string>
+    <string name="app_short_name">GDL</string>
+
+    <!-- Action/Navigation Strings -->
+    <string name="nav_confirm">Confirm</string>
+    <string name="nav_done">Done</string>
+    <string name="nav_next">Next</string>
+
+    <!-- EULA strings -->
+    <string name="eula_disagree">Disagree</string>
+    <string name="eula_agree">Agree</string>
+    <string name="eula_checkbox">I agree to the terms of the End User License Agreement.</string>
+
+    <!-- Age Verification strings -->
+    <string name="age_verification_title">Age Verification</string>
+    <string name="age_verification_question">You must be 13 years of age or older to download a book from the collection.\nHow old are you?</string>
+    <string name="age_verification_changed">If you are under 13, all content downloaded to My Books will be removed.\nHow old are you?</string>
+    <string name="age_verification_13_older">13 or Older</string>
+    <string name="age_verification_13_younger">Under 13</string>
+    <string name="age_verification_13_checkbox">I am 13 years of age or older.</string>
+    <string name="age_verification_too_young">You are not old enough to sign up for a library card.</string>
+
+    <!-- Books strings -->
+    <string name="books">My Books</string>
+    <string name="books_sync">Sync Account</string>
+    <string name="books_sort_by">Sort By</string>
+    <string name="books_sort_by_author">Author</string>
+    <string name="books_sort_by_title">Title</string>
+
+    <!-- Holds strings -->
+    <string name="holds">Reservations</string>
+    <string name="holds_empty">When you reserve a book from the catalog it will show up here. Look here from time to time to see if your book is available to download.</string>
+
+    <!-- Catalog strings -->
+    <string name="catalog">Catalog</string>
+    <string name="catalog_book_detail">Details</string>
+    <string name="catalog_load_error_title">Error</string>
+    <string name="catalog_load_error_text">An error occurred while loading the catalog. Please try again.</string>
+    <string name="catalog_load_not_connected">You are not connected to the internet. Please connect and try again.</string>
+    <string name="catalog_book_revoke_loan_confirm">Are you sure you want to return this book?</string>
+    <string name="catalog_book_revoke_hold_confirm">Are you sure you want to remove this reservation?</string>
+    <string name="catalog_book_delete_confirm">Are you sure you want to delete this book?</string>
+    <string name="catalog_cancel_downloading">Cancel</string>
+    <string name="catalog_categories">Categories</string>
+    <string name="catalog_detail_related">Related Books</string>
+    <string name="catalog_revoke_failed">The operation could not be completed.</string>
+    <string name="catalog_download_failed">The download could not be completed.</string>
+    <string name="catalog_download_failed_too_many_activations">The download could not be completed. Adobe device activations reached.</string>
+    <string name="catalog_download_failed_account_not_active">This device has not been activated. Go to account settings to activate.</string>
+    <string name="catalog_download_failed_loan_limit_reached">Book loan limit reached.</string>
+    <string name="catalog_download_failed_unsupported_pdf">This book is an Adobe PDF, which is not supported.</string>
+    <string name="catalog_download_failed_unsupported_unknown">This book is of an unknown type and is not supported.</string>
+    <string name="catalog_download_failed_unsupported_passhash">Passhash protected books are not supported.</string>
+    <string name="catalog_downloading">Downloading</string>
+    <string name="catalog_empty_feed">No results found.</string>
+    <string name="catalog_empty_my_books">Visit the Catalog to\nadd books to My Library.</string>
+    <string name="catalog_meta_corrupt">The metadata for this book is damaged! Please sync your account to fix it.</string>
+    <string name="catalog_meta_corrupt_title">Metadata damaged</string>
+    <string name="catalog_publication_date">Published</string>
+    <string name="catalog_publisher">Publisher</string>
+    <string name="catalog_refresh">Refresh Feed</string>
+    <string name="catalog_search">Search</string>
+    <string name="catalog_unknown_feed">Unknown</string>
+    <string name="catalog_more_feed">More</string>
+    <string name="catalog_requesting_loan">Requesting</string>
+    <string name="catalog_requesting_revoke">Requesting</string>
+
+    <string name="book_license">License</string>
+    <string name="book_authors">Authors</string>
+    <string name="book_level">Level %1$d</string>
+    <string name="book_published">Published</string>
+    <string name="book_publisher">Published by %1$s</string>
+
+    <!-- Catalog book detail strings -->
+    <string name="catalog_book_borrow">Get</string>
+    <string name="catalog_book_reserve">Reserve</string>
+    <string name="catalog_book_read">Read</string>
+    <string name="catalog_book_error_dismiss">Dismiss</string>
+    <string name="catalog_book_error_retry">Retry</string>
+    <string name="catalog_book_sync">Sync</string>
+    <string name="catalog_book_download">Download</string>
+    <string name="catalog_book_delete">Delete</string>
+    <string name="catalog_book_delete_cancel">Cancel</string>
+    <string name="catalog_book_revoke_loan">Return Now</string>
+    <string name="catalog_book_revoke_hold">Remove</string>
+    <string name="catalog_book_report">Report Issue</string>
+    <string name="catalog_book_distribution">Distributed by: %s</string>
+    <string name="catalog_book_revoke_cancel">Cancel</string>
+
+    <string name="catalog_book_availability_loaned_indefinite">You have this book on loan.</string>
+    <string name="catalog_book_availability_loaned_timed">You have this book on loan for %s.</string>
+    <string name="catalog_book_availability_open_access">This book is yours to keep.</string>
+    <string name="catalog_book_availability_held_indefinite">You have this book on hold.</string>
+    <string name="catalog_book_availability_held_timed">You will be able to borrow this book in %s.</string>
+    <string name="catalog_book_availability_held_queue">You are at position %d in the queue for this book.</string>
+    <string name="catalog_book_availability_reserved_timed">Your reservation expires in %s.</string>
+    <string name="catalog_book_availability_reserved_indefinite">You have this book reserved.</string>
+    <string name="catalog_book_availability_loanable">This book is available for loan.</string>
+    <string name="catalog_book_availability_holdable">All copies of this book are currently on loan.</string>
+    <string name="catalog_book_availability_revoked">This book is waiting to be returned.</string>
+    <string name="catalog_book_interval_days">days</string>
+    <string name="catalog_book_interval_hours">hours</string>
+    <string name="catalog_book_interval_sub_hour">less than an hour</string>
+    <string name="catalog_book_interval_years_short">y</string>
+    <string name="catalog_book_interval_months_short">m</string>
+    <string name="catalog_book_interval_weeks_short">w</string>
+    <string name="catalog_book_interval_days_short">d</string>
+    <string name="catalog_book_interval_hours_short">h</string>
+
+    <string name="catalog_book_summary_publisher">Book Publisher</string>
+
+    <!-- Catalog book report strings -->
+    <string name="catalog_book_report_wrong_genre">Wrong Genre</string>
+    <string name="catalog_book_report_wrong_audience">Wrong Audience</string>
+    <string name="catalog_book_report_wrong_age_range">Wrong Age Range</string>
+    <string name="catalog_book_report_wrong_title">Wrong Title</string>
+    <string name="catalog_book_report_wrong_medium">Wrong Medium</string>
+    <string name="catalog_book_report_wrong_author">Wrong Author</string>
+    <string name="catalog_book_report_wrong_cover_image">Wrong/Missing Cover Image</string>
+    <string name="catalog_book_report_wrong_description">Wrong/Mismatched Description</string>
+    <string name="catalog_book_report_cant_download">Can\'t Download</string>
+    <string name="catalog_book_report_cant_borrow">Can\'t Borrow</string>
+    <string name="catalog_book_report_incorrect_contents">Book Contents Blank or Incorrect</string>
+
+    <string name="catalog_book_report_cancel">Cancel</string>
+    <string name="catalog_book_report_submit">Submit</string>
+
+    <!-- Help strings -->
+    <string name="help">Frequently Asked Questions</string>
+
+    <!-- Library Signup Strings -->
+    <string name="library_signup_title">Sign Up for a Library Card</string>
+
+    <!-- Location Strings -->
+    <string name="location_no_valid_address">No valid address found</string>
+
+    <!-- Settings strings -->
+    <string name="settings">Settings</string>
+    <string name="settings_login_title">Library Card</string>
+    <string name="settings_barcode">Barcode</string>
+    <string name="settings_pin">PIN</string>
+    <string name="settings_name">Name</string>
+    <string name="settings_screen_Lock_not_setup">"Secure lock screen hasn't been set up. Go to 'Settings -> Security -> Screenlock' to set up a lock screen"</string>
+    <string name="settings_log_in_cancel">Cancel</string>
+    <string name="settings_log_in">Log In</string>
+    <string name="settings_log_out">Log Out</string>
+    <string name="settings_authentication_title">Authentication</string>
+    <string name="settings_device_title">Device</string>
+    <string name="settings_activate_this_device">Activate this Device</string>
+    <string name="settings_deactivate_this_device">Deactivate this Device</string>
+    <string name="settings_log_out_cancel">Cancel</string>
+    <string name="settings_login_succeeded">Logged in successfully</string>
+    <string name="settings_logout_succeeded">Logged out successfully</string>
+    <string name="settings_login_failed">Login Failed</string>
+    <string name="settings_login_failed_credentials">Your barcode and pin combination was not valid. Please try again.</string>
+    <string name="settings_login_failed_server">An unknown error occurred. Please check your connection or try again later.</string>
+    <string name="settings_logout_failed_server">An unknown error occurred. Please check your connection or try again later.</string>
+    <string name="settings_login_failed_device">An error occurred when activating your device. Please check your connection or try again later.</string>
+    <string name="settings_login_failed_adobe_device_limit">Too many devices have been registered on this account. Please contact Adobe support for assistance.</string>
+    <string name="settings_login_failed_adobe_device_bad_clock">An error occurred when activating your device. Please check that your device clock is set to the correct time.</string>
+    <string name="settings_logout_failed">Logout Failed</string>
+    <string name="settings_feedback">Feedback</string>
+    <string name="settings_about">About GDL</string>
+    <string name="settings_account">Account</string>
+    <string name="settings_accounts">Accounts</string>
+    <string name="settings_manage_accounts">Manage Accounts</string>
+    <string name="settings_credits">Acknowledgements</string>
+    <string name="settings_eula">User Agreement</string>
+    <string name="settings_report_issue">Report an Issue</string>
+    <string name="settings_privacy">Privacy Policy</string>
+    <string name="settings_licences">Licenses</string>
+    <string name="settings_licence_software">Software License</string>
+    <string name="settings_licence_content">Content License</string>
+    <string name="settings_logout_confirm">If you sign out of your account, all content will be removed from this device.</string>
+    <string name="settings_adobe_accounts">Adobe Accounts</string>
+    <string name="settings_alt_uris">Alternate URIs</string>
+    <string name="settings_reveal_password">Show PIN</string>
+
+    <string name="login_needed">You need to login to access the collection.</string>
+    <string name="login_with_barcode">Login with Barcode</string>
+    <string name="login_with_clever">Login with Clever</string>
+    <string name="request_new_codes">Request New Code</string>
+
+    <string name="navigation_accessibility">Navigation</string>
+    <string name="navigation_accessibility_drawer_show">Show navigation drawer. button.</string>
+    <string name="navigation_accessibility_drawer_hide">Hide navigation drawer. button.</string>
+
+    <!-- Accessibility strings used for content descriptions (Settings) -->
+    <string name="settings_accessibility_log_in_cancel">Cancel login</string>
+    <string name="settings_accessibility_log_in">Log in</string>
+    <string name="settings_accessibility_log_out_cancel">Cancel logout</string>
+    <string name="settings_accessibility_log_out">Log out</string>
+
+    <string name="catalog_accessibility_book_borrow">Get Button</string>
+    <string name="catalog_accessibility_book_reserve">Reserve Button</string>
+    <string name="catalog_accessibility_book_read">Read Button</string>
+    <string name="catalog_accessibility_book_error_dismiss">Dismiss Button</string>
+    <string name="catalog_accessibility_book_error_retry">Retry Button</string>
+    <string name="catalog_accessibility_book_sync">Sync Button</string>
+    <string name="catalog_accessibility_book_download">Download Button</string>
+    <string name="catalog_accessibility_book_delete">Delete Button</string>
+    <string name="catalog_accessibility_book_revoke_loan">Return Now Button</string>
+    <string name="catalog_accessibility_book_revoke_hold">Remove Button</string>
+    <string name="catalog_accessibility_book_revoke_loan_cancel">Cancel Return Now</string>
+    <string name="catalog_accessibility_book_revoke_hold_cancel">Cancel Remove</string>
+    <string name="catalog_accessibility_header_show_more">show more in %1$s</string>
+
+    <!-- Reader strings -->
+    <string name="reader">Reader</string>
+    <string name="reader_toc">Table Of Contents</string>
+
+    <!-- Accessibility strings used for content descriptions (Reader) -->
+    <string name="reader_accessibility_toc">Show table of contents</string>
+    <string name="reader_accessibility_toc_back">Close the table of contents without selecting an item</string>
+    <string name="reader_accessibility_settings">Show reader settings</string>
+    <string name="reader_accessibility_close">Close the book</string>
+    <string name="reader_accessibility_media_previous">Go to previous media item</string>
+    <string name="reader_accessibility_media_next">Go to next media item</string>
+    <string name="reader_accessibility_media_play">Play or pause current media item</string>
+
+
+    <string name="reader_accessibility_settings_sans_font">Sans font</string>
+    <string name="reader_accessibility_settings_serif_font">Serif font</string>
+    <string name="reader_accessibility_settings_open_dyslexic_font">Open dyslexic font</string>
+    <string name="reader_accessibility_settings_white_on_black_text">White on black text</string>
+    <string name="reader_accessibility_settings_black_on_sepia_text">Black on sepia text</string>
+    <string name="reader_accessibility_settings_black_on_white_text">Black on white text</string>
+    <string name="reader_accessibility_settings_decrease_font_size">Decrease font size</string>
+    <string name="reader_accessibility_settings_increase_font_size">Increase font size</string>
+    <string name="reader_accessibility_settings_brightness_slider">Brightness slider</string>
+    <string name="reader_accessibility_settings_close">Close reader settings</string>
+    <string name="reader_settings_close">Close</string>
+
+    <!-- Welcome Strings -->
+    <string name="welcome_library_header">Read E-Books from Your Library</string>
+    <string name="welcome_library_subtext">Simply browse, borrow, and read free e-books from your local library.</string>
+    <string name="welcome_library_button">Find Your Library</string>
+    <string name="welcome_instant_header">SimplyE Collection</string>
+    <string name="welcome_instant_subtext">E-books free to download and read without a library card.</string>
+    <string name="welcome_instant_button">Read Now</string>
+
+    <string name="need_card_question">Don\'t have a library card?</string>
+    <string name="need_card_button">Sign Up</string>
+    <string name="need_card_create">Create Card</string>
+
+
+    <string name="language">Language</string>
+    <string name="drawer_open">Open the navigation drawer</string>
+    <string name="drawer_close">Close the navigation drawer</string>
+    <string name="nav_catalog">Catalog</string>
+    <string name="nav_my_library">My Library</string>
+    <string name="nav_about_gdl">About GDL</string>
+    <string name="nav_menu_title">Menu</string>
+    <string name="nav_language_header">Language</string>
+    <string name="nav_current_language">Books in %1$s</string>
+    <string name="language_header">Language</string>
+    <string name="error_fetching_languages">Error fetching languages</string>
+
+
+</resources>

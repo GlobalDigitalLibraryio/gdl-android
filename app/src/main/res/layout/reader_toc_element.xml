@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!--Most of this is set in code-->
+    <TextView
+        android:id="@+id/reader_toc_element_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:text="Text"
+        android:textColor="@color/dark_text"
+        android:textSize="14sp" />
+
+</RelativeLayout>

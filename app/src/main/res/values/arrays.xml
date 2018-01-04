@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="navigation_choices">
+        <item>Catalog</item>
+        <item>My Library</item>
+        <item>About GDL</item>
+    </string-array>
+</resources>

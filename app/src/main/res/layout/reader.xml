@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Note: The views in a FrameLayout are rendered in declaration order, so this 
+  fact is used to render UI controls over the top of a web view. -->
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+  <!-- The main web view container, rendered at the lowest layer -->
+
+  <RelativeLayout
+      android:id="@+id/reader_webview_container"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">
+
+    <WebView
+        android:id="@+id/reader_webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="50dp"
+        android:layout_marginTop="56dp"/>
+
+  </RelativeLayout>
+
+  <!-- The showable/hideable HUD controls -->
+
+  <RelativeLayout
+      android:id="@+id/reader_hud_container"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp">
+
+      <RelativeLayout
+          android:id="@+id/reader_hud_controls"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/reader_title_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/reader_settings"
+            android:ellipsize="end"
+            android:gravity="start"
+            android:maxLines="1"
+            android:layout_marginStart="10dp"
+            android:text="@string/placeholder_long_title"
+            android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+        <ImageView
+            android:id="@+id/reader_toc"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="15dp"
+            android:contentDescription="@string/reader_accessibility_toc"
+            android:src="@drawable/ic_format_list_numbered_dark_24dp"/>
+
+        <ImageView
+            android:id="@+id/reader_settings"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp"
+            android:layout_toStartOf="@id/reader_toc"
+            android:contentDescription="@string/reader_accessibility_settings"
+            android:src="@drawable/ic_font_download_dark_24dp"/>
+      </RelativeLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/reader_settings_container"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="center"
+        android:layout_marginEnd="31dp"
+        android:layout_marginTop="34dp"
+        android:orientation="vertical"
+        android:padding="5dp"
+        android:clipToPadding="false"
+        android:visibility="gone">
+
+      <View
+          android:id="@+id/rectangle"
+          android:layout_width="20dp"
+          android:layout_height="10dp"
+          android:layout_gravity="end"
+          android:layout_marginEnd="20dp"
+          android:padding="10dp"
+          android:clipToPadding="false"
+          android:elevation="2dp"
+          android:translationZ="2dp"
+          android:background="@drawable/triangle"/>
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:elevation="2dp"
+          android:translationZ="2dp"
+          android:background="@drawable/rounded_square"
+          android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal">
+
+          <TextView
+              android:id="@+id/reader_settings_text_smaller"
+              android:layout_width="0dp"
+              android:layout_height="match_parent"
+              android:layout_weight="1"
+              android:contentDescription="@string/reader_accessibility_settings_decrease_font_size"
+              android:gravity="center"
+              android:text="A"
+              android:textSize="12sp"/>
+
+          <FrameLayout
+              android:layout_width="1dp"
+              android:layout_height="match_parent"
+              android:background="#eee"/>
+
+          <TextView
+              android:id="@+id/reader_settings_text_larger"
+              android:layout_width="0dp"
+              android:layout_height="match_parent"
+              android:layout_weight="1"
+              android:contentDescription="@string/reader_accessibility_settings_increase_font_size"
+              android:gravity="center"
+              android:text="A"
+              android:textSize="24sp"/>
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#eee"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal">
+
+          <TextView
+              android:id="@+id/reader_settings_black_on_white"
+              android:layout_width="0dp"
+              android:layout_height="match_parent"
+              android:layout_weight="1"
+              android:contentDescription="@string/reader_accessibility_settings_black_on_white_text"
+              android:gravity="center"
+              android:text="A a"
+              android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+          <FrameLayout
+              android:layout_width="1dp"
+              android:layout_height="48dp"
+              android:background="#eee"/>
+
+          <TextView
+              android:id="@+id/reader_settings_black_on_beige"
+              android:layout_width="0dp"
+              android:layout_height="match_parent"
+              android:layout_weight="1"
+              android:contentDescription="@string/reader_accessibility_settings_black_on_sepia_text"
+              android:gravity="center"
+              android:text="A a"
+              android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+          <FrameLayout
+              android:layout_width="1dp"
+              android:layout_height="48dp"
+              android:background="#eee"/>
+
+          <TextView
+              android:id="@+id/reader_settings_white_on_black"
+              android:layout_width="0dp"
+              android:layout_height="match_parent"
+              android:layout_weight="1"
+              android:contentDescription="@string/reader_accessibility_settings_white_on_black_text"
+              android:gravity="center"
+              android:text="A a"
+              android:textAppearance="?android:attr/textAppearanceLarge"/>
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#eee"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+          <ImageView
+              android:layout_width="16dp"
+              android:layout_height="16dp"
+              android:layout_gravity="center_vertical"
+              android:src="@drawable/brightness_8x"/>
+
+          <SeekBar
+              android:id="@+id/reader_settings_brightness"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_gravity="center_vertical"
+              android:layout_marginLeft="8dp"
+              android:layout_marginRight="8dp"
+              android:layout_weight="1"
+              android:contentDescription="@string/reader_accessibility_settings_brightness_slider"
+              android:max="100"
+              android:maxHeight="2dp"
+              android:progressDrawable="@drawable/simplified_progress"
+              android:thumb="@drawable/simplified_progress_thumb"
+              />
+
+          <ImageView
+              android:layout_width="24dp"
+              android:layout_height="24dp"
+              android:layout_gravity="center_vertical"
+              android:src="@drawable/brightness_8x"/>
+
+        </LinearLayout>
+
+      </LinearLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/reader_progress"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true">
+
+      <TextView
+          android:id="@+id/reader_position_text"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_alignParentBottom="true"
+          android:layout_centerHorizontal="true"
+          android:layout_marginBottom="8dp"
+          android:text=""
+          android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+      <ProgressBar
+          android:id="@+id/reader_position_progress"
+          style="?android:attr/progressBarStyleHorizontal"
+          android:layout_width="match_parent"
+          android:layout_height="4dp"
+          android:layout_above="@id/reader_position_text"
+          android:layout_centerHorizontal="true"
+          android:layout_marginBottom="8dp"
+          android:layout_marginEnd="16dp"
+          android:layout_marginStart="16dp"
+          android:progressDrawable="@drawable/simplified_progress"/>
+    </RelativeLayout>
+  </RelativeLayout>
+
+  <!-- The initial loading progress bar -->
+
+  <RelativeLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">
+
+    <ProgressBar
+        android:id="@+id/reader_loading"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"/>
+
+  </RelativeLayout>
+
+</FrameLayout>

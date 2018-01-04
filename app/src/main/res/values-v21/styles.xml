@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <style name="GdlTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:colorPrimary">@color/gdl_primary</item>
+        <item name="android:colorPrimaryDark">@color/gdl_dark</item>
+        <item name="android:colorAccent">@color/gdl_primary</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorSecondary">@color/white</item>
+        <item name="android:colorControlNormal">@color/white</item>
+        <item name="android:actionBarTheme">@style/GdlTheme.ActionBarTheme</item>
+        <item name="android:actionBarStyle">@style/GdlTheme.ActionBarStyle</item>
+    </style>
+
+    <style name="GdlTheme.ActionBarTheme" parent="@style/ThemeOverlay.AppCompat.ActionBar">
+        <item name="android:colorControlNormal">@color/white</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="GdlTheme.ActionBarStyle" parent="@style/Widget.AppCompat.Light.ActionBar">
+        <item name="elevation">4dp</item>
+        <!-- style for actionBar title -->
+        <item name="titleTextStyle">@style/GdlTheme.ActionBarTitleText</item>
+        <!-- style for actionBar subtitle -->
+        <item name="subtitleTextStyle">@style/GdlTheme.ActionBarTitleText</item>
+    </style>
+
+    <style name="GdlTheme.ActionBarTitleText">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:typeface">sans</item>
+    </style>
+
+    <style name="NavigationDrawerText" parent="@android:style/Theme.Translucent.NoTitleBar">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorSecondary">@color/white</item>
+    </style>
+
+    <style name="NavigationDrawerSubtitleText" parent="@android:style/Theme.Translucent.NoTitleBar">
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorSecondary">@color/white</item>
+    </style>
+    <style name="Theme.AppCompat.Translucent" parent="GdlTheme">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+</resources>

@@ -1,0 +1,68 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="io.digitallibrary.reader">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <uses-feature android:name="android.hardware.location.gps" />
+
+    <application
+        android:name="io.digitallibrary.reader.Gdl"
+        android:allowBackup="true"
+        android:contentDescription="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:theme="@style/GdlTheme">
+
+        <!-- Main entry point for the application. -->
+        <activity
+            android:name="io.digitallibrary.reader.MainSplashActivity"
+            android:configChanges="orientation|screenSize"
+            android:contentDescription="@string/app_name"
+            android:label="@string/app_short_name"
+            android:theme="@style/GdlTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Main application parts -->
+        <activity
+            android:name="io.digitallibrary.reader.GdlActivity"
+            android:configChanges="orientation|screenSize"
+            android:contentDescription="@string/catalog"
+            android:label="@string/catalog" />
+
+        <activity
+            android:name="io.digitallibrary.reader.SelectLanguageActivity"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/Theme.AppCompat.Translucent" />
+
+        <activity
+            android:name="io.digitallibrary.reader.reader.ReaderActivity"
+            android:configChanges="orientation|screenSize"
+            android:contentDescription="@string/reader"
+            android:label="@string/reader"
+            android:theme="@style/GdlTheme" />
+        <activity
+            android:name="io.digitallibrary.reader.reader.ReaderSettingsActivity"
+            android:configChanges="orientation|screenSize"
+            android:contentDescription="@string/reader_accessibility_settings"
+            android:label="@string/reader_accessibility_settings"
+            android:theme="@style/Theme.AppCompat.Translucent" />
+        <activity
+            android:name="io.digitallibrary.reader.reader.ReaderTOCActivity"
+            android:configChanges="orientation|screenSize"
+            android:contentDescription="@string/reader_toc"
+            android:label="@string/reader_toc"
+            android:theme="@style/Theme.AppCompat.Translucent" />
+
+    </application>
+
+</manifest>
