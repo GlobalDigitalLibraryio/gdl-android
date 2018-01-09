@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/catalog_group_lane_background">
+
+    <RelativeLayout
+        android:id="@+id/feed_header"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:background="#EFF0F2">
+
+        <TextView
+            android:id="@+id/feed_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="15dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingTop="5dp"
+            android:text="@string/catalog_unknown_feed"
+            android:textAllCaps="true"
+            android:textColor="@color/dark_text"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/feed_more"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="15dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingTop="5dp"
+            android:text="@string/catalog_more_feed"
+            android:textAllCaps="true"
+            android:textColor="@color/gdl_primary"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/catalog_category_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:layout_below="@id/feed_header"
+        android:clipToPadding="false"
+        android:orientation="horizontal"
+        android:paddingEnd="5dp"
+        android:paddingStart="5dp"
+        android:scrollbars="none"
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/catalog_category_recyclerview"
+        android:background="#E3E3E3" />
+
+</RelativeLayout>
+

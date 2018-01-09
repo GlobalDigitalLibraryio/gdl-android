@@ -11,7 +11,7 @@
     <uses-feature android:name="android.hardware.location.gps" />
 
     <application
-        android:name="io.digitallibrary.reader.Gdl"
+        android:name=".Gdl"
         android:allowBackup="true"
         android:contentDescription="@string/app_name"
         android:icon="@mipmap/ic_launcher"
@@ -21,11 +21,11 @@
 
         <!-- Main entry point for the application. -->
         <activity
-            android:name="io.digitallibrary.reader.MainSplashActivity"
+            android:name=".SplashActivity"
             android:configChanges="orientation|screenSize"
             android:contentDescription="@string/app_name"
             android:label="@string/app_short_name"
-            android:theme="@style/GdlTheme">
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -34,35 +34,48 @@
 
         <!-- Main application parts -->
         <activity
-            android:name="io.digitallibrary.reader.GdlActivity"
+            android:name=".GdlActivity"
             android:configChanges="orientation|screenSize"
             android:contentDescription="@string/catalog"
-            android:label="@string/catalog" />
+            android:label="@string/catalog"
+            android:theme="@style/GdlTheme" />
 
         <activity
-            android:name="io.digitallibrary.reader.SelectLanguageActivity"
+            android:name=".SelectLanguageActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/Theme.AppCompat.Translucent" />
 
         <activity
-            android:name="io.digitallibrary.reader.reader.ReaderActivity"
+            android:name=".reader.ReaderActivity"
             android:configChanges="orientation|screenSize"
             android:contentDescription="@string/reader"
             android:label="@string/reader"
             android:theme="@style/GdlTheme" />
         <activity
-            android:name="io.digitallibrary.reader.reader.ReaderSettingsActivity"
+            android:name=".reader.ReaderSettingsActivity"
             android:configChanges="orientation|screenSize"
             android:contentDescription="@string/reader_accessibility_settings"
             android:label="@string/reader_accessibility_settings"
             android:theme="@style/Theme.AppCompat.Translucent" />
         <activity
-            android:name="io.digitallibrary.reader.reader.ReaderTOCActivity"
+            android:name=".reader.ReaderTOCActivity"
             android:configChanges="orientation|screenSize"
             android:contentDescription="@string/reader_toc"
             android:label="@string/reader_toc"
             android:theme="@style/Theme.AppCompat.Translucent" />
 
-    </application>
+        <activity
+            android:name=".catalog.CatalogCategoryActivity"
+            android:configChanges="orientation|screenSize"
+            android:contentDescription="@string/catalog"
+            android:label="@string/catalog"
+            android:theme="@style/GdlTheme" />
+        <activity
+            android:name=".catalog.BookDetailsActivity"
+            android:configChanges="orientation|screenSize"
+            android:contentDescription="@string/catalog"
+            android:label="@string/catalog"
+            android:theme="@style/GdlTheme" />
 
+    </application>
 </manifest>

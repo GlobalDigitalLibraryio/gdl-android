@@ -1,25 +1,24 @@
 package io.digitallibrary.reader.catalog
 
+import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.*
-import java.time.OffsetDateTime
 
-@Entity(tableName = "books",
-        foreignKeys = [(ForeignKey(entity = Category::class, parentColumns = arrayOf("id"), childColumns = arrayOf("category_id")))],
-        indices= [(Index(value = ["category_id"], name = "category_id_index", unique = true))])
+@Entity(tableName = "books")
 data class Book(
-    @PrimaryKey
-    var dbid: Long? = null,
-    var id: String = "",
-    var title: String = "",
-    var downloaded: Boolean = false,
-    var readingLevel: Int? = null,
-    var license: String = "",
-    var author: String = "",
-    var publisher: String = "",
-    var readingPosition: String = "",
-    var cover: String = "",
-    @ColumnInfo(name = "category_id")
-    var categoryId: Long? = null
+        @PrimaryKey
+        var dbid: Long? = null,
+        var id: String = "",
+        var title: String? = null,
+        var downloaded: Boolean = false,
+        var readingLevel: Int? = null,
+        var license: String? = null,
+        var author: String? = null,
+        var publisher: String? = null,
+        var readingPosition: String? = null,
+        var cover: String? = null,
+        var description: String? = null,
+        @ColumnInfo(name = "category_id")
+        var categoryId: String? = null
 )
 
 @Dao
@@ -33,20 +32,29 @@ interface BookDao {
     @Delete
     fun delete(book: Book)
 
+    @Query("DELETE FROM books")
+    fun deleteAll()
+
     @Query("SELECT * FROM books")
     fun getAllBooks(): List<Book>
+
+    @Query("SELECT * FROM books WHERE category_id = :arg0")
+    fun getBooks(categoryId: String): LiveData<List<Book>>
+
+    @Query("SELECT * FROM books WHERE id = :arg0")
+    fun getBook(bookId: String): Book
 }
 
 
-@Entity(tableName = "categories", indices= [(Index(value = ["id"], name = "id_index", unique = true))])
+@Entity(tableName = "categories")
 data class Category(
     @PrimaryKey
     var dbid: Long? = null,
     var id: String = "",
-    var title: String = "",
-    var link: String = "",
-    var updated: String = "",
-    var description: String = ""
+    var title: String? = "",
+    var link: String? = "",
+    var updated: String? = "",
+    var description: String? = ""
 )
 
 @Dao
@@ -60,8 +68,14 @@ interface CategoryDao {
     @Delete
     fun delete(category: Category)
 
+    @Query("DELETE FROM categories")
+    fun deleteAll()
+
     @Query("SELECT * FROM categories")
-    fun getAllCategories(): List<Category>
+    fun getAllCategories(): LiveData<List<Category>>
+
+    @Query("SELECT * FROM categories WHERE id = :arg0")
+    fun getCategory(categoryId: String): Category
 }
 
 @Database(entities = arrayOf(Category::class, Book::class), version = 1)

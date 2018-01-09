@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 1,
-    "identityHash": "9314b42d78b04238771fad2e6d9ee997",
+    "version": 2,
+    "identityHash": "6a12c2417cac200590df86ccb6c8d22d",
     "entities": [
       {
         "tableName": "categories",
@@ -56,7 +56,7 @@
       },
       {
         "tableName": "books",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dbid` INTEGER, `id` TEXT NOT NULL, `title` TEXT, `downloaded` INTEGER NOT NULL, `readingLevel` INTEGER, `license` TEXT, `author` TEXT, `publisher` TEXT, `readingPosition` TEXT, `cover` TEXT, `description` TEXT, `category_id` TEXT, PRIMARY KEY(`dbid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dbid` INTEGER, `id` TEXT NOT NULL, `title` TEXT, `downloaded` INTEGER NOT NULL, `readingLevel` TEXT, `license` TEXT, `author` TEXT, `publisher` TEXT, `readingPosition` TEXT, `cover` TEXT, `category_id` TEXT, PRIMARY KEY(`dbid`))",
         "fields": [
           {
             "fieldPath": "dbid",
@@ -85,7 +85,7 @@
           {
             "fieldPath": "readingLevel",
             "columnName": "readingLevel",
-            "affinity": "INTEGER",
+            "affinity": "TEXT",
             "notNull": false
           },
           {
@@ -119,12 +119,6 @@
             "notNull": false
           },
           {
-            "fieldPath": "description",
-            "columnName": "description",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
             "fieldPath": "categoryId",
             "columnName": "category_id",
             "affinity": "TEXT",
@@ -143,7 +137,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"9314b42d78b04238771fad2e6d9ee997\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"6a12c2417cac200590df86ccb6c8d22d\")"
     ]
   }
 }

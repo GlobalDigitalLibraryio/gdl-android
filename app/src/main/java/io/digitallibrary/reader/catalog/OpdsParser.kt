@@ -1,7 +1,7 @@
 package io.digitallibrary.reader.catalog
 
-import android.util.Log
 import com.ethlo.time.FastInternetDateTimeUtil
+import io.digitallibrary.reader.Gdl
 import kotlinx.coroutines.experimental.launch
 import org.simpleframework.xml.*
 import org.simpleframework.xml.convert.AnnotationStrategy
@@ -21,12 +21,17 @@ import retrofit2.http.Url
 import ru.gildor.coroutines.retrofit.await
 import java.time.OffsetDateTime
 
-val TAG = "KotCoRutTest"
+const val TAG = "KotCoRutTest"
+
+const val ACQUISITION_TYPE_STRING = "application/atom+xml;profile=opds-catalog;kind=acquisition"
+const val AQ_IMAGE_LINK_REL = "http://opds-spec.org/image"
+const val AQ_IMAGE_THUMB_REL = "http://opds-spec.org/image/thumbnail"
 
 class DateConverter : Converter<OffsetDateTime> {
     companion object {
         val itu: FastInternetDateTimeUtil = FastInternetDateTimeUtil()
     }
+
     override fun read(node: InputNode): OffsetDateTime {
         val dateAsString = node.value
         return itu.parse(dateAsString)
@@ -93,17 +98,17 @@ class Feed {
         @get:ElementList(required = false)
         var author: List<String>? = null
 
-        @Namespace(reference="http://purl.org/dc/terms/")
+        @Namespace(reference = "http://purl.org/dc/terms/")
         @set:Element(required = false)
         @get:Element(required = false)
         var license: String? = null
 
-        @Namespace(reference="http://purl.org/dc/terms/")
+        @Namespace(reference = "http://purl.org/dc/terms/")
         @set:Element(required = false)
         @get:Element(required = false)
         var publisher: String? = null
 
-        @Namespace(reference="http://purl.org/dc/terms/")
+        @Namespace(reference = "http://purl.org/dc/terms/")
         @set:Element(required = false)
         @get:Element(required = false)
         @set:Convert(DateConverter::class)
@@ -122,7 +127,7 @@ class Feed {
         @get:Convert(DateConverter::class)
         var published: OffsetDateTime? = null
 
-        @Namespace(reference="http://purl.org/dcx/lrmi-terms/")
+        @Namespace(reference = "http://purl.org/dcx/lrmi-terms/")
         @set:Element(required = false)
         @get:Element(required = false)
         var educationalAlignment: EducationalAlignment? = null
@@ -172,33 +177,57 @@ interface OpdsParser {
     }
 }
 
-suspend fun updateCategories(categories: List<Feed.Entry>) {
-
+fun updateCategories(categories: List<Feed.Entry>?): List<Category> {
+    val db = Gdl.getDatabase()
+    db.categoryDao().deleteAll()
+    val categoriesList = categories.orEmpty().map {
+        Category(
+                null,
+                it.id ?: "missing",
+                it.title,
+                it.links.orEmpty().firstOrNull { it.type.equals(ACQUISITION_TYPE_STRING) }?.href,
+                it.updated.toString(),
+                it.summary
+        )
+    }
+    categoriesList.forEach { db.categoryDao().insert(it) }
+    return categoriesList
 }
 
-fun fetchRoot() {
-    launch {
-        Log.i(TAG, "Starting ...")
-        val parser = OpdsParser.create()
-        val test = parser.getNavRoot("eng").await()
-        // Update categories
+fun saveBooks(category: Category, books: List<Feed.Entry>?) {
+    val db = Gdl.getDatabase()
+    books.orEmpty().map {
+        Book(
+                null,
+                it.id ?: "missing",
+                it.title,
+                false,
+                it.educationalAlignment?.targetName?.toInt(),
+                it.license,
+                it.author?.joinToString(),
+                it.publisher,
+                null,
+                it.links.orEmpty().firstOrNull { it.rel.equals(AQ_IMAGE_LINK_REL) }?.href,
+                it.summary,
+                category.id
+        )
+    }.forEach { db.bookDao().insert(it) }
+}
 
-        for (item in test.entries!!) {
-            for (link in item.links.orEmpty()) {
-                Log.i(TAG, "VVV Fetching from " + item.title)
-                launch {
-                    Log.i(TAG, "XXX Fetching from " + item.title)
-                    val aq = parser.getAcquisitionFeed(link.href).await()
-                    Log.i(TAG, "XXX Got result from " + item.title)
-                    for (e in aq.entries.orEmpty()) {
-                        launch {
-                            // save book
-                        }
-                    }
-                    Log.i(TAG, item.title + " done")
-                }
+fun fetchFeed() {
+    launch {
+        val parser = OpdsParser.create()
+        val nav = parser.getNavRoot("eng").await()
+
+        Gdl.getDatabase().bookDao().deleteAll()
+
+        val categories = updateCategories(nav.entries)
+
+        categories.forEach {
+            launch {
+                val aq = parser.getAcquisitionFeed(it.link).await()
+                saveBooks(it, aq.entries)
             }
         }
-        Log.i(TAG, "Done ...")
     }
 }

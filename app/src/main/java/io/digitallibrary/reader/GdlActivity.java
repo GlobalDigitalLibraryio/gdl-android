@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import io.digitallibrary.reader.catalog.CatalogFragment;
 import io.digitallibrary.reader.utilities.LanguageUtil;
 
 /**
@@ -145,8 +146,15 @@ public class GdlActivity extends AppCompatActivity implements FragmentManager.On
         }
     }
 
+    private boolean updated = false;
+
     private void updateFragment() {
-//        Fragment f;
+        if (!updated) {
+            Fragment f = new CatalogFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
+            updated = true;
+        }
+            //        Fragment f;
 //        if (currentMenuChoice == MenuChoices.CATALOG) {
 //            final GdlCatalogAppServicesType app = Gdl.getCatalogAppServices();
 //            final BooksType books = app.getBooks();
