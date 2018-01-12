@@ -2,7 +2,6 @@ package io.digitallibrary.reader.catalog
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +15,6 @@ class BooksAdapter(val providerContext : Context, val callback: CategoriesAdapte
     private var books: List<Book>? = null
 
     fun updateBooks(newBooksList: List<Book>) {
-        Log.i(TAG, "updateBooks: " + newBooksList.size)
         books = newBooksList
         notifyDataSetChanged()
     }
@@ -39,7 +37,7 @@ class BooksAdapter(val providerContext : Context, val callback: CategoriesAdapte
             itemView.cell_book_title.text = book.title
             itemView.setOnClickListener { callback.onBookClicked(book) }
             Glide.with(providerContext)
-                    .load(book.cover)
+                    .load(book.thumb)
                     .apply(RequestOptions().centerCrop().placeholder(R.drawable.book_image_placeholder))
                     .into(itemView.cell_cover_image)
         }

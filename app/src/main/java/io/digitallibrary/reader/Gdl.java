@@ -19,8 +19,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import io.digitallibrary.reader.catalog.Callback;
 import io.digitallibrary.reader.catalog.CatalogDatabase;
-import io.digitallibrary.reader.catalog.OpdsParserKt;
 import io.digitallibrary.reader.reader.ReaderBookmarks;
 import io.digitallibrary.reader.reader.ReaderHTTPMimeMap;
 import io.digitallibrary.reader.reader.ReaderHTTPMimeMapType;
@@ -32,6 +32,7 @@ import io.digitallibrary.reader.reader.ReaderSettings;
 import io.digitallibrary.reader.reader.ReaderSettingsType;
 
 import static io.digitallibrary.reader.GdlActivity.MENU_CHOICE_PREF;
+import static io.digitallibrary.reader.catalog.Opds_parserKt.fetchFeed;
 
 /**
  * Global application state.
@@ -57,7 +58,18 @@ public final class Gdl extends Application {
     }
 
     public static CatalogDatabase getDatabase() {
+        Callback c = new Callback() {
+            @Override
+            public void done() {
+
+            }
+        };
         return database;
+    }
+
+
+    public static void fetch(final Callback callback) {
+        fetchFeed(callback);
     }
 
     /**
@@ -149,7 +161,7 @@ public final class Gdl extends Application {
 
         database = Room.databaseBuilder(getApplicationContext(), CatalogDatabase.class, "catalog_db").build();
 
-        // OpdsParserKt.fetchFeed();
+        // Opds_parserKt.fetchFeed();
     }
 
     public static final class ReaderAppServices  {

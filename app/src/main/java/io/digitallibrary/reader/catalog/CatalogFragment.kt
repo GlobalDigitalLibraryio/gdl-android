@@ -5,10 +5,12 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import io.digitallibrary.reader.Gdl
 import io.digitallibrary.reader.R
 
 class CatalogFragment : Fragment() {
@@ -30,6 +32,15 @@ class CatalogFragment : Fragment() {
             }
         })
         recyclerView.adapter = adapter
+
+        val swipeRefreshLayout: SwipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout)
+        swipeRefreshLayout.setOnRefreshListener {
+            Gdl.fetch(object : Callback {
+                override fun done() {
+                    swipeRefreshLayout.isRefreshing = false
+                }
+            })
+        }
 
         ViewModelProviders.of(this).get(CatalogViewModel::class.java).getCategories().observe(this, Observer {
             it?.let { adapter.updateCategories(it) }

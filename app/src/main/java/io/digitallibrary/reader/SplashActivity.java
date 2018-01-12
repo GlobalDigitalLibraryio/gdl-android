@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import static io.digitallibrary.reader.catalog.OpdsParserKt.fetchFeed;
-
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -15,7 +13,7 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(final Bundle state) {
         super.onCreate(state);
 
-//        fetchFeed();
+        Gdl.fetch(null);
 
         final Intent i = new Intent(this, GdlActivity.class);
         i.putExtra("reload", true);

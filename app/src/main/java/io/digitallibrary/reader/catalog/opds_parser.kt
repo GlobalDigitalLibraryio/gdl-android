@@ -1,7 +1,11 @@
 package io.digitallibrary.reader.catalog
 
-import com.ethlo.time.FastInternetDateTimeUtil
+import android.util.Log
 import io.digitallibrary.reader.Gdl
+import io.digitallibrary.reader.utilities.LanguageUtil
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import org.simpleframework.xml.*
 import org.simpleframework.xml.convert.AnnotationStrategy
@@ -11,33 +15,31 @@ import org.simpleframework.xml.core.Persister
 import org.simpleframework.xml.strategy.Strategy
 import org.simpleframework.xml.stream.InputNode
 import org.simpleframework.xml.stream.OutputNode
+import org.threeten.bp.OffsetDateTime
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Url
-import ru.gildor.coroutines.retrofit.await
-import java.time.OffsetDateTime
+import java.util.*
+import kotlin.collections.ArrayList
 
 const val TAG = "KotCoRutTest"
 
-const val ACQUISITION_TYPE_STRING = "application/atom+xml;profile=opds-catalog;kind=acquisition"
-const val AQ_IMAGE_LINK_REL = "http://opds-spec.org/image"
-const val AQ_IMAGE_THUMB_REL = "http://opds-spec.org/image/thumbnail"
+private const val ACQUISITION_TYPE_STRING = "application/atom+xml;profile=opds-catalog;kind=acquisition"
+private const val AQ_IMAGE_LINK_REL = "http://opds-spec.org/image"
+private const val AQ_IMAGE_THUMB_LINK_REL = "http://opds-spec.org/image/thumbnail"
+private const val EPUB_TYPE = "application/epub"
 
-class DateConverter : Converter<OffsetDateTime> {
-    companion object {
-        val itu: FastInternetDateTimeUtil = FastInternetDateTimeUtil()
-    }
-
-    override fun read(node: InputNode): OffsetDateTime {
-        val dateAsString = node.value
-        return itu.parse(dateAsString)
+object DateConverter : Converter<OffsetDateTime> {
+    override fun read(node: InputNode): OffsetDateTime? {
+        return TimeTypeConverters.toOffsetDateTime(node.value)
     }
 
     override fun write(node: OutputNode, date: OffsetDateTime) {
+        node.value = TimeTypeConverters.fromOffsetDateTime(date)
     }
 }
 
@@ -170,64 +172,135 @@ interface OpdsParser {
             val retrofit = Retrofit.Builder()
                     .baseUrl("https://opds.staging.digitallibrary.io/")
                     .addConverterFactory(SimpleXmlConverterFactory.create(serializer))
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .build()
             return retrofit.create(OpdsParser::class.java)
         }
     }
 }
 
-fun updateCategories(categories: List<Feed.Entry>?): List<Category> {
-    val db = Gdl.getDatabase()
-    db.categoryDao().deleteAll()
-    val categoriesList = categories.orEmpty().map {
+fun updateCategories(categories: List<Feed.Entry>?, language: String): List<Category> {
+    val dao = Gdl.getDatabase().categoryDao()
+    val oldCategoryMap: MutableMap<String, Category> = HashMap()
+    dao.getCategories(language).associateByTo(oldCategoryMap) { it.id }
+
+    val categoriesToUpdate: MutableList<Category> = ArrayList(10)
+
+    Log.i(TAG, "oldCatMap is " + oldCategoryMap)
+
+    val categoriesList = categories.orEmpty().mapIndexed { i, it ->
         Category(
-                null,
-                it.id ?: "missing",
-                it.title,
-                it.links.orEmpty().firstOrNull { it.type.equals(ACQUISITION_TYPE_STRING) }?.href,
-                it.updated.toString(),
-                it.summary
+                id = it.id ?: "missing",
+                title = it.title,
+                link = it.links.orEmpty().firstOrNull { it.type.equals(ACQUISITION_TYPE_STRING) }?.href,
+                language = language,
+                viewOrder = i,
+                updated = it.updated,
+                description = it.summary
         )
     }
-    categoriesList.forEach { db.categoryDao().insert(it) }
-    return categoriesList
+
+    categoriesList.forEach {
+        val old = oldCategoryMap.get(it.id)
+        if (old != null) {
+            it.dbid = old.dbid
+            dao.update(it)
+            oldCategoryMap.remove(it.id)
+            val oldTime = old.updated
+
+            if (oldTime != null && it.updated?.isAfter(old.updated) == true) {
+                categoriesToUpdate.add(it)
+            }
+        } else {
+            categoriesToUpdate.add(it)
+            dao.insert(it)
+        }
+    }
+
+    oldCategoryMap.values.forEach {
+        dao.delete(it)
+    }
+
+    return categoriesToUpdate
 }
 
-fun saveBooks(category: Category, books: List<Feed.Entry>?) {
+fun saveBooks(category: Category, books: List<Feed.Entry>?, language: String) {
     val db = Gdl.getDatabase()
     books.orEmpty().map {
         Book(
-                null,
-                it.id ?: "missing",
-                it.title,
-                false,
-                it.educationalAlignment?.targetName?.toInt(),
-                it.license,
-                it.author?.joinToString(),
-                it.publisher,
-                null,
-                it.links.orEmpty().firstOrNull { it.rel.equals(AQ_IMAGE_LINK_REL) }?.href,
-                it.summary,
-                category.id
+                id = it.id ?: "missing",
+                title = it.title,
+                downloaded = false,
+                readingLevel = it.educationalAlignment?.targetName?.toInt(),
+                language = language,
+                license = it.license,
+
+                /*
+                 * The simple XML parser parses:
+                 *   <author>
+                 *       <name/>
+                 *   </author>
+                 * to:
+                 *   [null]
+                 * which joinToString turned into the String "null" by default (bug?)
+                 */
+                author = it.author?.joinToString(transform = { str: String? -> str ?: "" }),
+                publisher = it.publisher,
+                readingPosition = null,
+                image = it.links.orEmpty().firstOrNull { it.rel == AQ_IMAGE_LINK_REL }?.href,
+                thumb = it.links.orEmpty().firstOrNull { it.rel == AQ_IMAGE_THUMB_LINK_REL }?.href,
+                ePubLink = it.links.orEmpty().firstOrNull { it.type?.startsWith(EPUB_TYPE) == true }?.href,
+                description = it.summary,
+                updated = it.updated,
+                created = it.created,
+                published = it.published,
+                categoryId = category.id
         )
     }.forEach { db.bookDao().insert(it) }
 }
 
-fun fetchFeed() {
-    launch {
+
+interface Callback {
+    fun done()
+}
+
+fun fetchFeed(callback: Callback?) {
+    launch(CommonPool) {
         val parser = OpdsParser.create()
-        val nav = parser.getNavRoot("eng").await()
 
-        Gdl.getDatabase().bookDao().deleteAll()
+        val nav: Response<Feed>? =
+                try {
+                    parser.getNavRoot(LanguageUtil.getCurrentLanguage()).execute()
+                } catch (e: Exception) {
+                    Log.e(TAG, "getNavRoot for " + LanguageUtil.getCurrentLanguage() + " failed")
+                    e.printStackTrace()
+                    null
+                }
 
-        val categories = updateCategories(nav.entries)
+        if (nav == null) {
+            callback?.done()
+            return@launch
+        }
+
+        val categories = updateCategories(nav.body()?.entries, LanguageUtil.getCurrentLanguage())
+
+        val jobs: MutableList<Deferred<Unit>> = ArrayList()
 
         categories.forEach {
-            launch {
-                val aq = parser.getAcquisitionFeed(it.link).await()
-                saveBooks(it, aq.entries)
-            }
+            jobs.add(async(CommonPool) {
+                val aq: Response<Feed> =
+                        try {
+                            parser.getAcquisitionFeed(it.link).execute()
+                        } catch (e: Exception) {
+                            Log.e(TAG, "getAcquisitionFeed for " + it.title + " failed")
+                            e.printStackTrace()
+                            null
+                        } ?: return@async
+
+                saveBooks(it, aq.body()?.entries, LanguageUtil.getCurrentLanguage())
+            })
         }
+
+        jobs.forEach { it.await() }
+        callback?.done()
     }
 }

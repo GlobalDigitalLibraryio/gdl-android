@@ -90,7 +90,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center_horizontal"
                             android:orientation="horizontal"
-                            android:visibility="visible">
+                            android:visibility="gone">
 
                             <Button
                                 android:id="@+id/book_download_retry"
@@ -122,7 +122,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center_horizontal"
                             android:orientation="horizontal"
-                            android:visibility="visible">
+                            android:visibility="gone">
 
                             <Button
                                 android:id="@+id/book_read_book"
@@ -155,7 +155,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center_horizontal"
                             android:orientation="horizontal"
-                            android:visibility="visible">
+                            android:visibility="gone">
 
                             <RelativeLayout
                                 android:layout_width="140dp"
@@ -189,7 +189,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center_horizontal"
                             android:orientation="horizontal"
-                            android:visibility="visible">
+                            android:visibility="gone">
 
                             <Button
                                 android:id="@+id/book_download_button"

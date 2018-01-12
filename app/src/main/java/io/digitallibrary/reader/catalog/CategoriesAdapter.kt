@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import io.digitallibrary.reader.R
 import kotlinx.android.synthetic.main.catalog_category.view.*
 
-class CategoriesAdapter(val providerContext : Fragment, val callback: Callback) : RecyclerView.Adapter<CategoriesAdapter.CategoryViewHolder>() {
+class CategoriesAdapter(val fragment: Fragment, val callback: Callback) : RecyclerView.Adapter<CategoriesAdapter.CategoryViewHolder>() {
 
     private var categories: List<Category>? = null
 
@@ -21,7 +21,6 @@ class CategoriesAdapter(val providerContext : Fragment, val callback: Callback) 
     }
 
     fun updateCategories(newCategoriesList: List<Category>) {
-        Log.i(TAG, "updateCategories: " + newCategoriesList.size)
         categories = newCategoriesList
         notifyDataSetChanged()
     }
@@ -45,10 +44,10 @@ class CategoriesAdapter(val providerContext : Fragment, val callback: Callback) 
             itemView.feed_title.text = category.title
 
             val recyclerView: RecyclerView = itemView.catalog_category_recyclerview
-            val adapter = BooksAdapter(providerContext.context!!, callback)
+            val adapter = BooksAdapter(fragment.context!!, callback)
             recyclerView.adapter = adapter
 
-            ViewModelProviders.of(providerContext).get(CatalogViewModel::class.java).getBooks(category.id).observe(providerContext, Observer {
+            ViewModelProviders.of(fragment).get(CatalogViewModel::class.java).getBooks(category.id).observe(fragment, Observer {
                 it?.let { adapter.updateBooks(it) }
             })
 

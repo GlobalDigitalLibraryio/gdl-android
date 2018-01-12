@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "9314b42d78b04238771fad2e6d9ee997",
+    "identityHash": "a08a69a8ad08cb6370630226034627bc",
     "entities": [
       {
         "tableName": "categories",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dbid` INTEGER, `id` TEXT NOT NULL, `title` TEXT, `link` TEXT, `updated` TEXT, `description` TEXT, PRIMARY KEY(`dbid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dbid` INTEGER, `id` TEXT NOT NULL, `title` TEXT, `link` TEXT, `language` TEXT, `view_order` INTEGER, `updated` TEXT, `description` TEXT, PRIMARY KEY(`dbid`))",
         "fields": [
           {
             "fieldPath": "dbid",
@@ -33,6 +33,18 @@
             "notNull": false
           },
           {
+            "fieldPath": "language",
+            "columnName": "language",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "viewOrder",
+            "columnName": "view_order",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
             "fieldPath": "updated",
             "columnName": "updated",
             "affinity": "TEXT",
@@ -56,7 +68,7 @@
       },
       {
         "tableName": "books",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dbid` INTEGER, `id` TEXT NOT NULL, `title` TEXT, `downloaded` INTEGER NOT NULL, `readingLevel` INTEGER, `license` TEXT, `author` TEXT, `publisher` TEXT, `readingPosition` TEXT, `cover` TEXT, `description` TEXT, `category_id` TEXT, PRIMARY KEY(`dbid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dbid` INTEGER, `id` TEXT NOT NULL, `title` TEXT, `downloaded` INTEGER NOT NULL, `reading_level` INTEGER, `language` TEXT, `license` TEXT, `author` TEXT, `publisher` TEXT, `reading_position` TEXT, `image` TEXT, `thumb` TEXT, `epub_link` TEXT, `description` TEXT, `updated` TEXT, `created` TEXT, `published` TEXT, `category_id` TEXT, PRIMARY KEY(`dbid`))",
         "fields": [
           {
             "fieldPath": "dbid",
@@ -84,8 +96,14 @@
           },
           {
             "fieldPath": "readingLevel",
-            "columnName": "readingLevel",
+            "columnName": "reading_level",
             "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "language",
+            "columnName": "language",
+            "affinity": "TEXT",
             "notNull": false
           },
           {
@@ -108,19 +126,113 @@
           },
           {
             "fieldPath": "readingPosition",
-            "columnName": "readingPosition",
+            "columnName": "reading_position",
             "affinity": "TEXT",
             "notNull": false
           },
           {
-            "fieldPath": "cover",
-            "columnName": "cover",
+            "fieldPath": "image",
+            "columnName": "image",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "thumb",
+            "columnName": "thumb",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "ePubLink",
+            "columnName": "epub_link",
             "affinity": "TEXT",
             "notNull": false
           },
           {
             "fieldPath": "description",
             "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "updated",
+            "columnName": "updated",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "created",
+            "columnName": "created",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "published",
+            "columnName": "published",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "categoryId",
+            "columnName": "category_id",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "dbid"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "book_downloads",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dbid` INTEGER, `book_id` TEXT, `download_id` INTEGER, PRIMARY KEY(`dbid`))",
+        "fields": [
+          {
+            "fieldPath": "dbid",
+            "columnName": "dbid",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "bookId",
+            "columnName": "book_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "downloadId",
+            "columnName": "download_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "dbid"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "BookCategoryMap",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dbid` INTEGER, `book_id` TEXT, `category_id` TEXT, PRIMARY KEY(`dbid`))",
+        "fields": [
+          {
+            "fieldPath": "dbid",
+            "columnName": "dbid",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "bookId",
+            "columnName": "book_id",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -143,7 +255,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"9314b42d78b04238771fad2e6d9ee997\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"a08a69a8ad08cb6370630226034627bc\")"
     ]
   }
 }

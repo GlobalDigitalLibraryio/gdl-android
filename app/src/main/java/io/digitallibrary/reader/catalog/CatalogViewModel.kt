@@ -1,19 +1,47 @@
 package io.digitallibrary.reader.catalog
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.*
+import android.content.SharedPreferences
 import io.digitallibrary.reader.Gdl
+import io.digitallibrary.reader.utilities.LanguageUtil
 
 class CatalogViewModel : ViewModel() {
 
-    private var categories: LiveData<List<Category>>? = null
+    private var categories: MediatorLiveData<List<Category>> = MediatorLiveData()
+    private var dbCategories: LiveData<List<Category>>? = null
     private var books: MutableMap<String, LiveData<List<Book>>> = HashMap()
 
-    fun getCategories(): LiveData<List<Category>> {
-        if (categories == null) {
-            categories = Gdl.getDatabase().categoryDao().getAllCategories()
+    private var downloadedBooks: LiveData<List<Book>>? = null
+
+    private var langListener: SharedPreferences.OnSharedPreferenceChangeListener
+
+    init {
+        langListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key === LanguageUtil.getLangPrefKey()) {
+                dbCategories?.let {
+                    categories.removeSource(it)
+                }
+                dbCategories = Gdl.getDatabase().categoryDao().getLiveCategories(LanguageUtil.getCurrentLanguage())
+                dbCategories?.let {
+                    categories.addSource(it, { categories.postValue(it) })
+                }            }
         }
-        return categories as LiveData<List<Category>>
+        Gdl.getSharedPrefs().registerListener(langListener)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Gdl.getSharedPrefs().unregisterListener(langListener)
+    }
+
+    fun getCategories(): LiveData<List<Category>> {
+        if (dbCategories == null) {
+            dbCategories = Gdl.getDatabase().categoryDao().getLiveCategories(LanguageUtil.getCurrentLanguage())
+            dbCategories?.let {
+                categories.addSource(it, { categories.postValue(it) })
+            }
+        }
+        return categories
     }
 
     fun getBooks(categoryId: String): LiveData<List<Book>> {
@@ -29,5 +57,12 @@ class CatalogViewModel : ViewModel() {
 
     fun getBook(bookId: String): Book {
         return Gdl.getDatabase().bookDao().getBook(bookId)
+    }
+
+    fun getDownloadedBooks(): LiveData<List<Book>> {
+        if (downloadedBooks == null) {
+            downloadedBooks = Gdl.getDatabase().bookDao().getDownloadedBooks()
+        }
+        return downloadedBooks!!
     }
 }
