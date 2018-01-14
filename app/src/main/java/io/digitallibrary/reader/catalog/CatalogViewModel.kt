@@ -10,6 +10,7 @@ class CatalogViewModel : ViewModel() {
     private var categories: MediatorLiveData<List<Category>> = MediatorLiveData()
     private var dbCategories: LiveData<List<Category>>? = null
     private var books: MutableMap<String, LiveData<List<Book>>> = HashMap()
+    private var book: LiveData<Book>? = null
 
     private var downloadedBooks: LiveData<List<Book>>? = null
 
@@ -55,8 +56,11 @@ class CatalogViewModel : ViewModel() {
         return Gdl.getDatabase().categoryDao().getCategory(categoryId)
     }
 
-    fun getBook(bookId: String): Book {
-        return Gdl.getDatabase().bookDao().getBook(bookId)
+    fun getBook(bookId: String): LiveData<Book> {
+        if (book?.value?.id != bookId) {
+            book = Gdl.getDatabase().bookDao().getLiveBook(bookId)
+        }
+        return book!!
     }
 
     fun getDownloadedBooks(): LiveData<List<Book>> {

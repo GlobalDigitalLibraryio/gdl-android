@@ -120,8 +120,8 @@ public class GdlActivity extends AppCompatActivity implements FragmentManager.On
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mDrawerToggle.syncState();
-        updateNavigationRows();
         updateFragment(MenuChoices.getDefault());
+        updateNavigationRows();
 
         langListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
@@ -203,8 +203,8 @@ public class GdlActivity extends AppCompatActivity implements FragmentManager.On
         if (currentMenuChoice == MenuChoices.MY_BOOKS) {
             return;
         }
-        updateNavigationRows();
         updateFragment(MenuChoices.MY_BOOKS);
+        updateNavigationRows();
         mDrawerLayout.closeDrawers();
     }
 
@@ -213,8 +213,8 @@ public class GdlActivity extends AppCompatActivity implements FragmentManager.On
         if (currentMenuChoice == MenuChoices.CATALOG) {
             return;
         }
-        updateNavigationRows();
         updateFragment(MenuChoices.CATALOG);
+        updateNavigationRows();
         mDrawerLayout.closeDrawers();
     }
 

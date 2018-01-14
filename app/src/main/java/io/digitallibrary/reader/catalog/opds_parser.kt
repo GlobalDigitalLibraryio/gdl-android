@@ -5,6 +5,7 @@ import io.digitallibrary.reader.Gdl
 import io.digitallibrary.reader.utilities.LanguageUtil
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import org.simpleframework.xml.*
@@ -26,7 +27,7 @@ import retrofit2.http.Url
 import java.util.*
 import kotlin.collections.ArrayList
 
-const val TAG = "KotCoRutTest"
+private const val TAG = "OpdsParser"
 
 private const val ACQUISITION_TYPE_STRING = "application/atom+xml;profile=opds-catalog;kind=acquisition"
 private const val AQ_IMAGE_LINK_REL = "http://opds-spec.org/image"
@@ -224,38 +225,40 @@ fun updateCategories(categories: List<Feed.Entry>?, language: String): List<Cate
 }
 
 fun saveBooks(category: Category, books: List<Feed.Entry>?, language: String) {
-    val db = Gdl.getDatabase()
-    books.orEmpty().map {
-        Book(
-                id = it.id ?: "missing",
-                title = it.title,
-                downloaded = false,
-                readingLevel = it.educationalAlignment?.targetName?.toInt(),
-                language = language,
-                license = it.license,
+    val dao = Gdl.getDatabase().bookDao()
+    dao.insertList(
+            books.orEmpty().map {
+                Book(
+                        id = it.id ?: "missing",
+                        title = it.title,
+                        downloaded = null,
+                        readingLevel = it.educationalAlignment?.targetName?.toInt(),
+                        language = language,
+                        license = it.license,
 
-                /*
-                 * The simple XML parser parses:
-                 *   <author>
-                 *       <name/>
-                 *   </author>
-                 * to:
-                 *   [null]
-                 * which joinToString turned into the String "null" by default (bug?)
-                 */
-                author = it.author?.joinToString(transform = { str: String? -> str ?: "" }),
-                publisher = it.publisher,
-                readingPosition = null,
-                image = it.links.orEmpty().firstOrNull { it.rel == AQ_IMAGE_LINK_REL }?.href,
-                thumb = it.links.orEmpty().firstOrNull { it.rel == AQ_IMAGE_THUMB_LINK_REL }?.href,
-                ePubLink = it.links.orEmpty().firstOrNull { it.type?.startsWith(EPUB_TYPE) == true }?.href,
-                description = it.summary,
-                updated = it.updated,
-                created = it.created,
-                published = it.published,
-                categoryId = category.id
-        )
-    }.forEach { db.bookDao().insert(it) }
+                        /*
+                         * The simple XML parser parses:
+                         *   <author>
+                         *       <name/>
+                         *   </author>
+                         * to:
+                         *   [null]
+                         * which joinToString turned into the String "null" by default (bug?)
+                         */
+                        author = it.author?.joinToString(transform = { str: String? -> str ?: "" }),
+                        publisher = it.publisher,
+                        readingPosition = null,
+                        image = it.links.orEmpty().firstOrNull { it.rel == AQ_IMAGE_LINK_REL }?.href,
+                        thumb = it.links.orEmpty().firstOrNull { it.rel == AQ_IMAGE_THUMB_LINK_REL }?.href,
+                        ePubLink = it.links.orEmpty().firstOrNull { it.type?.startsWith(EPUB_TYPE) == true }?.href,
+                        description = it.summary,
+                        updated = it.updated,
+                        created = it.created,
+                        published = it.published,
+                        categoryId = category.id
+                )
+            }
+    )
 }
 
 
@@ -266,41 +269,87 @@ interface Callback {
 fun fetchFeed(callback: Callback?) {
     launch(CommonPool) {
         val parser = OpdsParser.create()
+        val lang = LanguageUtil.getCurrentLanguage()
 
         val nav: Response<Feed>? =
                 try {
-                    parser.getNavRoot(LanguageUtil.getCurrentLanguage()).execute()
+                    parser.getNavRoot(lang).execute()
                 } catch (e: Exception) {
-                    Log.e(TAG, "getNavRoot for " + LanguageUtil.getCurrentLanguage() + " failed")
+                    Log.e(TAG, "getNavRoot for $lang failed")
                     e.printStackTrace()
                     null
                 }
 
         if (nav == null) {
-            callback?.done()
+            launch(UI) {
+                callback?.done()
+            }
             return@launch
         }
 
-        val categories = updateCategories(nav.body()?.entries, LanguageUtil.getCurrentLanguage())
+        val categories = updateCategories(nav.body()?.entries, lang)
 
-        val jobs: MutableList<Deferred<Unit>> = ArrayList()
+        val jobs: MutableList<Deferred<Unit>> = ArrayList(10)
 
-        categories.forEach {
-            jobs.add(async(CommonPool) {
-                val aq: Response<Feed> =
+
+        if (Gdl.getDatabase().bookDao().haveLanguage(lang)) {
+            categories.forEach {
+                jobs.add(async(CommonPool) {
+                    val aq: Response<Feed> =
+                            try {
+                                parser.getAcquisitionFeed(it.link).execute()
+                            } catch (e: Exception) {
+                                Log.e(TAG, "getAcquisitionFeed for " + it.title + " failed")
+                                e.printStackTrace()
+                                null
+                            } ?: return@async
+
+                    saveBooks(it, aq.body()?.entries, lang)
+                })
+            }
+        } else {
+            // Do the 6 first books in order from top category and down, then the rest
+            // TODO: calculate visible books
+
+            val aqs: MutableList<Pair<Category, Deferred<Response<Feed>?>>> = ArrayList(10)
+
+            categories.forEach {
+                aqs.add(Pair(it, async(CommonPool) {
                         try {
                             parser.getAcquisitionFeed(it.link).execute()
                         } catch (e: Exception) {
                             Log.e(TAG, "getAcquisitionFeed for " + it.title + " failed")
                             e.printStackTrace()
                             null
-                        } ?: return@async
+                        }
+                }))
+            }
 
-                saveBooks(it, aq.body()?.entries, LanguageUtil.getCurrentLanguage())
-            })
+            val todoLater: MutableList<Pair<Category, List<Feed.Entry>>> = ArrayList(10)
+
+            aqs.forEach {
+                val aq = it.second.await()
+                val books: List<Feed.Entry>? = aq?.body()?.entries
+                if (books != null) {
+                    if (books.size > 6) {
+                        todoLater.add(Pair(it.first, books.subList(6, books.size)))
+                        saveBooks(it.first, books.subList(0, 6), lang)
+                    } else {
+                        saveBooks(it.first, books, lang)
+                    }
+                }
+            }
+
+            todoLater.forEach {
+                jobs.add(async {
+                    saveBooks(it.first, it.second, lang)
+                })
+            }
         }
 
         jobs.forEach { it.await() }
-        callback?.done()
+        launch(UI) {
+            callback?.done()
+        }
     }
 }

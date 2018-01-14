@@ -1,6 +1,7 @@
 package io.digitallibrary.reader.catalog
 
 import android.app.DownloadManager
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.net.Uri
@@ -23,17 +24,17 @@ import kotlinx.android.synthetic.main.book_details.*
 import kotlinx.coroutines.experimental.CommonPool
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
-import kotlin.coroutines.experimental.suspendCoroutine
+import java.io.File
+import java.net.URI
 
 
 class BookDetailsActivity : AppCompatActivity() {
-    private val STATUS_NOT_SET = -1
-    private val STATUS_DOWNLOADED = -2
-    private val STATUS_NOT_DOWNLOADED = -3
-    private val STATUS_DOWNLOADING = -4
+    private val TAG = "BookDetailsActivity"
 
-    private var status: Int = STATUS_NOT_SET
-    private var reqId: Long = -1
+    private val STATUS_DOWNLOADED = -1
+    private val STATUS_NOT_DOWNLOADED = -2
+    private val STATUS_DOWNLOADING = -3
+    private val STATUS_FAILED = -4
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -44,6 +45,8 @@ class BookDetailsActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
+    private var book: Book? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,46 +62,62 @@ class BookDetailsActivity : AppCompatActivity() {
 
         val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
 
-        launch(UI) {
-            val book = async { viewModel.getBook(bookId) }.await()
-            Glide.with(applicationContext)
-                    .load(book.image)
-                    .apply(RequestOptions().centerCrop().placeholder(R.drawable.book_image_placeholder))
-                    .into(book_cover)
-            book_title.text = book.title
-            book_publisher.text = book.publisher
-            book_description.text = book.description
-            book_level.text = getString(R.string.book_level, book.readingLevel)
-            book_authors.text = book.author
-            book_license.text = book.license
-            book_published.text = book.published?.format(formatter)
-            book_download_button.setOnClickListener { downloadBook(book) }
-            book_download_retry.setOnClickListener { downloadBook(book) }
-            book_download_dismiss.setOnClickListener { dismissFailedDownload(book) }
+        var initialized = false
 
-            book_download_cancel.setOnClickListener { cancelDownloadBook(book) }
-            book_delete_book.setOnClickListener { deleteBook(book) }
-            book_read_book.setOnClickListener { readBook(book) }
-            updateDownloadingState(book)
-        }
+        viewModel.getBook(bookId).observe(this, Observer {
+            it?.let {
+                book = it
+                if (!initialized) {
+                    launch(UI) {
+                        book?.let {
+                            Glide.with(applicationContext)
+                                    .load(it.image)
+                                    .apply(RequestOptions().centerCrop().placeholder(R.drawable.book_image_placeholder))
+                                    .into(book_cover)
+                            book_title.text = it.title
+                            book_publisher.text = it.publisher
+                            book_description.text = it.description
+                            book_level.text = getString(R.string.book_level, it.readingLevel)
+                            book_authors.text = it.author
+                            book_license.text = it.license
+                            book_published.text = it.published?.format(formatter)
+                        }
+
+                        book_download_button.setOnClickListener { downloadBook() }
+                        book_download_retry.setOnClickListener { downloadBook() }
+                        book_download_dismiss.setOnClickListener { dismissFailedDownload() }
+
+                        book_download_cancel.setOnClickListener { cancelDownloadBook() }
+                        book_delete_book.setOnClickListener { deleteBook() }
+                        book_read_book.setOnClickListener { readBook() }
+                        initialized = true
+                        updateDownloadingState()
+                    }
+                } else {
+                    updateDownloadingState()
+                }
+            }
+        })
+
+
     }
 
     private fun updateActionButtons() {
         launch(UI) {
-            when (status) {
-                STATUS_NOT_DOWNLOADED, DownloadManager.STATUS_PAUSED -> {
+            when (getDownloadStatus()) {
+                STATUS_NOT_DOWNLOADED -> {
                     book_download_failed_container.visibility = GONE
                     book_downloading_container.visibility = GONE
                     book_read_and_delete_container.visibility = GONE
                     book_download_button_container.visibility = VISIBLE
                 }
-                STATUS_DOWNLOADING, DownloadManager.STATUS_PENDING, DownloadManager.STATUS_RUNNING -> {
+                STATUS_DOWNLOADING -> {
                     book_download_failed_container.visibility = GONE
                     book_download_button_container.visibility = GONE
                     book_read_and_delete_container.visibility = GONE
                     book_downloading_container.visibility = VISIBLE
                 }
-                DownloadManager.STATUS_FAILED -> {
+                STATUS_FAILED -> {
                     book_downloading_container.visibility = GONE
                     book_download_button_container.visibility = GONE
                     book_read_and_delete_container.visibility = GONE
@@ -114,168 +133,124 @@ class BookDetailsActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateDownloadingState(book: Book) {
-        launch(UI) {
-            if (!bookIsDownloaded(book)) {
-                val bookDownload = async { Gdl.getDatabase().bookDownloadDao().getBookDownload(book.id) }.await()
-                var downloading = bookDownload != null
-                val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-
-                while (downloading) {
-                    Log.i(TAG, "Looping")
-                    val newStatus = async {
-                        val cursor = downloadManager.query(bookDownload!!.downloadId?.let { DownloadManager.Query().setFilterById(it) })
-                        cursor.moveToFirst()
-//                        val bytesDownloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
-//                        val bytesTotal = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
-                        cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
-                    }.await()
-
-                    when (newStatus) {
-                        DownloadManager.STATUS_PAUSED -> Log.i(TAG, "Download paused")
-                        DownloadManager.STATUS_PENDING -> Log.i(TAG, "Download pending")
-                        DownloadManager.STATUS_RUNNING -> Log.i(TAG, "Download running")
-                        DownloadManager.STATUS_FAILED -> {
-                            Log.i(TAG, "Download failed")
-                            async { Gdl.getDatabase().bookDownloadDao().delete(bookDownload!!) }.await()
-                            downloading = false
-                        }
-                        DownloadManager.STATUS_SUCCESSFUL -> {
-                            Log.i(TAG, "Download successful")
-                            async {
-                                book.downloaded = true
-                                Gdl.getDatabase().bookDao().update(book)
-                            }.await()
-                            status = STATUS_DOWNLOADED
-                            downloading = false
-                        }
-                        else -> {
-                            downloading = false
-                            Log.wtf(TAG, "This shouldn't happen")
-                        }
-                    }
-                    status = newStatus
-                    updateActionButtons()
-                }
-            }
-            updateActionButtons()
+    private fun isDownloaded(): Boolean {
+        book?.downloaded?.let {
+            return File(URI(it)).isFile
         }
+        return false
     }
 
-    private suspend fun bookIsDownloaded(book: Book): Boolean {
-        return suspendCoroutine { cont ->
-            launch {
-                val bookFile = book.getBookFile(applicationContext)
-                val fileExists = bookFile.isFile
-                val dbRegisteredAsDownloaded = book.downloaded
-
-                if (fileExists && dbRegisteredAsDownloaded) {
-                    status = STATUS_DOWNLOADED
-                    cont.resume(true)
-                    return@launch
-                }
-
-                val bookDownload = Gdl.getDatabase().bookDownloadDao().getBookDownload(book.id)
-                val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-                var isDownloading = false
-                if (bookDownload != null) {
-                    val cursor = downloadManager.query(bookDownload.downloadId?.let { DownloadManager.Query().setFilterById(it) })
-                    cursor.moveToFirst()
-                    val dmStatus = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
-                    when (dmStatus) {
-                        DownloadManager.STATUS_PAUSED, DownloadManager.STATUS_PENDING, DownloadManager.STATUS_RUNNING -> isDownloading = true
-                    }
-                }
-
-                if (fileExists && !dbRegisteredAsDownloaded) {
-                    if (isDownloading) {
-                        status = STATUS_DOWNLOADING
-                    } else {
-                        Gdl.getDatabase().bookDownloadDao().delete(book.id)
-                        bookFile.delete()
-                        status = STATUS_NOT_DOWNLOADED
-                    }
-                    cont.resume(false)
-                    return@launch
-                }
-
-                if (!fileExists && dbRegisteredAsDownloaded) {
-                    book.downloaded = false
-                    Gdl.getDatabase().bookDao().update(book)
-                    Gdl.getDatabase().bookDownloadDao().delete(book.id)
-                    status = STATUS_NOT_DOWNLOADED
-                    cont.resume(false)
-                    return@launch
-                }
-
-                status = STATUS_NOT_DOWNLOADED
-                cont.resume(false)
-            }
+    private suspend fun getDownloadStatus(): Int {
+        if (isDownloaded()) {
+            return STATUS_DOWNLOADED
         }
-    }
-
-    private fun downloadBook(book: Book) {
-        launch {
-            val bookDownload = Gdl.getDatabase().bookDownloadDao().getBookDownload(book.id)
-            if (bookDownload == null) {
-                val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-                val request = DownloadManager.Request(Uri.parse(book.ePubLink)).setDestinationInExternalFilesDir(applicationContext, null, book.getBookFilePath())
-                request.setTitle(book.title)
-                request.setDescription("Downloading " + book.title + " from the Global Digital Library")
-                reqId = downloadManager.enqueue(request)
-                Gdl.getDatabase().bookDownloadDao().insert(BookDownload(bookId = book.id, downloadId = reqId))
-                updateDownloadingState(book)
-            }
-        }
-
-    }
-
-    private fun cancelDownloadBook(book: Book) {
-        launch {
-            val bookDownload = Gdl.getDatabase().bookDownloadDao().getBookDownload(book.id)
+        book?.let {
+            val bookDownload = async { Gdl.getDatabase().bookDownloadDao().getBookDownload(it.id) }.await()
             if (bookDownload != null) {
                 val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-                bookDownload.downloadId?.let { downloadManager.remove(it) }
-                Gdl.getDatabase().bookDownloadDao().delete(bookDownload)
-                status = STATUS_NOT_DOWNLOADED
+                val newStatus = async {
+                    val cursor = downloadManager.query(bookDownload.downloadId?.let { DownloadManager.Query().setFilterById(it) })
+                    if (cursor.moveToFirst()) {
+                        cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
+                    } else {
+                        null
+                    }
+                }.await()
+
+                when (newStatus) {
+                    DownloadManager.STATUS_PAUSED, DownloadManager.STATUS_PENDING, DownloadManager.STATUS_RUNNING -> return STATUS_DOWNLOADING
+                    DownloadManager.STATUS_FAILED -> return STATUS_FAILED
+                    DownloadManager.STATUS_SUCCESSFUL -> return STATUS_DOWNLOADED
+                }
+            }
+        }
+        return STATUS_NOT_DOWNLOADED
+    }
+
+    private suspend fun isDownloading(): Boolean {
+        return getDownloadStatus() == STATUS_DOWNLOADING
+    }
+
+    private fun updateDownloadingState() {
+        launch(CommonPool) {
+            updateActionButtons()
+            var isDownloading = isDownloading()
+            while (isDownloading) {
+                Log.i(TAG, "looping")
+                isDownloading = isDownloading()
             }
             updateActionButtons()
         }
     }
 
-    private fun dismissFailedDownload(book: Book) {
-        status = STATUS_NOT_DOWNLOADED
-        updateActionButtons()
-    }
-
-    private fun readBook(book: Book) {
-        launch {
-            if (bookIsDownloaded(book)) {
-                val file = book.getBookFile(applicationContext)
-                ReaderActivity.startActivity(this@BookDetailsActivity, book.id, file)
-            } else {
-                // Show error message
-                val downloading = Gdl.getDatabase().bookDownloadDao().getBookDownload(book.id)
-                if (downloading != null) {
-                    Gdl.getDatabase().bookDownloadDao().delete(downloading)
-                    status = -1
-                    launch(UI) { updateActionButtons() }
+    private fun downloadBook() {
+        launch(CommonPool) {
+            book?.let {
+                val bookDownload = Gdl.getDatabase().bookDownloadDao().getBookDownload(it.id)
+                if (bookDownload == null) {
+                    val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                    val request = DownloadManager.Request(Uri.parse(it.ePubLink)).setDestinationInExternalFilesDir(applicationContext, null, "books/" + it.id + ".epub")
+                    request.setTitle(it.title)
+                    request.setDescription("Downloading " + it.title + " from the Global Digital Library")
+                    val reqId = downloadManager.enqueue(request)
+                    Gdl.getDatabase().bookDownloadDao().insert(BookDownload(bookId = it.id, downloadId = reqId))
+                    updateDownloadingState()
                 }
             }
         }
     }
 
-    private fun deleteBook(book: Book) {
+    private fun cancelDownloadBook() {
         launch(CommonPool) {
-            val bookFile = book.getBookFile(applicationContext)
-            if (bookFile.isFile) {
-                bookFile.delete()
+            book?.let {
+                val bookDownload = Gdl.getDatabase().bookDownloadDao().getBookDownload(it.id)
+                if (bookDownload != null) {
+                    val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                    bookDownload.downloadId?.let { downloadManager.remove(it) }
+                    Gdl.getDatabase().bookDownloadDao().delete(bookDownload)
+                }
+                updateActionButtons()
             }
-            book.downloaded = false
-            Gdl.getDatabase().bookDao().update(book)
-            Gdl.getDatabase().bookDownloadDao().delete(book.id)
-            status = STATUS_NOT_DOWNLOADED
-            updateActionButtons()
+        }
+    }
+
+    private fun dismissFailedDownload() {
+        deleteBook()
+    }
+
+    private fun readBook() {
+        launch(UI) {
+            book?.let {
+                if (isDownloaded()) {
+                    it.downloaded?.let { uri ->
+                        ReaderActivity.startActivity(this@BookDetailsActivity, it.id, File(URI(uri)))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun deleteBook() {
+        launch(CommonPool) {
+            book?.let {
+                val bookDownload = Gdl.getDatabase().bookDownloadDao().getBookDownload(it.id)
+                if (bookDownload != null) {
+                    val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                    bookDownload.downloadId?.let { downloadManager.remove(it) }
+                    Gdl.getDatabase().bookDownloadDao().delete(bookDownload)
+                }
+
+                it.downloaded?.let { uri ->
+                    val bookFile = File(URI(uri))
+                    if (bookFile.isFile) {
+                        bookFile.delete()
+                    }
+                }
+                it.downloaded = null
+                Gdl.getDatabase().bookDao().update(it)
+                Gdl.getDatabase().bookDownloadDao().delete(it.id)
+                updateActionButtons()
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ package io.digitallibrary.reader.catalog
 import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.*
 import android.content.Context
+import org.apache.commons.lang.BooleanUtils
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import java.io.File
@@ -13,7 +14,7 @@ data class Book(
         var dbid: Long? = null,
         var id: String = "",
         var title: String? = null,
-        var downloaded: Boolean = false,
+        var downloaded: String? = null,
         @ColumnInfo(name = "reading_level")
         var readingLevel: Int? = null,
         var language: String? = null,
@@ -32,20 +33,15 @@ data class Book(
         var published: OffsetDateTime? = null,
         @ColumnInfo(name = "category_id")
         var categoryId: String? = null
-) {
-    fun getBookFilePath(): String {
-        return "/books/$id.epub"
-    }
-
-    fun getBookFile(context: Context): File {
-        return context.getExternalFilesDir(getBookFilePath())
-    }
-}
+)
 
 @Dao
 interface BookDao {
     @Insert
     fun insert(book: Book)
+
+    @Insert
+    fun insertList(books: List<Book>)
 
     @Update
     fun update(book: Book)
@@ -56,7 +52,7 @@ interface BookDao {
     @Query("DELETE FROM books")
     fun deleteAll()
 
-    @Query("SELECT * FROM books WHERE downloaded = 1")
+    @Query("SELECT * FROM books WHERE downloaded NOT NULL")
     fun getDownloadedBooks(): LiveData<List<Book>>
 
     @Query("SELECT * FROM books WHERE category_id = :arg0")
@@ -65,8 +61,14 @@ interface BookDao {
     @Query("SELECT * FROM books WHERE id = :arg0")
     fun getBook(bookId: String): Book
 
+    @Query("SELECT * FROM books WHERE id = :arg0")
+    fun getLiveBook(bookId: String): LiveData<Book>
+
     @Query("SELECT * FROM books WHERE id IN (SELECT book_id FROM book_downloads WHERE download_id = :arg0)")
     fun getBookFromDownloadId(downloadId: String): Book
+
+    @Query("SELECT COUNT(dbid) FROM books WHERE language = :arg0 LIMIT 1")
+    fun haveLanguage(language: String): Boolean
 }
 
 @Entity(tableName = "categories")
@@ -143,6 +145,10 @@ interface BookDownloadDao{
 
     @Query("SELECT * FROM book_downloads WHERE book_id = :arg0")
     fun getBookDownload(bookId: String?): BookDownload?
+
+    @Query("SELECT * FROM book_downloads WHERE download_id = :arg0")
+    fun getBookDownload(downloadId: Long?): BookDownload?
+
 }
 
 object TimeTypeConverters {

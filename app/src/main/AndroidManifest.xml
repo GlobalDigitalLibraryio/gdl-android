@@ -77,5 +77,14 @@
             android:label="@string/catalog"
             android:theme="@style/GdlTheme" />
 
+        <receiver
+            android:name=".DownloadBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
+                <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
+            </intent-filter>
+        </receiver>
+
     </application>
 </manifest>
