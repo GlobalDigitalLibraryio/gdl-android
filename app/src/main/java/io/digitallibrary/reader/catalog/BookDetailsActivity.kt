@@ -150,11 +150,13 @@ class BookDetailsActivity : AppCompatActivity() {
                 val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
                 val newStatus = async {
                     val cursor = downloadManager.query(bookDownload.downloadId?.let { DownloadManager.Query().setFilterById(it) })
-                    if (cursor.moveToFirst()) {
+                    val status = if (cursor.moveToFirst()) {
                         cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
                     } else {
                         null
                     }
+                    cursor.close()
+                    status
                 }.await()
 
                 when (newStatus) {

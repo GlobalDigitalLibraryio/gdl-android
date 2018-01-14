@@ -18,11 +18,13 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
                     val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
                         val localUri = async {
                             val cursor = downloadManager.query(DownloadManager.Query().setFilterById(id))
-                            if (cursor.moveToFirst()) {
+                            val res = if (cursor.moveToFirst()) {
                                 cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))
                             } else {
                                 null
                             }
+                            cursor.close()
+                            res
                         }.await()
                         if (localUri != null) {
                             val book = Gdl.getDatabase().bookDao().getBook(it)
