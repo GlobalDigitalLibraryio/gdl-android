@@ -2,11 +2,8 @@ package io.digitallibrary.reader.catalog
 
 import android.arch.lifecycle.LiveData
 import android.arch.persistence.room.*
-import android.content.Context
-import org.apache.commons.lang.BooleanUtils
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
-import java.io.File
 
 @Entity(tableName = "books")
 data class Book(

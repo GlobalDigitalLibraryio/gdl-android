@@ -13,12 +13,12 @@ import com.android.volley.toolbox.Volley;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import io.digitallibrary.reader.Prefs;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import io.digitallibrary.reader.Gdl;
+import io.digitallibrary.reader.Prefs;
 
 public class LanguageUtil {
     public static final String TAG = "LANG SET";

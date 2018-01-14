@@ -2,21 +2,21 @@ package io.digitallibrary.reader.catalog
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import io.digitallibrary.reader.Gdl
 import io.digitallibrary.reader.R
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.IntentFilter
-import android.util.Log
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 
@@ -71,8 +71,8 @@ class CatalogFragment : Fragment() {
         return view
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         try {
             LocalBroadcastManager.getInstance(context!!).unregisterReceiver(broadcastReceiver!!)
         } catch (e: NullPointerException) {

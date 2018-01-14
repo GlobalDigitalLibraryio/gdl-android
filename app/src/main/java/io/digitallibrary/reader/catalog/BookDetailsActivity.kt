@@ -17,11 +17,11 @@ import com.bumptech.glide.request.RequestOptions
 import io.digitallibrary.reader.Gdl
 import io.digitallibrary.reader.R
 import io.digitallibrary.reader.reader.ReaderActivity
+import kotlinx.android.synthetic.main.book_details.*
+import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
-import kotlinx.android.synthetic.main.book_details.*
-import kotlinx.coroutines.experimental.CommonPool
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 import java.io.File

@@ -98,9 +98,13 @@ public class SelectLanguageActivity extends AppCompatActivity {
                         selected = position;
                         String newLang = langArray.get(position);
                         String newLangCode = languages.get(newLang);
+                        String oldLang = LanguageUtil.getCurrentLanguage();
                         LanguageUtil.setLanguage(newLangCode, newLang);
                         view.findViewById(R.id.checked).setVisibility(View.VISIBLE);
                         langItemsAdapter.notifyDataSetChanged();
+                        if (!oldLang.equals(newLang)) {
+                            Gdl.fetch();
+                        }
                     }
                 });
             }

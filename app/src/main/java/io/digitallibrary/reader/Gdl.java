@@ -159,8 +159,6 @@ public final class Gdl extends Application {
         getSharedPrefs().putInt(MENU_CHOICE_PREF, GdlActivity.MenuChoices.getDefault().ordinal());
 
         database = Room.databaseBuilder(getApplicationContext(), CatalogDatabase.class, "catalog_db").build();
-
-        // Opds_parserKt.fetchFeed();
     }
 
     public static final class ReaderAppServices  {

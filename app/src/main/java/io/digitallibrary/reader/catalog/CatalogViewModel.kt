@@ -1,6 +1,8 @@
 package io.digitallibrary.reader.catalog
 
-import android.arch.lifecycle.*
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MediatorLiveData
+import android.arch.lifecycle.ViewModel
 import android.content.SharedPreferences
 import io.digitallibrary.reader.Gdl
 import io.digitallibrary.reader.utilities.LanguageUtil

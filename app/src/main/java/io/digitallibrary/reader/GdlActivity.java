@@ -1,7 +1,6 @@
 package io.digitallibrary.reader;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -45,7 +44,6 @@ public class GdlActivity extends AppCompatActivity implements FragmentManager.On
 
     public static final String MENU_CHOICE_PREF = "MENU_CHOICE_PREF";
     private static MenuChoices currentMenuChoice;
-    private SharedPreferences.OnSharedPreferenceChangeListener langListener;
 
     @Override
     public void onBackStackChanged() {
@@ -122,16 +120,6 @@ public class GdlActivity extends AppCompatActivity implements FragmentManager.On
         mDrawerToggle.syncState();
         updateFragment(MenuChoices.getDefault());
         updateNavigationRows();
-
-        langListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
-            @Override
-            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if (key == LanguageUtil.getLangPrefKey()) {
-                    Gdl.fetch();
-                }
-            }
-        };
-        Gdl.getSharedPrefs().registerListener(langListener);
     }
 
     private void updateNavigationRows() {
@@ -148,19 +136,17 @@ public class GdlActivity extends AppCompatActivity implements FragmentManager.On
     }
 
     private void updateFragment(MenuChoices newChoice) {
-        if (currentMenuChoice != newChoice) {
-            currentMenuChoice = newChoice;
-            if (currentMenuChoice == MenuChoices.CATALOG) {
-                Fragment f = new CatalogFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
-                setTitle(R.string.catalog);
-            } else if (currentMenuChoice == MenuChoices.MY_BOOKS) {
-                Fragment f = new CatalogDownloadedFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
-                setTitle(R.string.nav_my_library);
-            } else {
-                throw new UnreachableCodeException();
-            }
+        currentMenuChoice = newChoice;
+        if (currentMenuChoice == MenuChoices.CATALOG) {
+            Fragment f = new CatalogFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
+            setTitle(R.string.catalog);
+        } else if (currentMenuChoice == MenuChoices.MY_BOOKS) {
+            Fragment f = new CatalogDownloadedFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
+            setTitle(R.string.nav_my_library);
+        } else {
+            throw new UnreachableCodeException();
         }
     }
 
@@ -231,6 +217,5 @@ public class GdlActivity extends AppCompatActivity implements FragmentManager.On
         super.onDestroy();
         Log.v(TAG, "onDestroy");
         mDrawerLayout.removeDrawerListener(mDrawerToggle);
-        Gdl.getSharedPrefs().unregisterListener(langListener);
     }
 }
