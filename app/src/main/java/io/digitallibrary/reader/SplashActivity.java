@@ -13,7 +13,7 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(final Bundle state) {
         super.onCreate(state);
 
-        Gdl.fetch(null);
+        Gdl.fetch();
 
         final Intent i = new Intent(this, GdlActivity.class);
         i.putExtra("reload", true);

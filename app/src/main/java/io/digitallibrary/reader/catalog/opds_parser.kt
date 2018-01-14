@@ -1,11 +1,12 @@
 package io.digitallibrary.reader.catalog
 
+import android.content.Intent
+import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import io.digitallibrary.reader.Gdl
 import io.digitallibrary.reader.utilities.LanguageUtil
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.Deferred
-import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 import org.simpleframework.xml.*
@@ -28,6 +29,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 private const val TAG = "OpdsParser"
+
+const val OPDS_PARSE_DONE = "opds-fetch-done"
 
 private const val ACQUISITION_TYPE_STRING = "application/atom+xml;profile=opds-catalog;kind=acquisition"
 private const val AQ_IMAGE_LINK_REL = "http://opds-spec.org/image"
@@ -261,31 +264,60 @@ fun saveBooks(category: Category, books: List<Feed.Entry>?, language: String) {
     )
 }
 
+val fetchJobLock = Any()
+var currentLang: String? = null
+val fetchJobs: Deque<String> = LinkedList()
 
-interface Callback {
-    fun done()
-}
 
-fun fetchFeed(callback: Callback?) {
+fun fetchFeed(recursive: Boolean = false) {
+    synchronized(fetchJobLock) {
+        if (recursive) {
+            if (fetchJobs.isEmpty()) {
+                currentLang = null
+                return
+            } else {
+                currentLang = fetchJobs.removeFirst()
+                // This now starts
+            }
+        } else {
+            val newLang = LanguageUtil.getCurrentLanguage()
+
+            if (currentLang == null) {
+                // Not running
+                if (fetchJobs.isEmpty()) {
+                    currentLang = newLang
+                } else {
+                    Log.e(TAG, "This shouldn't happen")
+                    currentLang = fetchJobs.removeFirst()
+                    fetchJobs.add(newLang)
+                }
+                // Start
+            } else {
+                // We are running
+                if (newLang == currentLang || fetchJobs.contains(newLang)) {
+                    // Language already added
+                    return
+                } else {
+                    fetchJobs.add(newLang)
+                }
+                // Do nothing, next lang will be started by fetchFeed(true)
+                return
+            }
+        }
+    }
+
     launch(CommonPool) {
         val parser = OpdsParser.create()
         val lang = LanguageUtil.getCurrentLanguage()
 
-        val nav: Response<Feed>? =
+        val nav: Response<Feed> =
                 try {
                     parser.getNavRoot(lang).execute()
                 } catch (e: Exception) {
                     Log.e(TAG, "getNavRoot for $lang failed")
                     e.printStackTrace()
                     null
-                }
-
-        if (nav == null) {
-            launch(UI) {
-                callback?.done()
-            }
-            return@launch
-        }
+                } ?: return@launch
 
         val categories = updateCategories(nav.body()?.entries, lang)
 
@@ -348,8 +380,9 @@ fun fetchFeed(callback: Callback?) {
         }
 
         jobs.forEach { it.await() }
-        launch(UI) {
-            callback?.done()
-        }
+
+        val intent = Intent(OPDS_PARSE_DONE)
+        LocalBroadcastManager.getInstance(Gdl.getAppContext()).sendBroadcast(intent)
+        fetchFeed(true)
     }
 }

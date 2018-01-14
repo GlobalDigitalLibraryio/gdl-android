@@ -127,7 +127,7 @@ public class GdlActivity extends AppCompatActivity implements FragmentManager.On
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (key == LanguageUtil.getLangPrefKey()) {
-                    Gdl.fetch(null);
+                    Gdl.fetch();
                 }
             }
         };

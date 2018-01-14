@@ -19,7 +19,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-import io.digitallibrary.reader.catalog.Callback;
 import io.digitallibrary.reader.catalog.CatalogDatabase;
 import io.digitallibrary.reader.reader.ReaderBookmarks;
 import io.digitallibrary.reader.reader.ReaderHTTPMimeMap;
@@ -58,18 +57,18 @@ public final class Gdl extends Application {
     }
 
     public static CatalogDatabase getDatabase() {
-        Callback c = new Callback() {
-            @Override
-            public void done() {
-
-            }
-        };
+        Gdl.checkInitialized();
         return database;
     }
 
+    public static Context getAppContext() {
+        final Gdl i = Gdl.checkInitialized();
+        return i.getApplicationContext();
+    }
 
-    public static void fetch(final Callback callback) {
-        fetchFeed(callback);
+
+    public static void fetch() {
+        fetchFeed(false);
     }
 
     /**
