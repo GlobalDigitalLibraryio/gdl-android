@@ -189,8 +189,6 @@ fun updateCategories(categories: List<Feed.Entry>?, language: String): List<Cate
 
     val categoriesToUpdate: MutableList<Category> = ArrayList(10)
 
-    Log.i(TAG, "oldCatMap is " + oldCategoryMap)
-
     val categoriesList = categories.orEmpty().mapIndexed { i, it ->
         Category(
                 id = it.id ?: "missing",
@@ -207,13 +205,16 @@ fun updateCategories(categories: List<Feed.Entry>?, language: String): List<Cate
         val old = oldCategoryMap.get(it.id)
         if (old != null) {
             it.dbid = old.dbid
-            dao.update(it)
-            oldCategoryMap.remove(it.id)
             val oldTime = old.updated
 
-            if (oldTime != null && it.updated?.isAfter(old.updated) == true) {
-                categoriesToUpdate.add(it)
+            if (it != old) {
+                dao.update(it)
+                if (oldTime != null && it.updated?.isAfter(old.updated) == true) {
+                    categoriesToUpdate.add(it)
+                }
             }
+
+            oldCategoryMap.remove(it.id)
         } else {
             categoriesToUpdate.add(it)
             dao.insert(it)
@@ -306,9 +307,12 @@ fun fetchFeed(recursive: Boolean = false) {
         }
     }
 
+
     launch(CommonPool) {
         val parser = OpdsParser.create()
         val lang = LanguageUtil.getCurrentLanguage()
+
+        Log.i(TAG, "Fetching $lang")
 
         val nav: Response<Feed> =
                 try {
@@ -322,7 +326,6 @@ fun fetchFeed(recursive: Boolean = false) {
         val categories = updateCategories(nav.body()?.entries, lang)
 
         val jobs: MutableList<Deferred<Unit>> = ArrayList(10)
-
 
         if (Gdl.getDatabase().bookDao().haveLanguage(lang)) {
             categories.forEach {
