@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:onClick="onBackgroundClicked">
+    android:onClick="onClose">
 
     <RelativeLayout
         android:id="@+id/background"
@@ -55,7 +55,7 @@
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="2dp"
                 android:background="@android:color/transparent"
-                android:onClick="onCloseLanguagesClicked"
+                android:onClick="onClose"
                 android:src="@drawable/ic_keyboard_arrow_left_white_24dp" />
 
             <TextView

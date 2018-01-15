@@ -314,16 +314,17 @@ fun fetchFeed(recursive: Boolean = false) {
 
         Log.i(TAG, "Fetching $lang")
 
-        val nav: Response<Feed> =
+        val nav: Response<Feed>? =
                 try {
                     parser.getNavRoot(lang).execute()
                 } catch (e: Exception) {
                     Log.e(TAG, "getNavRoot for $lang failed")
                     e.printStackTrace()
                     null
-                } ?: return@launch
+                }
 
-        val categories = updateCategories(nav.body()?.entries, lang)
+
+        val categories: List<Category> = if (nav != null) { updateCategories(nav.body()?.entries, lang) } else { ArrayList() }
 
         val jobs: MutableList<Deferred<Unit>> = ArrayList(10)
 

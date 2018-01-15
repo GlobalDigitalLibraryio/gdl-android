@@ -4,7 +4,6 @@ import android.app.Application;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.res.Resources;
-import android.os.Environment;
 import android.os.Process;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -12,7 +11,6 @@ import android.util.Log;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jnull.Nullable;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.ExecutorService;
@@ -29,6 +27,7 @@ import io.digitallibrary.reader.reader.ReaderReadiumEPUBLoader;
 import io.digitallibrary.reader.reader.ReaderReadiumEPUBLoaderType;
 import io.digitallibrary.reader.reader.ReaderSettings;
 import io.digitallibrary.reader.reader.ReaderSettingsType;
+import io.digitallibrary.reader.utilities.LanguageUtil;
 
 import static io.digitallibrary.reader.GdlActivity.MENU_CHOICE_PREF;
 import static io.digitallibrary.reader.catalog.Opds_parserKt.fetchFeed;
@@ -77,31 +76,6 @@ public final class Gdl extends Application {
     public static Prefs getSharedPrefs() {
         final Gdl i = Gdl.checkInitialized();
         return new Prefs(i.getApplicationContext());
-    }
-
-    static File getDiskDataDir(final Context context) {
-        /*
-         * If external storage is mounted and is on a device that doesn't allow
-         * the storage to be removed, use the external storage for data.
-         */
-
-        if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-
-            Log.d(TAG,"trying external storage");
-            if (!Environment.isExternalStorageRemovable()) {
-                final File r = context.getExternalFilesDir(null);
-                Log.d(TAG,"external storage is not removable, using it (" + r + ")");
-                return NullCheck.notNull(r);
-            }
-        }
-
-        /*
-         * Otherwise, use internal storage.
-         */
-
-        final File r = context.getFilesDir();
-        Log.d(TAG,"no non-removable external storage, using internal storage (" + r + ")");
-        return NullCheck.notNull(r);
     }
 
     /**

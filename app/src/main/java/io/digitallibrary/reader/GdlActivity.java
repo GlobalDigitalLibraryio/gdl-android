@@ -1,6 +1,7 @@
 package io.digitallibrary.reader;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -44,6 +45,8 @@ public class GdlActivity extends AppCompatActivity implements FragmentManager.On
 
     public static final String MENU_CHOICE_PREF = "MENU_CHOICE_PREF";
     private static MenuChoices currentMenuChoice;
+
+    private SharedPreferences.OnSharedPreferenceChangeListener langListener;
 
     @Override
     public void onBackStackChanged() {
@@ -120,6 +123,19 @@ public class GdlActivity extends AppCompatActivity implements FragmentManager.On
         mDrawerToggle.syncState();
         updateFragment(MenuChoices.getDefault());
         updateNavigationRows();
+
+
+        langListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if (key.equals(LanguageUtil.getLangPrefKey())) {
+                    updateFragment(MenuChoices.getDefault());
+                    updateNavigationRows();
+                    mDrawerLayout.closeDrawers();
+                }
+            }
+        };
+        Gdl.getSharedPrefs().registerListener(langListener);
     }
 
     private void updateNavigationRows() {
@@ -217,5 +233,6 @@ public class GdlActivity extends AppCompatActivity implements FragmentManager.On
         super.onDestroy();
         Log.v(TAG, "onDestroy");
         mDrawerLayout.removeDrawerListener(mDrawerToggle);
+        Gdl.getSharedPrefs().unregisterListener(langListener);
     }
 }

@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -46,10 +45,14 @@ public class SelectLanguageActivity extends AppCompatActivity {
         overridePendingTransition(0,0);
         ViewTreeObserver vto = languageDrawer.getViewTreeObserver();
         background.setAlpha(0f);
+        final boolean[] haveAnimatedIn = {false};
         vto.addOnGlobalLayoutListener (new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                animateIn();
+                if (!haveAnimatedIn[0]) {
+                    animateIn();
+                    haveAnimatedIn[0] = true;
+                }
             }
         });
 
@@ -64,13 +67,11 @@ public class SelectLanguageActivity extends AppCompatActivity {
                 Collections.sort(langArray);
                 selected = -1;
                 for (int i=0; i != langArray.size(); ++i) {
-                    Log.i(TAG, "i " + i);
                     if (langArray.get(i).equals(LanguageUtil.getCurrentLanguageText())) {
                         selected = i;
                         continue;
                     }
                 }
-                Log.i(TAG, "Selected is: " + selected);
                 langItemsAdapter = new ArrayAdapter<String>(SelectLanguageActivity.this, R.layout.language_row, R.id.language_name, langArray) {
                     @NonNull
                     @Override
@@ -94,7 +95,6 @@ public class SelectLanguageActivity extends AppCompatActivity {
                 langList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Log.i(TAG, "onItemClick: " + position);
                         selected = position;
                         String newLang = langArray.get(position);
                         String newLangCode = languages.get(newLang);
@@ -105,6 +105,7 @@ public class SelectLanguageActivity extends AppCompatActivity {
                         if (!oldLang.equals(newLang)) {
                             Gdl.fetch();
                         }
+                        onClose(null);
                     }
                 });
             }
@@ -141,18 +142,7 @@ public class SelectLanguageActivity extends AppCompatActivity {
         });
     }
 
-    public void onCloseLanguagesClicked(View view) {
-        animateOut();
-        languageDrawer.animate().withEndAction(new Runnable() {
-            @Override
-            public void run() {
-                SelectLanguageActivity.this.finish();
-                SelectLanguageActivity.this.overridePendingTransition(0,0);
-            }
-        });
-    }
-
-    public void onBackgroundClicked(View view) {
+    public void onClose(View view) {
         animateOut();
         languageDrawer.animate().withEndAction(new Runnable() {
             @Override
