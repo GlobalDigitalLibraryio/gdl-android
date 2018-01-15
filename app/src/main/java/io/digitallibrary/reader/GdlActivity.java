@@ -122,7 +122,6 @@ public class GdlActivity extends AppCompatActivity implements FragmentManager.On
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mDrawerToggle.syncState();
         updateFragment(MenuChoices.getDefault());
-        updateNavigationRows();
 
 
         langListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -130,7 +129,6 @@ public class GdlActivity extends AppCompatActivity implements FragmentManager.On
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                 if (key.equals(LanguageUtil.getLangPrefKey())) {
                     updateFragment(MenuChoices.getDefault());
-                    updateNavigationRows();
                     mDrawerLayout.closeDrawers();
                 }
             }
@@ -155,15 +153,17 @@ public class GdlActivity extends AppCompatActivity implements FragmentManager.On
         currentMenuChoice = newChoice;
         if (currentMenuChoice == MenuChoices.CATALOG) {
             Fragment f = new CatalogFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
+            // Need to call commitAllowingStateLoss instead of just commit to avoid crash on old Android versions
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, f).commitAllowingStateLoss();
             setTitle(R.string.catalog);
         } else if (currentMenuChoice == MenuChoices.MY_BOOKS) {
             Fragment f = new CatalogDownloadedFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, f).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, f).commitAllowingStateLoss();
             setTitle(R.string.nav_my_library);
         } else {
             throw new UnreachableCodeException();
         }
+        updateNavigationRows();
     }
 
     @Override
@@ -206,7 +206,6 @@ public class GdlActivity extends AppCompatActivity implements FragmentManager.On
             return;
         }
         updateFragment(MenuChoices.MY_BOOKS);
-        updateNavigationRows();
         mDrawerLayout.closeDrawers();
     }
 
@@ -216,7 +215,6 @@ public class GdlActivity extends AppCompatActivity implements FragmentManager.On
             return;
         }
         updateFragment(MenuChoices.CATALOG);
-        updateNavigationRows();
         mDrawerLayout.closeDrawers();
     }
 
