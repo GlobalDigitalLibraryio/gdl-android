@@ -49,7 +49,7 @@ class CatalogViewModel : ViewModel() {
 
     fun getBooks(categoryId: String): LiveData<List<Book>> {
         if (!books.containsKey(categoryId)) {
-            books[categoryId] = Gdl.getDatabase().bookDao().getBooks(categoryId)
+            books[categoryId] = Gdl.getDatabase().bookDao().getLiveBooks(categoryId)
         }
         return books[categoryId]!!
     }
@@ -67,7 +67,7 @@ class CatalogViewModel : ViewModel() {
 
     fun getDownloadedBooks(): LiveData<List<Book>> {
         if (downloadedBooks == null) {
-            downloadedBooks = Gdl.getDatabase().bookDao().getDownloadedBooks()
+            downloadedBooks = Gdl.getDatabase().bookDao().getLiveDownloadedBooks()
         }
         return downloadedBooks!!
     }

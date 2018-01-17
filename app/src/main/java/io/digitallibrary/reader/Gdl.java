@@ -27,7 +27,6 @@ import io.digitallibrary.reader.reader.ReaderReadiumEPUBLoader;
 import io.digitallibrary.reader.reader.ReaderReadiumEPUBLoaderType;
 import io.digitallibrary.reader.reader.ReaderSettings;
 import io.digitallibrary.reader.reader.ReaderSettingsType;
-import io.digitallibrary.reader.utilities.LanguageUtil;
 
 import static io.digitallibrary.reader.GdlActivity.MENU_CHOICE_PREF;
 import static io.digitallibrary.reader.catalog.Opds_parserKt.fetchFeed;

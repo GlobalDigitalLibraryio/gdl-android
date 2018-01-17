@@ -5,7 +5,7 @@ import android.arch.persistence.room.*
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
-@Entity(tableName = "books")
+@Entity(tableName = "books", indices = [(Index(value = [("id")], name = "book_id_index", unique = true))])
 data class Book(
         @PrimaryKey
         var dbid: Long? = null,
@@ -19,7 +19,6 @@ data class Book(
         var author: String? = null,
         var publisher: String? = null,
         @ColumnInfo(name = "reading_position")
-        var readingPosition: String? = null,
         var image: String? = null,
         var thumb: String? = null,
         @ColumnInfo(name = "epub_link")
@@ -27,33 +26,19 @@ data class Book(
         var description: String? = null,
         var updated: OffsetDateTime? = null,
         var created: OffsetDateTime? = null,
-        var published: OffsetDateTime? = null,
-        @ColumnInfo(name = "category_id")
-        var categoryId: String? = null
+        var published: OffsetDateTime? = null
 )
 
 @Dao
 interface BookDao {
-    @Insert
-    fun insert(book: Book)
-
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertList(books: List<Book>)
 
     @Update
     fun update(book: Book)
 
     @Delete
-    fun delete(book: Book)
-
-    @Query("DELETE FROM books")
-    fun deleteAll()
-
-    @Query("SELECT * FROM books WHERE downloaded NOT NULL")
-    fun getDownloadedBooks(): LiveData<List<Book>>
-
-    @Query("SELECT * FROM books WHERE category_id = :arg0")
-    fun getBooks(categoryId: String): LiveData<List<Book>>
+    fun delete(books: List<Book>)
 
     @Query("SELECT * FROM books WHERE id = :arg0")
     fun getBook(bookId: String): Book
@@ -61,35 +46,33 @@ interface BookDao {
     @Query("SELECT * FROM books WHERE id = :arg0")
     fun getLiveBook(bookId: String): LiveData<Book>
 
-    @Query("SELECT * FROM books WHERE id IN (SELECT book_id FROM book_downloads WHERE download_id = :arg0)")
-    fun getBookFromDownloadId(downloadId: String): Book
+    @Query(value = "SELECT * FROM books JOIN book_categories_map ON books.id = book_categories_map.book_id " +
+            "WHERE book_categories_map.category_id = :arg0 ORDER BY book_categories_map.view_order")
+    fun getBooks(categoryId: String): List<Book>
+
+    @Query(value = "SELECT * FROM books JOIN book_categories_map ON books.id = book_categories_map.book_id " +
+            "WHERE book_categories_map.category_id = :arg0 ORDER BY book_categories_map.view_order")
+    fun getLiveBooks(categoryId: String): LiveData<List<Book>>
+
+    @Query("SELECT * FROM books WHERE downloaded NOT NULL")
+    fun getLiveDownloadedBooks(): LiveData<List<Book>>
 
     @Query("SELECT COUNT(dbid) FROM books WHERE language = :arg0 LIMIT 1")
     fun haveLanguage(language: String): Boolean
 }
 
-@Entity(tableName = "categories")
+@Entity(tableName = "categories", indices = [(Index(value = [("id")], name = "category_id_index", unique = true))])
 data class Category(
-    @PrimaryKey
-    var dbid: Long? = null,
-    var id: String = "",
-    var title: String? = "",
-    var link: String? = "",
-    var language: String? = null,
-    @ColumnInfo(name = "view_order")
-    var viewOrder: Int? = null,
-    var updated: OffsetDateTime? = null,
-    var description: String? = ""
-)
-
-@Entity()
-data class BookCategoryMap(
         @PrimaryKey
         var dbid: Long? = null,
-        @ColumnInfo(name = "book_id")
-        var bookId: String? = null,
-        @ColumnInfo(name = "category_id")
-        var categoryId: String? = null
+        var id: String = "",
+        var title: String? = "",
+        var link: String? = "",
+        var language: String? = null,
+        @ColumnInfo(name = "view_order")
+        var viewOrder: Int? = null,
+        var updated: OffsetDateTime? = null,
+        var description: String? = ""
 )
 
 @Dao
@@ -103,20 +86,42 @@ interface CategoryDao {
     @Delete
     fun delete(category: Category)
 
+    @Query("SELECT * FROM categories WHERE id = :arg0")
+    fun getCategory(categoryId: String): Category
+
     @Query("SELECT * FROM categories WHERE language = :arg0 ORDER BY view_order")
     fun getCategories(language: String): List<Category>
 
     @Query("SELECT * FROM categories WHERE language = :arg0 ORDER BY view_order")
     fun getLiveCategories(language: String): LiveData<List<Category>>
+}
 
-    @Query("DELETE FROM categories")
-    fun deleteAll()
+@Entity(tableName = "book_categories_map")
+data class BookCategoryMap(
+        @PrimaryKey
+        var dbid: Long? = null,
+        @ColumnInfo(name = "book_id")
+        var bookId: String? = null,
+        @ColumnInfo(name = "category_id")
+        var categoryId: String? = null,
+        @ColumnInfo(name = "view_order")
+        var viewOrder: Int? = null,
+        var language: String? = null
+)
 
-    @Query("SELECT * FROM categories")
-    fun getAllCategories(): LiveData<List<Category>>
+@Dao
+interface BookCategoryMapDao{
+    @Insert
+    fun insert(bookCategoryMap: List<BookCategoryMap>)
 
-    @Query("SELECT * FROM categories WHERE id = :arg0")
-    fun getCategory(categoryId: String): Category
+    @Update
+    fun update(bookCategoryMap: BookCategoryMap)
+
+    @Delete
+    fun delete(bookCategoryMap: List<BookCategoryMap>)
+
+    @Query(value = "SELECT * FROM book_categories_map WHERE category_id = :arg0 ORDER BY view_order")
+    fun getBookCategoryMaps(categoryId: String): List<BookCategoryMap>
 }
 
 @Entity(tableName = "book_downloads")
@@ -171,5 +176,6 @@ object TimeTypeConverters {
 abstract class CatalogDatabase : RoomDatabase() {
     abstract fun bookDao(): BookDao
     abstract fun categoryDao(): CategoryDao
+    abstract fun bookCategoryMapDao(): BookCategoryMapDao
     abstract fun bookDownloadDao(): BookDownloadDao
 }

@@ -1,7 +1,6 @@
 package io.digitallibrary.reader.utilities;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -40,7 +39,6 @@ public class LanguageUtil {
                         JSONObject lang = jsonArray.getJSONObject(i);
                         m.put(lang.getString("name"), lang.getString("code"));
                     }
-                    Log.d(TAG, "Resp: " + m);
                     callback.onSuccess(m);
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -170,8 +170,8 @@ interface OpdsParser {
         fun create(): OpdsParser {
 
             // This makes the Convert annotation work
-            val strategy: Strategy = AnnotationStrategy()
-            val serializer: Serializer = Persister(strategy)
+            val strategy = AnnotationStrategy()
+            val serializer = Persister(strategy)
 
             val retrofit = Retrofit.Builder()
                     .baseUrl("https://opds.staging.digitallibrary.io/")
@@ -189,20 +189,18 @@ fun updateCategories(categories: List<Feed.Entry>?, language: String): List<Cate
 
     val categoriesToUpdate: MutableList<Category> = ArrayList(10)
 
-    val categoriesList = categories.orEmpty().mapIndexed { i, it ->
+    categories.orEmpty().mapIndexed { index, entry ->
         Category(
-                id = it.id ?: "missing",
-                title = it.title,
-                link = it.links.orEmpty().firstOrNull { it.type.equals(ACQUISITION_TYPE_STRING) }?.href,
+                id = entry.id ?: "missing",
+                title = entry.title,
+                link = entry.links.orEmpty().firstOrNull { it.type.equals(ACQUISITION_TYPE_STRING) }?.href,
                 language = language,
-                viewOrder = i,
-                updated = it.updated,
-                description = it.summary
+                viewOrder = index,
+                updated = entry.updated,
+                description = entry.summary
         )
-    }
-
-    categoriesList.forEach {
-        val old = oldCategoryMap.get(it.id)
+    }.forEach {
+        val old = oldCategoryMap[it.id]
         if (old != null) {
             it.dbid = old.dbid
             val oldTime = old.updated
@@ -222,47 +220,139 @@ fun updateCategories(categories: List<Feed.Entry>?, language: String): List<Cate
     }
 
     oldCategoryMap.values.forEach {
+        val booksFromDeletedCategory = Gdl.getDatabase().bookDao().getBooks(it.id)
+        Gdl.getDatabase().bookDao().delete(booksFromDeletedCategory.filter { it.downloaded == null })
         dao.delete(it)
     }
 
     return categoriesToUpdate
 }
 
-fun saveBooks(category: Category, books: List<Feed.Entry>?, language: String) {
-    val dao = Gdl.getDatabase().bookDao()
-    dao.insertList(
-            books.orEmpty().map {
-                Book(
-                        id = it.id ?: "missing",
-                        title = it.title,
-                        downloaded = null,
-                        readingLevel = it.educationalAlignment?.targetName?.toInt(),
-                        language = language,
-                        license = it.license,
+fun updateBooks(category: Category, books: List<Feed.Entry>, language: String, checkDb: Boolean = false, startAtIndex: Int = 0) {
+    if (checkDb) {
+        val oldBooks: MutableMap<String, Book> = HashMap()
+        Gdl.getDatabase().bookDao().getBooks(category.id).associateByTo(oldBooks) { it.id }
 
-                        /*
-                         * The simple XML parser parses:
-                         *   <author>
-                         *       <name/>
-                         *   </author>
-                         * to:
-                         *   [null]
-                         * which joinToString turned into the String "null" by default (bug?)
-                         */
-                        author = it.author?.joinToString(transform = { str: String? -> str ?: "" }),
-                        publisher = it.publisher,
-                        readingPosition = null,
-                        image = it.links.orEmpty().firstOrNull { it.rel == AQ_IMAGE_LINK_REL }?.href,
-                        thumb = it.links.orEmpty().firstOrNull { it.rel == AQ_IMAGE_THUMB_LINK_REL }?.href,
-                        ePubLink = it.links.orEmpty().firstOrNull { it.type?.startsWith(EPUB_TYPE) == true }?.href,
-                        description = it.summary,
-                        updated = it.updated,
-                        created = it.created,
-                        published = it.published,
-                        categoryId = category.id
+        val oldBookCategoryMap: MutableMap<String, BookCategoryMap> = HashMap()
+        Gdl.getDatabase().bookCategoryMapDao().getBookCategoryMaps(category.id).associateByTo(oldBookCategoryMap) { it.bookId!! }
+
+        val booksToInsert: MutableList<Book> = ArrayList(books.size)
+        val bookCategoryMapsToInsert: MutableList<BookCategoryMap> = ArrayList(books.size)
+
+        books.map {
+            Book(
+                    id = it.id ?: "missing",
+                    title = it.title,
+                    downloaded = null,
+                    readingLevel = it.educationalAlignment?.targetName?.toInt(),
+                    language = language,
+                    license = it.license,
+
+                    /*
+                     * The simple XML parser parses:
+                     *   <author>
+                     *       <name/>
+                     *   </author>
+                     * to:
+                     *   [null]
+                     * which joinToString turned into the String "null" by default (bug?)
+                     */
+                    author = it.author?.joinToString(transform = { str: String? -> str ?: "" }),
+                    publisher = it.publisher,
+                    image = it.links.orEmpty().firstOrNull { it.rel == AQ_IMAGE_LINK_REL }?.href,
+                    thumb = it.links.orEmpty().firstOrNull { it.rel == AQ_IMAGE_THUMB_LINK_REL }?.href,
+                    ePubLink = it.links.orEmpty().firstOrNull { it.type?.startsWith(EPUB_TYPE) == true }?.href,
+                    description = it.summary,
+                    updated = it.updated,
+                    created = it.created,
+                    published = it.published
+            )
+        }.forEachIndexed { index, book ->
+            val old = oldBooks[book.id]
+            if (old != null) {
+                book.dbid = old.dbid
+                if (book != old) {
+                    Gdl.getDatabase().bookDao().update(book)
+                }
+                val oldMapping = oldBookCategoryMap[book.id]
+
+                if (oldMapping != null) {
+                    if (oldMapping.viewOrder != index) {
+                        oldMapping.viewOrder = index
+                        Gdl.getDatabase().bookCategoryMapDao().update(oldMapping)
+                    }
+                } else {
+                    Log.e(TAG, "Have old book, but no BookCategoryMap. This should be impossible.")
+                    bookCategoryMapsToInsert.add(
+                            BookCategoryMap(
+                                    bookId = book.id,
+                                    categoryId = category.id,
+                                    viewOrder = index,
+                                    language = language
+                            )
+                    )
+                }
+                oldBooks.remove(book.id)
+                oldBookCategoryMap.remove(book.id)
+            } else {
+                booksToInsert.add(book)
+                bookCategoryMapsToInsert.add(
+                        BookCategoryMap(
+                                bookId = book.id,
+                                categoryId = category.id,
+                                viewOrder = index,
+                                language = language
+                        )
                 )
             }
-    )
+        }
+
+        Gdl.getDatabase().bookDao().insertList(booksToInsert)
+        // We do not delete downloaded books
+        Gdl.getDatabase().bookDao().delete(oldBooks.values.filter { it.downloaded == null }.toList())
+        Gdl.getDatabase().bookCategoryMapDao().insert(bookCategoryMapsToInsert)
+        Gdl.getDatabase().bookCategoryMapDao().delete(oldBookCategoryMap.values.toList())
+    } else {
+        Gdl.getDatabase().bookDao().insertList(
+                books.map {
+                    Book(
+                            id = it.id ?: "missing",
+                            title = it.title,
+                            downloaded = null,
+                            readingLevel = it.educationalAlignment?.targetName?.toInt(),
+                            language = language,
+                            license = it.license,
+
+                            /*
+                             * The simple XML parser parses:
+                             *   <author>
+                             *       <name/>
+                             *   </author>
+                             * to:
+                             *   [null]
+                             * which joinToString turned into the String "null" by default (bug?)
+                             */
+                            author = it.author?.joinToString(transform = { str: String? -> str ?: "" }),
+                            publisher = it.publisher,
+                            image = it.links.orEmpty().firstOrNull { it.rel == AQ_IMAGE_LINK_REL }?.href,
+                            thumb = it.links.orEmpty().firstOrNull { it.rel == AQ_IMAGE_THUMB_LINK_REL }?.href,
+                            ePubLink = it.links.orEmpty().firstOrNull { it.type?.startsWith(EPUB_TYPE) == true }?.href,
+                            description = it.summary,
+                            updated = it.updated,
+                            created = it.created,
+                            published = it.published
+                    )
+                })
+        Gdl.getDatabase().bookCategoryMapDao().insert(
+                books.mapIndexed { index, entry ->
+                    BookCategoryMap(
+                            bookId = entry.id,
+                            categoryId = category.id,
+                            viewOrder = index + startAtIndex,
+                            language = language
+                    )
+                })
+    }
 }
 
 val fetchJobLock = Any()
@@ -340,7 +430,7 @@ fun fetchFeed(recursive: Boolean = false) {
                                 null
                             } ?: return@async
 
-                    saveBooks(it, aq.body()?.entries, lang)
+                    updateBooks(it, aq.body()?.entries ?: emptyList(), lang, checkDb = true)
                 })
             }
         } else {
@@ -369,16 +459,16 @@ fun fetchFeed(recursive: Boolean = false) {
                 if (books != null) {
                     if (books.size > 6) {
                         todoLater.add(Pair(it.first, books.subList(6, books.size)))
-                        saveBooks(it.first, books.subList(0, 6), lang)
+                        updateBooks(it.first, books.subList(0, 6), lang)
                     } else {
-                        saveBooks(it.first, books, lang)
+                        updateBooks(it.first, books, lang)
                     }
                 }
             }
 
             todoLater.forEach {
                 jobs.add(async {
-                    saveBooks(it.first, it.second, lang)
+                    updateBooks(it.first, it.second, lang, startAtIndex = 6)
                 })
             }
         }
