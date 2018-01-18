@@ -40,24 +40,28 @@ interface BookDao {
     @Delete
     fun delete(books: List<Book>)
 
-    @Query("SELECT * FROM books WHERE id = :arg0")
+    @Query("SELECT * FROM books WHERE id = :bookId")
     fun getBook(bookId: String): Book
 
-    @Query("SELECT * FROM books WHERE id = :arg0")
+    @Query("SELECT * FROM books WHERE id = :bookId")
     fun getLiveBook(bookId: String): LiveData<Book>
 
-    @Query(value = "SELECT * FROM books JOIN book_categories_map ON books.id = book_categories_map.book_id " +
-            "WHERE book_categories_map.category_id = :arg0 ORDER BY book_categories_map.view_order")
+    @Query(value = "SELECT books.dbid, id, title, downloaded, reading_level, books.language, " +
+            "license, author, publisher, reading_position, thumb, epub_link, description, updated, " +
+            "created, published FROM books JOIN book_categories_map ON books.id = book_categories_map.book_id " +
+            "WHERE book_categories_map.category_id = :categoryId ORDER BY book_categories_map.view_order")
     fun getBooks(categoryId: String): List<Book>
 
-    @Query(value = "SELECT * FROM books JOIN book_categories_map ON books.id = book_categories_map.book_id " +
-            "WHERE book_categories_map.category_id = :arg0 ORDER BY book_categories_map.view_order")
+    @Query(value = "SELECT books.dbid, id, title, downloaded, reading_level, books.language, " +
+            "license, author, publisher, reading_position, thumb, epub_link, description, updated, " +
+            "created, published FROM books JOIN book_categories_map ON books.id = book_categories_map.book_id " +
+            "WHERE book_categories_map.category_id = :categoryId ORDER BY book_categories_map.view_order")
     fun getLiveBooks(categoryId: String): LiveData<List<Book>>
 
     @Query("SELECT * FROM books WHERE downloaded NOT NULL")
     fun getLiveDownloadedBooks(): LiveData<List<Book>>
 
-    @Query("SELECT COUNT(dbid) FROM books WHERE language = :arg0 LIMIT 1")
+    @Query("SELECT COUNT(dbid) FROM books WHERE language = :language LIMIT 1")
     fun haveLanguage(language: String): Boolean
 }
 
@@ -86,13 +90,13 @@ interface CategoryDao {
     @Delete
     fun delete(category: Category)
 
-    @Query("SELECT * FROM categories WHERE id = :arg0")
+    @Query("SELECT * FROM categories WHERE id = :categoryId")
     fun getCategory(categoryId: String): Category
 
-    @Query("SELECT * FROM categories WHERE language = :arg0 ORDER BY view_order")
+    @Query("SELECT * FROM categories WHERE language = :language ORDER BY view_order")
     fun getCategories(language: String): List<Category>
 
-    @Query("SELECT * FROM categories WHERE language = :arg0 ORDER BY view_order")
+    @Query("SELECT * FROM categories WHERE language = :language ORDER BY view_order")
     fun getLiveCategories(language: String): LiveData<List<Category>>
 }
 
@@ -120,7 +124,7 @@ interface BookCategoryMapDao{
     @Delete
     fun delete(bookCategoryMap: List<BookCategoryMap>)
 
-    @Query(value = "SELECT * FROM book_categories_map WHERE category_id = :arg0 ORDER BY view_order")
+    @Query(value = "SELECT * FROM book_categories_map WHERE category_id = :categoryId ORDER BY view_order")
     fun getBookCategoryMaps(categoryId: String): List<BookCategoryMap>
 }
 
@@ -142,13 +146,13 @@ interface BookDownloadDao{
     @Delete
     fun delete(bookDownload: BookDownload)
 
-    @Query("DELETE FROM book_downloads WHERE book_id = :arg0")
+    @Query("DELETE FROM book_downloads WHERE book_id = :bookId")
     fun delete(bookId: String)
 
-    @Query("SELECT * FROM book_downloads WHERE book_id = :arg0")
+    @Query("SELECT * FROM book_downloads WHERE book_id = :bookId")
     fun getBookDownload(bookId: String?): BookDownload?
 
-    @Query("SELECT * FROM book_downloads WHERE download_id = :arg0")
+    @Query("SELECT * FROM book_downloads WHERE download_id = :downloadId")
     fun getBookDownload(downloadId: Long?): BookDownload?
 
 }

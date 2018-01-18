@@ -38,8 +38,8 @@
             android:paddingTop="5dp"
             android:text="@string/catalog_more_feed"
             android:textAllCaps="true"
-            android:textColor="@color/gdl_primary"
-            android:textSize="12sp" />
+            android:textColor="@color/gdl_links"
+            android:textSize="14sp" />
     </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView

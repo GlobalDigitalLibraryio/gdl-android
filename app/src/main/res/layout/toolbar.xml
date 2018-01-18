@@ -4,5 +4,5 @@
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
     app:titleTextColor="@color/white"
-    android:background="@drawable/gradient_toolbar"
+    android:background="@color/gdl_blue"
     android:fitsSystemWindows="true" />
