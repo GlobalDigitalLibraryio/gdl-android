@@ -75,7 +75,7 @@ class BookDetailsActivity : AppCompatActivity() {
                                     .apply(RequestOptions().centerCrop().placeholder(R.drawable.book_image_placeholder))
                                     .into(book_cover)
                             book_title.text = it.title
-                            book_publisher.text = it.publisher
+                            book_publisher.text = getString(R.string.book_publisher, it.publisher)
                             book_description.text = it.description
                             book_level.text = getString(R.string.book_level, it.readingLevel)
                             book_authors.text = it.author
@@ -98,8 +98,6 @@ class BookDetailsActivity : AppCompatActivity() {
                 }
             }
         })
-
-
     }
 
     private fun updateActionButtons() {

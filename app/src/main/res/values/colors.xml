@@ -9,7 +9,7 @@
     <color name="gdl_links">#FF0085DD</color>
 
     <!--Support colors-->
-    <color name="red_dark">#DA3D34</color>
+    <color name="red_dark">#AE0E16</color>
 
     <color name="green_highlight">#EDFFF4</color>
 
@@ -18,7 +18,7 @@
     <color name="white">#FFFFFF</color>
 
     <color name="gray_platinum">#E3E3E3</color>
-    <color name="gray_gallery">#EFF0F2</color>
+    <color name="gray_background">#EFF0F2</color>
     <color name="gray_desert_storm">#F8F8F8</color>
 
     <!--Navigation drawer-->

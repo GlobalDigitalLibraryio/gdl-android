@@ -6,8 +6,8 @@
 
     <!-- Catalog strings -->
     <string name="catalog">Catalog</string>
-    <string name="catalog_book_detail">Details</string>
-    <string name="catalog_cancel_downloading">Cancel</string>
+    <string name="catalog_book_detail">Book Details</string>
+    <string name="catalog_cancel_downloading">Cancel Download</string>
     <string name="catalog_unknown_feed">Unknown</string>
     <string name="catalog_more_feed">More</string>
 
@@ -15,6 +15,7 @@
     <string name="book_license">License</string>
     <string name="book_authors">Authors</string>
     <string name="book_level">Level %1$d</string>
+    <string name="book_publisher">From %1$s</string>
     <string name="book_published">Published</string>
 
     <!-- Catalog book detail strings -->
@@ -22,7 +23,7 @@
     <string name="catalog_book_error_dismiss">Dismiss</string>
     <string name="catalog_book_error_retry">Retry</string>
     <string name="catalog_book_download">Download</string>
-    <string name="catalog_book_delete">Delete</string>
+    <string name="catalog_book_delete">Delete Book</string>
 
 
     <!-- Accessibility strings used for content descriptions (Settings) -->
@@ -54,4 +55,5 @@
     <string name="nav_current_language">Books in %1$s</string>
     <string name="language_header">Language</string>
     <string name="error_fetching_languages">Error fetching languages</string>
+    <string name="book_downloading">Downloading</string>
 </resources>

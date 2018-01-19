@@ -2,7 +2,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <style name="GdlTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:colorPrimary">@color/gdl_blue</item>
-        <item name="android:colorPrimaryDark">@color/gdl_blue</item>
+        <item name="android:colorPrimaryDark">@color/gdl_dark</item>
         <item name="android:colorAccent">@color/gdl_blue</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textColorSecondary">@color/white</item>

@@ -1,6 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/gray_background"
     android:orientation="vertical">
 
     <include layout="@layout/toolbar" />
@@ -15,23 +16,21 @@
             android:id="@+id/book_dialog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/gray_gallery"
             android:orientation="vertical">
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/gradient">
+                android:layout_height="wrap_content">
 
                 <android.support.v7.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="11dp"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="173dp"
                     android:background="@color/white"
-                    android:orientation="vertical"
-                    card_view:cardCornerRadius="4dp"
-                    card_view:cardElevation="4dp"
-                    card_view:cardUseCompatPadding="true">
+                    card_view:cardCornerRadius="0dp"
+                    card_view:cardElevation="1dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -43,8 +42,7 @@
                             android:id="@+id/book_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="15dp"
-                            android:layout_marginStart="15dp"
+                            android:layout_marginTop="30dp"
                             android:ellipsize="end"
                             android:gravity="center"
                             android:maxLines="2"
@@ -56,9 +54,6 @@
                             android:id="@+id/book_publisher"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="15dp"
-                            android:layout_marginStart="15dp"
-                            android:layout_marginTop="3dp"
                             android:ellipsize="end"
                             android:gravity="center"
                             android:maxLines="1"
@@ -66,190 +61,175 @@
                             android:textColor="@color/dark_text"
                             android:textSize="14sp" />
 
-                        <android.support.v7.widget.CardView
-                            android:layout_width="wrap_content"
+                        <TextView
+                            android:id="@+id/book_description"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginBottom="13dp"
-                            android:layout_marginTop="13dp"
-                            android:background="@color/white"
-                            card_view:cardCornerRadius="4dp"
-                            card_view:cardElevation="2dp"
-                            card_view:cardUseCompatPadding="true">
-
-                            <ImageView
-                                android:id="@+id/book_cover"
-                                android:layout_width="150dp"
-                                android:layout_height="185dp" />
-
-                        </android.support.v7.widget.CardView>
+                            android:layout_marginTop="15dp"
+                            android:gravity="center"
+                            android:text="@string/placeholder_description"
+                            android:textColor="@color/dark_text"
+                            android:textSize="12sp" />
 
                         <LinearLayout
                             android:id="@+id/book_download_failed_container"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="15dp"
                             android:gravity="center_horizontal"
-                            android:orientation="horizontal"
+                            android:orientation="vertical"
                             android:visibility="gone">
 
                             <Button
                                 android:id="@+id/book_download_retry"
-                                android:layout_width="140dp"
+                                style="?android:attr/buttonBarButtonStyle"
+                                android:layout_width="@dimen/button_standard_width"
                                 android:layout_height="@dimen/button_standard_height"
-                                android:layout_marginEnd="5dp"
-                                android:background="@drawable/button_green"
-                                android:elevation="1dp"
+                                android:background="@drawable/button_blue"
                                 android:text="@string/catalog_book_error_retry"
                                 android:textColor="@color/white"
-                                android:textSize="@dimen/button_text_size"
-                                android:translationZ="1dp" />
+                                android:textSize="@dimen/button_standard_text_size" />
 
                             <Button
                                 android:id="@+id/book_download_dismiss"
-                                android:layout_width="140dp"
+                                style="?android:attr/borderlessButtonStyle"
+                                android:layout_width="@dimen/button_standard_width"
                                 android:layout_height="@dimen/button_standard_height"
-                                android:background="@drawable/button_green"
-                                android:elevation="1dp"
+                                android:layout_gravity="center_horizontal"
                                 android:text="@string/catalog_book_error_dismiss"
-                                android:textColor="@color/white"
-                                android:textSize="@dimen/button_text_size"
-                                android:translationZ="1dp" />
+                                android:textAllCaps="false"
+                                android:textColor="@color/red_dark" />
                         </LinearLayout>
 
                         <LinearLayout
                             android:id="@+id/book_read_and_delete_container"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="15dp"
                             android:gravity="center_horizontal"
-                            android:orientation="horizontal"
+                            android:orientation="vertical"
                             android:visibility="gone">
 
                             <Button
                                 android:id="@+id/book_read_book"
-                                android:layout_width="140dp"
+                                style="?android:attr/borderlessButtonStyle"
+                                android:layout_width="@dimen/button_standard_width"
                                 android:layout_height="@dimen/button_standard_height"
-                                android:layout_marginEnd="5dp"
-                                android:background="@drawable/button_green"
-                                android:elevation="1dp"
+                                android:background="@drawable/button_blue"
                                 android:text="@string/catalog_book_read"
                                 android:textColor="@color/white"
-                                android:textSize="@dimen/button_text_size"
-                                android:translationZ="1dp" />
+                                android:textSize="@dimen/button_standard_text_size" />
 
-                            <ImageButton
+                            <Button
                                 android:id="@+id/book_delete_book"
-                                android:layout_width="35dp"
+                                style="?android:attr/borderlessButtonStyle"
+                                android:layout_width="@dimen/button_standard_width"
                                 android:layout_height="@dimen/button_standard_height"
-                                android:background="@drawable/button_red"
-                                android:contentDescription="@string/catalog_book_delete"
-                                android:elevation="1dp"
-                                android:src="@drawable/ic_delete_forever_white_24dp"
-                                android:textColor="@color/white"
-                                android:textSize="@dimen/button_text_size"
-                                android:translationZ="1dp" />
+                                android:layout_gravity="center_horizontal"
+                                android:text="@string/catalog_book_delete"
+                                android:textAllCaps="false"
+                                android:textColor="@color/red_dark" />
                         </LinearLayout>
 
                         <LinearLayout
                             android:id="@+id/book_downloading_container"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="15dp"
                             android:gravity="center_horizontal"
-                            android:orientation="horizontal"
+                            android:orientation="vertical"
                             android:visibility="gone">
 
-                            <RelativeLayout
-                                android:layout_width="140dp"
+                            <LinearLayout
+                                android:layout_width="@dimen/button_standard_width"
                                 android:layout_height="@dimen/button_standard_height"
                                 android:layout_marginEnd="5dp"
-                                android:background="@drawable/button_green_outline"
-                                android:gravity="center"
-                                android:elevation="1dp"
-                                android:translationZ="1dp">
-                                <ProgressBar
-                                    android:indeterminateTint="#FF359258"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content" />
-                            </RelativeLayout>
+                                android:background="@drawable/button_gray"
+                                android:gravity="center_vertical">
 
-                            <ImageButton
+                                <ProgressBar
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:layout_marginStart="12dp"
+                                    android:indeterminateTint="@color/dark_text" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="10dp"
+                                    android:text="@string/book_downloading"
+                                    android:textAllCaps="true"
+                                    android:textColor="@color/dark_text"
+                                    android:textSize="@dimen/button_standard_text_size" />
+                            </LinearLayout>
+
+                            <Button
                                 android:id="@+id/book_download_cancel"
-                                android:layout_width="35dp"
+                                style="?android:attr/borderlessButtonStyle"
+                                android:layout_width="@dimen/button_standard_width"
                                 android:layout_height="@dimen/button_standard_height"
                                 android:layout_gravity="center_horizontal"
-                                android:background="@drawable/button_red"
-                                android:contentDescription="@string/catalog_cancel_downloading"
-                                android:elevation="1dp"
-                                android:src="@drawable/ic_close_white_24dp"
-                                android:translationZ="1dp" />
+                                android:text="@string/catalog_cancel_downloading"
+                                android:textAllCaps="false"
+                                android:textColor="@color/red_dark" />
                         </LinearLayout>
 
                         <LinearLayout
                             android:id="@+id/book_download_button_container"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="15dp"
                             android:gravity="center_horizontal"
                             android:orientation="horizontal"
                             android:visibility="gone">
 
                             <Button
                                 android:id="@+id/book_download_button"
-                                android:layout_width="140dp"
+                                android:layout_width="@dimen/button_standard_width"
                                 android:layout_height="@dimen/button_standard_height"
-                                android:background="@drawable/button_green_outline"
-                                android:elevation="1dp"
+                                android:background="@drawable/button_blue"
                                 android:text="@string/catalog_book_download"
-                                android:textColor="#FF359258"
-                                android:textSize="@dimen/button_text_size"
-                                android:translationZ="1dp" />
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/button_standard_text_size" />
                         </LinearLayout>
                     </LinearLayout>
                 </android.support.v7.widget.CardView>
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/cardView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="15dp"
+                    android:background="@color/white"
+                    card_view:cardCornerRadius="0dp"
+                    card_view:cardElevation="2dp">
+
+                    <ImageView
+                        android:id="@+id/book_cover"
+                        android:layout_width="140dp"
+                        android:layout_height="180dp"
+                        android:layout_margin="5dp" />
+
+                </android.support.v7.widget.CardView>
+
             </RelativeLayout>
 
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="11dp"
+                android:layout_margin="15dp"
                 android:background="@color/white"
                 android:orientation="vertical"
-                card_view:cardCornerRadius="4dp"
-                card_view:cardElevation="4dp"
-                card_view:cardUseCompatPadding="true">
+                card_view:cardCornerRadius="0dp"
+                card_view:cardElevation="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/book_description_header"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="15dp"
-                        android:layout_marginStart="15dp"
-                        android:layout_marginTop="15dp"
-                        android:text="Description"
-                        android:textAllCaps="true"
-                        android:textColor="@color/dark_text"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/book_description"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="15dp"
-                        android:layout_marginEnd="15dp"
-                        android:layout_marginStart="15dp"
-                        android:text="@string/placeholder_description"
-                        android:textColor="@color/dark_text"
-                        android:textSize="12sp" />
-
-                    <View
-                        android:id="@+id/book_description_divider"
-                        android:layout_width="match_parent"
-                        android:layout_height="4dp"
-                        android:background="@color/gray_gallery" />
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -284,21 +264,33 @@
                                 android:textSize="12sp" />
                         </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/book_level"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                        <RelativeLayout
+                            android:layout_width="90dp"
+                            android:layout_height="30dp"
                             android:layout_alignParentEnd="true"
-                            android:layout_gravity="end"
-                            android:layout_marginEnd="15dp"
                             android:layout_marginTop="15dp"
-                            android:background="@drawable/level_background"
-                            android:elevation="1dp"
-                            android:gravity="center"
-                            android:padding="2dp"
-                            android:text="@string/book_level"
-                            android:textColor="#FF359258"
-                            android:translationZ="1dp" />
+                            android:background="@drawable/level_background">
+
+                            <RelativeLayout
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:background="@drawable/level_background_triangle"
+                                android:rotation="90" />
+
+                            <TextView
+                                android:id="@+id/book_level"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:paddingEnd="15dp"
+                                android:layout_centerInParent="true"
+                                android:textAllCaps="true"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:text="@string/book_level"
+                                android:textColor="@color/white" />
+                        </RelativeLayout>
+
                     </RelativeLayout>
 
                     <TextView
@@ -351,6 +343,8 @@
                 </LinearLayout>
 
             </android.support.v7.widget.CardView>
+
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
