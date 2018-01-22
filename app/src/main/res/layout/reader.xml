@@ -225,8 +225,8 @@
               android:contentDescription="@string/reader_accessibility_settings_brightness_slider"
               android:max="100"
               android:maxHeight="2dp"
-              android:progressDrawable="@drawable/simplified_progress"
-              android:thumb="@drawable/simplified_progress_thumb"
+              android:progressDrawable="@drawable/progress"
+              android:thumb="@drawable/progress_thumb"
               />
 
           <ImageView
@@ -267,7 +267,7 @@
           android:layout_marginBottom="8dp"
           android:layout_marginEnd="16dp"
           android:layout_marginStart="16dp"
-          android:progressDrawable="@drawable/simplified_progress"/>
+          android:progressDrawable="@drawable/progress"/>
     </RelativeLayout>
   </RelativeLayout>
 

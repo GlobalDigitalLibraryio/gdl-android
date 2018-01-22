@@ -10,7 +10,8 @@
     <string name="catalog_cancel_downloading">Cancel Download</string>
     <string name="catalog_unknown_feed">Unknown</string>
     <string name="catalog_more_feed">More</string>
-
+    <string name="catalog_change_language">Change</string>
+    <string name="catalog_current_language">Books in %1$s</string>
 
     <string name="book_license">License</string>
     <string name="book_authors">Authors</string>
@@ -45,6 +46,8 @@
     <string name="reader_accessibility_settings_increase_font_size">Increase font size</string>
     <string name="reader_accessibility_settings_brightness_slider">Brightness slider</string>
 
+    <string name="languages_title">Book Language</string>
+    <string name="error_fetching_languages">Error fetching languages</string>
 
     <string name="drawer_open">Open the navigation drawer</string>
     <string name="drawer_close">Close the navigation drawer</string>
@@ -53,7 +56,6 @@
     <string name="nav_menu_title">Menu</string>
     <string name="nav_language_header">Language</string>
     <string name="nav_current_language">Books in %1$s</string>
-    <string name="language_header">Language</string>
-    <string name="error_fetching_languages">Error fetching languages</string>
+
     <string name="book_downloading">Downloading</string>
 </resources>

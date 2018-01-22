@@ -29,12 +29,15 @@ import java.net.URI
 
 
 class BookDetailsActivity : AppCompatActivity() {
-    private val TAG = "BookDetailsActivity"
 
-    private val STATUS_DOWNLOADED = -1
-    private val STATUS_NOT_DOWNLOADED = -2
-    private val STATUS_DOWNLOADING = -3
-    private val STATUS_FAILED = -4
+    companion object {
+        private const val TAG = "BookDetailsActivity"
+        private const val STATUS_DOWNLOADED = -1
+        private const val STATUS_NOT_DOWNLOADED = -2
+        private const val STATUS_DOWNLOADING = -3
+        private const val STATUS_FAILED = -4
+    }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {

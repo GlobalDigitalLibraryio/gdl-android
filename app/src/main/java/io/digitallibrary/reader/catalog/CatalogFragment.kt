@@ -17,6 +17,7 @@ import android.view.View
 import android.view.ViewGroup
 import io.digitallibrary.reader.Gdl
 import io.digitallibrary.reader.R
+import io.digitallibrary.reader.SelectLanguageActivity
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 
@@ -24,7 +25,7 @@ import kotlinx.coroutines.experimental.launch
 class CatalogFragment : Fragment() {
     private var TAG = "CatalogFragment"
 
-    var broadcastReceiver: BroadcastReceiver? = null
+    private var broadcastReceiver: BroadcastReceiver? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.catalog_with_categories, container, false)
@@ -41,7 +42,13 @@ class CatalogFragment : Fragment() {
                 intent.putExtra("book_id", book.id)
                 startActivity(intent)
             }
+
+            override fun onChangeLanguageClicked() {
+                val intent = Intent(activity, SelectLanguageActivity::class.java)
+                startActivity(intent)
+            }
         })
+
         recyclerView.adapter = adapter
 
         val swipeRefreshLayout: SwipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout)

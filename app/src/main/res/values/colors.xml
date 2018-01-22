@@ -12,6 +12,7 @@
     <color name="red_dark">#AE0E16</color>
 
     <color name="green_highlight">#EDFFF4</color>
+    <color name="gdl_green">#00BA6E</color>
 
     <!--Grays-->
     <color name="dark_text">#444444</color>
