@@ -16,7 +16,7 @@ import java.util.*
 
 class SelectLanguageActivity : AppCompatActivity() {
     companion object {
-        val TAG = "SelectLanguageActivity"
+        private const val TAG = "SelectLanguageActivity"
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -82,7 +82,7 @@ class SelectLanguageActivity : AppCompatActivity() {
                     view.findViewById<TextView>(R.id.language_name).setTextColor(ContextCompat.getColor(baseContext, R.color.gdl_green))
                     langItemsAdapter.notifyDataSetChanged()
                     if (oldLang != newLang) {
-                        Gdl.fetch()
+                        Gdl.fetchOpdsFeed()
                     }
                     finish()
                 }

@@ -146,7 +146,7 @@ class BookDetailsActivity : AppCompatActivity() {
             return STATUS_DOWNLOADED
         }
         book?.let {
-            val bookDownload = async { Gdl.getDatabase().bookDownloadDao().getBookDownload(it.id) }.await()
+            val bookDownload = async { Gdl.database?.bookDownloadDao()?.getBookDownload(it.id) }.await()
             if (bookDownload != null) {
                 val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
                 val newStatus = async {
@@ -189,14 +189,14 @@ class BookDetailsActivity : AppCompatActivity() {
     private fun downloadBook() {
         launch(CommonPool) {
             book?.let {
-                val bookDownload = Gdl.getDatabase().bookDownloadDao().getBookDownload(it.id)
+                val bookDownload = Gdl.database.bookDownloadDao().getBookDownload(it.id)
                 if (bookDownload == null) {
                     val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
                     val request = DownloadManager.Request(Uri.parse(it.ePubLink)).setDestinationInExternalFilesDir(applicationContext, null, "books/" + it.id + ".epub")
                     request.setTitle(it.title)
                     request.setDescription(applicationContext.getString(R.string.app_name))
                     val reqId = downloadManager.enqueue(request)
-                    Gdl.getDatabase().bookDownloadDao().insert(BookDownload(bookId = it.id, downloadId = reqId))
+                    Gdl.database.bookDownloadDao().insert(BookDownload(bookId = it.id, downloadId = reqId))
                     updateDownloadingState()
                 }
             }
@@ -206,11 +206,11 @@ class BookDetailsActivity : AppCompatActivity() {
     private fun cancelDownloadBook() {
         launch(CommonPool) {
             book?.let {
-                val bookDownload = Gdl.getDatabase().bookDownloadDao().getBookDownload(it.id)
+                val bookDownload = Gdl.database.bookDownloadDao().getBookDownload(it.id)
                 if (bookDownload != null) {
                     val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
                     bookDownload.downloadId?.let { downloadManager.remove(it) }
-                    Gdl.getDatabase().bookDownloadDao().delete(bookDownload)
+                    Gdl.database.bookDownloadDao().delete(bookDownload)
                 }
                 updateActionButtons()
             }
@@ -236,11 +236,11 @@ class BookDetailsActivity : AppCompatActivity() {
     private fun deleteBook() {
         launch(CommonPool) {
             book?.let {
-                val bookDownload = Gdl.getDatabase().bookDownloadDao().getBookDownload(it.id)
+                val bookDownload = Gdl.database.bookDownloadDao().getBookDownload(it.id)
                 if (bookDownload != null) {
                     val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
                     bookDownload.downloadId?.let { downloadManager.remove(it) }
-                    Gdl.getDatabase().bookDownloadDao().delete(bookDownload)
+                    Gdl.database.bookDownloadDao().delete(bookDownload)
                 }
 
                 it.downloaded?.let { uri ->
@@ -250,8 +250,8 @@ class BookDetailsActivity : AppCompatActivity() {
                     }
                 }
                 it.downloaded = null
-                Gdl.getDatabase().bookDao().update(it)
-                Gdl.getDatabase().bookDownloadDao().delete(it.id)
+                Gdl.database.bookDao().update(it)
+                Gdl.database.bookDownloadDao().delete(it.id)
                 updateActionButtons()
             }
         }

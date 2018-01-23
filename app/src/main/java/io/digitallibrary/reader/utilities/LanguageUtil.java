@@ -59,7 +59,7 @@ public class LanguageUtil {
     }
 
     public static String getCurrentLanguage() {
-        Prefs p = Gdl.getSharedPrefs();
+        Prefs p = Gdl.Companion.getSharedPrefs();
         String current_lang = p.getString(PREF_ID_CURRENT_LANG);
         if (current_lang != null && current_lang.length() > 0) {
             return current_lang;
@@ -69,7 +69,7 @@ public class LanguageUtil {
     }
 
     public static String getCurrentLanguageText() {
-        Prefs p = Gdl.getSharedPrefs();
+        Prefs p = Gdl.Companion.getSharedPrefs();
         String current_lang = p.getString(PREF_ID_CURRENT_LANG_TEXT);
         if (current_lang != null && current_lang.length() > 0) {
             return current_lang;
@@ -79,7 +79,7 @@ public class LanguageUtil {
     }
 
     public static void setLanguage(String lang, String langText) {
-        Prefs p = Gdl.getSharedPrefs();
+        Prefs p = Gdl.Companion.getSharedPrefs();
         p.putString(PREF_ID_CURRENT_LANG, lang);
         p.putString(PREF_ID_CURRENT_LANG_TEXT, langText);
     }

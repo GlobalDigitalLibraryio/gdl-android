@@ -80,7 +80,7 @@ class CategoriesAdapter(val fragment: Fragment, val callback: Callback) : Recycl
         fun bindValues() {
             itemView.catalog_change_language.setOnClickListener { callback.onChangeLanguageClicked() }
             val language = LanguageUtil.getCurrentLanguageText()
-            val text = Gdl.getAppContext().getString(R.string.catalog_current_language, language)
+            val text = Gdl.appContext.getString(R.string.catalog_current_language, language)
             val spanText = SpannableString(text)
             val langStartIndex = text.indexOf(language)
             spanText.setSpan(StyleSpan(BOLD), langStartIndex, langStartIndex + language.length, 0)

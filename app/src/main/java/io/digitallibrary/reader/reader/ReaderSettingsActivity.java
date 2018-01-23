@@ -49,7 +49,7 @@ public class ReaderSettingsActivity extends AppCompatActivity {
             in_rectangle.setOutlineProvider(new RectangleOutline());
         }
 
-        final Gdl.ReaderAppServices rs = Gdl.getReaderAppServices();
+        final Gdl.ReaderAppServices rs = Gdl.Companion.getReaderAppServices();
         final ReaderSettingsType settings = rs.getSettings();
 
         /*

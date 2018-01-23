@@ -172,7 +172,7 @@ public final class ReaderActivity extends Activity
         Log.d(TAG, "epub file: " + in_epub_file);
         Log.d(TAG, "book id:   " + this.book_id);
 
-        final Gdl.ReaderAppServices rs = Gdl.getReaderAppServices();
+        final Gdl.ReaderAppServices rs = Gdl.Companion.getReaderAppServices();
 
         final ReaderSettingsType settings = rs.getSettings();
         settings.addListener(this);
@@ -278,7 +278,7 @@ public final class ReaderActivity extends Activity
 
         in_title_text.setText("");
 
-        final ReaderReadiumEPUBLoaderType pl = rs.getEPUBLoader();
+        final ReaderReadiumEPUBLoaderType pl = rs.getEpubLoader();
         pl.loadEPUB(in_epub_file, this);
 
         updateColors(settings.getColorScheme());
@@ -292,7 +292,7 @@ public final class ReaderActivity extends Activity
     @Override
     public void onCurrentPageReceived(final ReaderBookLocation l) {
         Log.d(TAG, "received book location: " + l);
-        final Gdl.ReaderAppServices rs = Gdl.getReaderAppServices();
+        final Gdl.ReaderAppServices rs = Gdl.Companion.getReaderAppServices();
         final ReaderBookmarks bm = rs.getBookmarks();
         final String in_book_id = NullCheck.notNull(this.book_id);
         bm.setBookmark(in_book_id, l);
@@ -302,7 +302,7 @@ public final class ReaderActivity extends Activity
     protected void onPause() {
         super.onPause();
 
-        final Gdl.ReaderAppServices rs = Gdl.getReaderAppServices();
+        final Gdl.ReaderAppServices rs = Gdl.Companion.getReaderAppServices();
 
         if (this.book_id != null && this.current_location != null) {
             rs.getBookmarks().setBookmark(this.book_id, this.current_location);
@@ -317,7 +317,7 @@ public final class ReaderActivity extends Activity
                 NullCheck.notNull(ReaderActivity.this.readium_js_api);
         readium_js.getCurrentPage(ReaderActivity.this);
 
-        final Gdl.ReaderAppServices rs = Gdl.getReaderAppServices();
+        final Gdl.ReaderAppServices rs = Gdl.Companion.getReaderAppServices();
 
         final ReaderSettingsType settings = rs.getSettings();
         settings.removeListener(this);
@@ -353,7 +353,7 @@ public final class ReaderActivity extends Activity
          * Configure the TOC button.
          */
 
-        final Gdl.ReaderAppServices rs = Gdl.getReaderAppServices();
+        final Gdl.ReaderAppServices rs = Gdl.Companion.getReaderAppServices();
 
         final View in_toc = NullCheck.notNull(this.view_toc);
 
@@ -371,7 +371,7 @@ public final class ReaderActivity extends Activity
          * will still be executed if the server is already running).
          */
 
-        final ReaderHTTPServerType hs = rs.getHTTPServer();
+        final ReaderHTTPServerType hs = rs.getHttpServer();
         hs.startIfNecessaryForPackage(p, this);
     }
 
@@ -428,9 +428,9 @@ public final class ReaderActivity extends Activity
     public void onReadiumFunctionInitialize() {
         Log.d(TAG, "readium initialize requested");
 
-        final Gdl.ReaderAppServices rs = Gdl.getReaderAppServices();
+        final Gdl.ReaderAppServices rs = Gdl.Companion.getReaderAppServices();
 
-        final ReaderHTTPServerType hs = rs.getHTTPServer();
+        final ReaderHTTPServerType hs = rs.getHttpServer();
         final Container c = NullCheck.notNull(this.epub_container);
         final Package p = NullCheck.notNull(c.getDefaultPackage());
         p.setRootUrls(hs.getURIBase().toString(), null);
@@ -438,7 +438,7 @@ public final class ReaderActivity extends Activity
         final ReaderReadiumViewerSettings vs = NullCheck.notNull(this.viewer_settings);
         final ReaderReadiumJavaScriptAPIType js = NullCheck.notNull(this.readium_js_api);
 
-        /**
+        /*
          * If there's a bookmark for the current book, send a request to open the
          * book to that specific page. Otherwise, start at the beginning.
          */
@@ -462,7 +462,7 @@ public final class ReaderActivity extends Activity
         // open book with page request, vs = view settings, p = package , what is package actually ? page_request = idref + contentcfi
         js.openBook(p, vs, page_request);
 
-        /**
+        /*
          * Configure the visibility of UI elements.
          */
 
@@ -508,7 +508,7 @@ public final class ReaderActivity extends Activity
         final WebView in_web_view = NullCheck.notNull(this.view_web_view);
 
 
-        /**
+        /*
          * Configure the progress bar and text.
          */
 
@@ -536,7 +536,7 @@ public final class ReaderActivity extends Activity
                                     default_package.getSpineItem(page.getIDRef()).getTitle())));
                 }
 
-                /**
+                /*
                  * Ask for Readium to deliver the unique identifier of the current page,
                  * and tell Gdl that the page has changed and so any Javascript
                  * state should be reconfigured.
@@ -555,7 +555,7 @@ public final class ReaderActivity extends Activity
         final ReaderJavaScriptAPIType simplified_js =
                 NullCheck.notNull(this.simplified_js_api);
 
-        /**
+        /*
          * Make the web view visible with a slight delay (as sometimes a
          * pagination-change event will be sent even though the content has not
          * yet been laid out in the web view). Only do this if the screen

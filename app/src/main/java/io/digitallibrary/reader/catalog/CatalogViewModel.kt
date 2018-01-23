@@ -24,22 +24,22 @@ class CatalogViewModel : ViewModel() {
                 dbCategories?.let {
                     categories.removeSource(it)
                 }
-                dbCategories = Gdl.getDatabase().categoryDao().getLiveCategories(LanguageUtil.getCurrentLanguage())
+                dbCategories = Gdl.database.categoryDao().getLiveCategories(LanguageUtil.getCurrentLanguage())
                 dbCategories?.let {
                     categories.addSource(it, { categories.postValue(it) })
                 }            }
         }
-        Gdl.getSharedPrefs().registerListener(langListener)
+        Gdl.sharedPrefs.registerListener(langListener)
     }
 
     override fun onCleared() {
         super.onCleared()
-        Gdl.getSharedPrefs().unregisterListener(langListener)
+        Gdl.sharedPrefs.unregisterListener(langListener)
     }
 
     fun getCategories(): LiveData<List<Category>> {
         if (dbCategories == null) {
-            dbCategories = Gdl.getDatabase().categoryDao().getLiveCategories(LanguageUtil.getCurrentLanguage())
+            dbCategories = Gdl.database.categoryDao().getLiveCategories(LanguageUtil.getCurrentLanguage())
             dbCategories?.let {
                 categories.addSource(it, { categories.postValue(it) })
             }
@@ -49,25 +49,25 @@ class CatalogViewModel : ViewModel() {
 
     fun getBooks(categoryId: String): LiveData<List<Book>> {
         if (!books.containsKey(categoryId)) {
-            books[categoryId] = Gdl.getDatabase().bookDao().getLiveBooks(categoryId)
+            books[categoryId] = Gdl.database.bookDao().getLiveBooks(categoryId)
         }
         return books[categoryId]!!
     }
 
     fun getCategory(categoryId: String): Category {
-        return Gdl.getDatabase().categoryDao().getCategory(categoryId)
+        return Gdl.database.categoryDao().getCategory(categoryId)
     }
 
     fun getBook(bookId: String): LiveData<Book> {
         if (book?.value?.id != bookId) {
-            book = Gdl.getDatabase().bookDao().getLiveBook(bookId)
+            book = Gdl.database.bookDao().getLiveBook(bookId)
         }
         return book!!
     }
 
     fun getDownloadedBooks(): LiveData<List<Book>> {
         if (downloadedBooks == null) {
-            downloadedBooks = Gdl.getDatabase().bookDao().getLiveDownloadedBooks()
+            downloadedBooks = Gdl.database.bookDao().getLiveDownloadedBooks()
         }
         return downloadedBooks!!
     }

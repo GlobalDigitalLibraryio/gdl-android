@@ -82,7 +82,7 @@
 
                             <Button
                                 android:id="@+id/book_download_retry"
-                                style="?android:attr/buttonBarButtonStyle"
+                                style="?android:attr/borderlessButtonStyle"
                                 android:layout_width="@dimen/button_standard_width"
                                 android:layout_height="@dimen/button_standard_height"
                                 android:background="@drawable/button_blue"
@@ -185,6 +185,7 @@
 
                             <Button
                                 android:id="@+id/book_download_button"
+                                style="?android:attr/borderlessButtonStyle"
                                 android:layout_width="@dimen/button_standard_width"
                                 android:layout_height="@dimen/button_standard_height"
                                 android:background="@drawable/button_blue"
@@ -282,13 +283,13 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_alignParentEnd="true"
-                                android:paddingEnd="15dp"
                                 android:layout_centerInParent="true"
-                                android:textAllCaps="true"
-                                android:textSize="14sp"
-                                android:textStyle="bold"
+                                android:paddingEnd="15dp"
                                 android:text="@string/book_level"
-                                android:textColor="@color/white" />
+                                android:textAllCaps="true"
+                                android:textColor="@color/white"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
                         </RelativeLayout>
 
                     </RelativeLayout>

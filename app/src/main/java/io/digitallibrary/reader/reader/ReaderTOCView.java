@@ -123,7 +123,7 @@ public final class ReaderTOCView implements ListAdapter {
         final TOCElement e = NullCheck.notNull(this.adapter).getItem(position);
         text_view.setText(e.getTitle());
 
-        final Gdl.ReaderAppServices rs = Gdl.getReaderAppServices();
+        final Gdl.ReaderAppServices rs = Gdl.Companion.getReaderAppServices();
 
         final float scale = context.getResources().getDisplayMetrics().density;
 

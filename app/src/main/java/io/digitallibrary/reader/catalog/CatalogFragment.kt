@@ -53,7 +53,7 @@ class CatalogFragment : Fragment() {
 
         val swipeRefreshLayout: SwipeRefreshLayout = view.findViewById(R.id.swipe_refresh_layout)
         swipeRefreshLayout.setOnRefreshListener {
-            Gdl.fetch()
+            Gdl.fetchOpdsFeed()
         }
 
         ViewModelProviders.of(this).get(CatalogViewModel::class.java).getCategories().observe(this, Observer {
