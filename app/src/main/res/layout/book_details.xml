@@ -25,12 +25,13 @@
                 <android.support.v7.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="15dp"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="173dp"
+                    android:layout_marginEnd="13dp"
+                    android:layout_marginStart="13dp"
+                    android:layout_marginTop="172dp"
                     android:background="@color/white"
                     card_view:cardCornerRadius="0dp"
-                    card_view:cardElevation="1dp">
+                    card_view:cardElevation="2dp"
+                    card_view:cardUseCompatPadding="true">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -42,7 +43,7 @@
                             android:id="@+id/book_title"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="30dp"
+                            android:layout_marginTop="20dp"
                             android:ellipsize="end"
                             android:gravity="center"
                             android:maxLines="2"
@@ -86,6 +87,10 @@
                                 android:layout_width="@dimen/button_standard_width"
                                 android:layout_height="@dimen/button_standard_height"
                                 android:background="@drawable/button_blue"
+                                android:shadowColor="#33000000"
+                                android:shadowDx="2"
+                                android:shadowDy="2"
+                                android:shadowRadius="2"
                                 android:text="@string/catalog_book_error_retry"
                                 android:textColor="@color/white"
                                 android:textSize="@dimen/button_standard_text_size" />
@@ -116,6 +121,10 @@
                                 android:layout_width="@dimen/button_standard_width"
                                 android:layout_height="@dimen/button_standard_height"
                                 android:background="@drawable/button_blue"
+                                android:shadowColor="#33000000"
+                                android:shadowDx="2"
+                                android:shadowDy="2"
+                                android:shadowRadius="2"
                                 android:text="@string/catalog_book_read"
                                 android:textColor="@color/white"
                                 android:textSize="@dimen/button_standard_text_size" />
@@ -189,6 +198,10 @@
                                 android:layout_width="@dimen/button_standard_width"
                                 android:layout_height="@dimen/button_standard_height"
                                 android:background="@drawable/button_blue"
+                                android:shadowColor="#33000000"
+                                android:shadowDx="2"
+                                android:shadowDy="2"
+                                android:shadowRadius="2"
                                 android:text="@string/catalog_book_download"
                                 android:textColor="@color/white"
                                 android:textSize="@dimen/button_standard_text_size" />
@@ -206,7 +219,7 @@
                     android:layout_marginTop="15dp"
                     android:background="@color/white"
                     card_view:cardCornerRadius="0dp"
-                    card_view:cardElevation="2dp">
+                    card_view:cardElevation="3dp">
 
                     <ImageView
                         android:id="@+id/book_cover"
@@ -221,11 +234,12 @@
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="15dp"
+                android:layout_margin="13dp"
                 android:background="@color/white"
                 android:orientation="vertical"
                 card_view:cardCornerRadius="0dp"
-                card_view:cardElevation="1dp">
+                card_view:cardElevation="2dp"
+                card_view:cardUseCompatPadding="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -285,11 +299,16 @@
                                 android:layout_alignParentEnd="true"
                                 android:layout_centerInParent="true"
                                 android:paddingEnd="15dp"
+                                android:shadowColor="#33000000"
+                                android:shadowDx="2"
+                                android:shadowDy="2"
+                                android:shadowRadius="2"
                                 android:text="@string/book_level"
                                 android:textAllCaps="true"
                                 android:textColor="@color/white"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
+
                         </RelativeLayout>
 
                     </RelativeLayout>
@@ -344,7 +363,6 @@
                 </LinearLayout>
 
             </android.support.v7.widget.CardView>
-
 
         </LinearLayout>
     </ScrollView>
