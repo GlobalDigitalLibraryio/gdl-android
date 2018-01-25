@@ -2,124 +2,24 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
         <include layout="@layout/toolbar" />
+
         <FrameLayout
             android:id="@+id/content_frame"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </LinearLayout>
-    <LinearLayout
+
+    <android.support.design.widget.NavigationView
         android:id="@+id/navigation"
-        android:orientation="vertical"
-        android:layout_width="295dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="@color/navigation_drawer_background">
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:gravity="center_vertical"
-            android:layout_height="?attr/actionBarSize">
-
-            <ImageButton
-                android:src="@drawable/ic_close_white_24dp"
-                android:onClick="onCloseDrawerClicked"
-                android:background="@android:color/transparent"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="1dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:textSize="24sp"
-                android:layout_marginStart="15dp"
-                android:text="@string/nav_menu_title"/>
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/catalog_row"
-            android:onClick="onCatalogClicked"
-            android:orientation="horizontal"
-            android:background="@drawable/navigation_drawer_item_background"
-            android:gravity="center_vertical"
-            android:layout_width="match_parent"
-            android:layout_height="38dp">
-            <TextView
-                android:layout_marginStart="15dp"
-                android:text="@string/nav_catalog"
-                android:textAppearance="@style/NavigationDrawerText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/my_library_row"
-            android:onClick="onMyLibraryClicked"
-            android:layout_marginTop="1dp"
-            android:orientation="horizontal"
-            android:background="@drawable/navigation_drawer_item_background"
-            android:gravity="center_vertical"
-            android:layout_width="match_parent"
-            android:layout_height="38dp">
-            <TextView
-                android:layout_marginStart="15dp"
-                android:text="@string/nav_my_library"
-                android:textAppearance="@style/NavigationDrawerText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-        <!--<LinearLayout-->
-            <!--android:onClick="onAboutClicked"-->
-            <!--android:layout_marginTop="1dp"-->
-            <!--android:orientation="horizontal"-->
-            <!--android:background="@drawable/navigation_drawer_item_background"-->
-            <!--android:gravity="center_vertical"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="38dp">-->
-            <!--<TextView-->
-                <!--android:layout_marginStart="15dp"-->
-                <!--android:text="@string/nav_about_gdl"-->
-                <!--android:textAppearance="@style/NavigationDrawerText"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content" />-->
-        <!--</LinearLayout>-->
-        <TextView
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:text="@string/nav_language_header"
-            android:textAppearance="@style/NavigationDrawerSubtitleText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <LinearLayout
-            android:id="@+id/nav_language"
-            android:onClick="onLanguageClicked"
-            android:layout_marginTop="1dp"
-            android:orientation="horizontal"
-            android:background="@drawable/navigation_drawer_item_background"
-            android:gravity="center_vertical"
-            android:layout_width="match_parent"
-            android:layout_height="38dp">
-            <TextView
-                android:id="@+id/current_language"
-                android:layout_marginStart="15dp"
-                android:text="@string/placeholder_language"
-                android:textAppearance="@style/NavigationDrawerText"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content" />
-            <ImageView
-                android:layout_marginEnd="10dp"
-                android:src="@drawable/ic_keyboard_arrow_right_white_24dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
-    </LinearLayout>
+        android:theme="@style/NavigationDrawer" />
 </android.support.v4.widget.DrawerLayout>

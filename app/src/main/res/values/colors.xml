@@ -22,7 +22,4 @@
     <color name="gray_background">#EFF0F2</color>
     <color name="gray_desert_storm">#F8F8F8</color>
 
-    <!--Navigation drawer-->
-    <color name="navigation_drawer_background">#444444</color>
-    <color name="navigation_drawer_item_background">#575757</color>
 </resources>

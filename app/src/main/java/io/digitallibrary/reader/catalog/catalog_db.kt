@@ -19,6 +19,7 @@ data class Book(
         var author: String? = null,
         var publisher: String? = null,
         @ColumnInfo(name = "reading_position")
+        var readingPosition: String? = null,
         var image: String? = null,
         var thumb: String? = null,
         @ColumnInfo(name = "epub_link")
@@ -26,7 +27,8 @@ data class Book(
         var description: String? = null,
         var updated: OffsetDateTime? = null,
         var created: OffsetDateTime? = null,
-        var published: OffsetDateTime? = null
+        var published: OffsetDateTime? = null,
+        var state: Int? = null
 )
 
 @Dao
@@ -47,14 +49,14 @@ interface BookDao {
     fun getLiveBook(bookId: String): LiveData<Book>
 
     @Query(value = "SELECT books.dbid, id, title, downloaded, reading_level, books.language, " +
-            "license, author, publisher, reading_position, thumb, epub_link, description, updated, " +
-            "created, published FROM books JOIN book_categories_map ON books.id = book_categories_map.book_id " +
+            "license, author, publisher, reading_position, image, thumb, epub_link, description, updated, " +
+            "created, published, state FROM books JOIN book_categories_map ON books.id = book_categories_map.book_id " +
             "WHERE book_categories_map.category_id = :categoryId ORDER BY book_categories_map.view_order")
     fun getBooks(categoryId: String): List<Book>
 
     @Query(value = "SELECT books.dbid, id, title, downloaded, reading_level, books.language, " +
-            "license, author, publisher, reading_position, thumb, epub_link, description, updated, " +
-            "created, published FROM books JOIN book_categories_map ON books.id = book_categories_map.book_id " +
+            "license, author, publisher, reading_position, image, thumb, epub_link, description, updated, " +
+            "created, published, state FROM books JOIN book_categories_map ON books.id = book_categories_map.book_id " +
             "WHERE book_categories_map.category_id = :categoryId ORDER BY book_categories_map.view_order")
     fun getLiveBooks(categoryId: String): LiveData<List<Book>>
 

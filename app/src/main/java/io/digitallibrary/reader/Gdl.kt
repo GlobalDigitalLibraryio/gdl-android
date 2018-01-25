@@ -6,25 +6,14 @@ import android.content.Context
 import android.content.res.Resources
 import android.os.Process
 import android.util.Log
-
+import io.digitallibrary.reader.catalog.CatalogDatabase
+import io.digitallibrary.reader.catalog.fetchFeed
+import io.digitallibrary.reader.reader.*
 import java.io.IOException
 import java.net.ServerSocket
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
-
-import io.digitallibrary.reader.catalog.CatalogDatabase
-import io.digitallibrary.reader.reader.ReaderBookmarks
-import io.digitallibrary.reader.reader.ReaderHTTPMimeMap
-import io.digitallibrary.reader.reader.ReaderHTTPMimeMapType
-import io.digitallibrary.reader.reader.ReaderHTTPServerAAsync
-import io.digitallibrary.reader.reader.ReaderHTTPServerType
-import io.digitallibrary.reader.reader.ReaderReadiumEPUBLoader
-import io.digitallibrary.reader.reader.ReaderReadiumEPUBLoaderType
-import io.digitallibrary.reader.reader.ReaderSettings
-import io.digitallibrary.reader.reader.ReaderSettingsType
-
-import io.digitallibrary.reader.catalog.fetchFeed
 
 /**
  * Global application state.

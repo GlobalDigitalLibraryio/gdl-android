@@ -1,7 +1,9 @@
 package io.digitallibrary.reader
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
@@ -17,6 +19,7 @@ import java.util.*
 class SelectLanguageActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "SelectLanguageActivity"
+        const val LANGUAGE_SELECTED = "LANGUAGE_SELECTED"
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -72,7 +75,7 @@ class SelectLanguageActivity : AppCompatActivity() {
                 language_list.visibility = View.VISIBLE
                 language_list.adapter = langItemsAdapter
                 language_list.setItemChecked(selected, true)
-                language_list.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+                language_list.onItemClickListener = AdapterView.OnItemClickListener { _, view, position, _ ->
                     selected = position
                     val newLang = langArray[position]
                     val newLangCode = languages[newLang]
@@ -84,6 +87,8 @@ class SelectLanguageActivity : AppCompatActivity() {
                     if (oldLang != newLang) {
                         Gdl.fetchOpdsFeed()
                     }
+                    val intent = Intent(LANGUAGE_SELECTED)
+                    LocalBroadcastManager.getInstance(Gdl.appContext).sendBroadcast(intent)
                     finish()
                 }
             }

@@ -50,3 +50,7 @@
 }
 
 -keep class org.readium.sdk.android.CFI
+
+-keepclassmembernames class kotlinx.** {
+    volatile <fields>;
+}

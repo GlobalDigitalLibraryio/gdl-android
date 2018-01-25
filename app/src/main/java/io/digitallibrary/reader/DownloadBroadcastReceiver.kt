@@ -1,11 +1,9 @@
 package io.digitallibrary.reader
 
 import android.app.DownloadManager
-import android.arch.persistence.room.Room
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import io.digitallibrary.reader.catalog.CatalogDatabase
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch

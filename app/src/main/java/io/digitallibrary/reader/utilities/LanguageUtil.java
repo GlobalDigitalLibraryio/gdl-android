@@ -80,8 +80,8 @@ public class LanguageUtil {
 
     public static void setLanguage(String lang, String langText) {
         Prefs p = Gdl.Companion.getSharedPrefs();
-        p.putString(PREF_ID_CURRENT_LANG, lang);
         p.putString(PREF_ID_CURRENT_LANG_TEXT, langText);
+        p.putString(PREF_ID_CURRENT_LANG, lang);
     }
 
     public interface Callback {

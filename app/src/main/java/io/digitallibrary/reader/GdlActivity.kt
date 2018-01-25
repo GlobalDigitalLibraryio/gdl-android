@@ -1,21 +1,27 @@
 package io.digitallibrary.reader
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
+import android.content.IntentFilter
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.FragmentManager
+import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Gravity
+import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import io.digitallibrary.reader.catalog.CatalogDownloadedFragment
-import io.digitallibrary.reader.catalog.CatalogFragment
+import io.digitallibrary.reader.catalog.*
 import io.digitallibrary.reader.utilities.LanguageUtil
 import kotlinx.android.synthetic.main.main.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 
 /**
  * The type of non-reader activities in the app.
@@ -26,11 +32,23 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
 
     companion object {
         private const val TAG = "GdlActivity"
+
+        enum class NavChoices {
+            LANGUAGE,
+            MY_LIBRARY,
+            CATALOG,
+            CATEGORIES;
+
+            companion object {
+                fun default(): NavChoices {
+                    return CATALOG
+                }
+            }
+        }
     }
 
-    private var currentMenuChoice: MenuChoices = MenuChoices.default()
     private lateinit var mDrawerToggle: ActionBarDrawerToggle
-    private var langListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
+    private var broadcastReceiver: BroadcastReceiver? = null
 
     override fun onBackStackChanged() {
         Log.i(TAG, "onBackStackChanged c: " + supportFragmentManager.backStackEntryCount)
@@ -62,14 +80,16 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
         return true
     }
 
-    enum class MenuChoices {
-        CATALOG,
-        MY_BOOKS;
-
-        companion object {
-            fun default(): MenuChoices { return CATALOG }
+    private fun getNavText(navChoice: NavChoices): String {
+        return when (navChoice) {
+            NavChoices.LANGUAGE -> getString(R.string.nav_current_language, LanguageUtil.getCurrentLanguageText())
+            NavChoices.MY_LIBRARY -> getString(R.string.nav_my_library)
+            NavChoices.CATALOG -> getString(R.string.nav_catalog)
+            else -> throw IllegalArgumentException("NavChoice $navChoice does not have a menu text")
         }
     }
+
+    private lateinit var categories: List<Category>
 
     override fun onCreate(state: Bundle?) {
         super.onCreate(state)
@@ -80,7 +100,6 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
         setSupportActionBar(toolbar)
         supportFragmentManager.addOnBackStackChangedListener(this)
 
-        current_language.text = getString(R.string.nav_current_language, LanguageUtil.getCurrentLanguageText())
 
         mDrawerToggle = ActionBarDrawerToggle(this, drawer_layout, R.string.drawer_open, R.string.drawer_close)
 
@@ -89,51 +108,103 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
         supportActionBar?.setHomeButtonEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         mDrawerToggle.syncState()
-        updateFragment(MenuChoices.default())
 
-        langListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == LanguageUtil.getLangPrefKey()) {
-                updateFragment(MenuChoices.CATALOG)
-                drawer_layout.closeDrawers()
+        broadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                launch(UI) {
+                    drawer_layout.closeDrawers()
+                    navigation.menu.getItem(NavChoices.LANGUAGE.ordinal).title = getNavText(NavChoices.LANGUAGE)
+                    setCurrentFragment(NavChoices.default())
+                    setCheckedItem(navigation.menu.getItem(NavChoices.default().ordinal))
+                }
             }
         }
-        Gdl.sharedPrefs.registerListener(langListener)
+
+        try {
+            LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver!!, IntentFilter(SelectLanguageActivity.LANGUAGE_SELECTED))
+        } catch (e: NullPointerException) {
+            Log.e(TAG, "Error setting up local broadcast receiver")
+            e.printStackTrace()
+        }
+
+        ViewModelProviders.of(this).get(CatalogViewModel::class.java).getCategories().observe(this, Observer {
+            it?.let {
+                categories = it
+                updateMenuCategories(it)
+            }
+        })
+
+        launch(UI) {
+            val menu: Menu = navigation.menu
+            NavChoices.values().forEach {
+                if (it != NavChoices.CATEGORIES) {
+                    val choice = menu.add(it.ordinal, it.ordinal, it.ordinal, getNavText(it))
+                    if (it == NavChoices.default()) {
+                        choice.isChecked = true
+                    }
+                }
+            }
+            navigation.setNavigationItemSelectedListener {
+                when (it.groupId) {
+                    NavChoices.LANGUAGE.ordinal -> {
+                        val intent = Intent(applicationContext, SelectLanguageActivity::class.java)
+                        startActivity(intent)
+                    }
+                    NavChoices.MY_LIBRARY.ordinal -> {
+                        setCurrentFragment(NavChoices.MY_LIBRARY)
+                        setCheckedItem(it)
+                    }
+                    NavChoices.CATALOG.ordinal -> {
+                        setCurrentFragment(NavChoices.CATALOG)
+                        setCheckedItem(it)
+                    }
+                    NavChoices.CATEGORIES.ordinal -> {
+                        val category = categories[it.itemId - 10]
+                        val intent = Intent(applicationContext, CatalogCategoryActivity::class.java)
+                        intent.putExtra("category_id", category.id)
+                        startActivity(intent)
+                    }
+                }
+                drawer_layout.closeDrawers()
+                true
+            }
+        }
+
+        setCurrentFragment(NavChoices.default())
     }
 
-    private fun updateNavigationRows() {
-        if (currentMenuChoice == MenuChoices.CATALOG) {
-            catalog_row.setBackgroundResource(R.drawable.nav_menu_background_pressed)
-        } else {
-            catalog_row.setBackgroundResource(R.drawable.navigation_drawer_item_background)
-        }
-        if (currentMenuChoice == MenuChoices.MY_BOOKS) {
-            my_library_row.setBackgroundResource(R.drawable.nav_menu_background_pressed)
-        } else {
-            my_library_row.setBackgroundResource(R.drawable.navigation_drawer_item_background)
+    private fun updateMenuCategories(categories: List<Category>) {
+        val menu: Menu = navigation.menu
+        menu.removeGroup(NavChoices.CATEGORIES.ordinal)
+        categories.forEachIndexed { index, category ->
+            menu.add(NavChoices.CATEGORIES.ordinal, index + 10, NavChoices.CATEGORIES.ordinal, category.title)
         }
     }
 
-    private fun updateFragment(newChoice: MenuChoices) {
-        currentMenuChoice = newChoice
-        when (currentMenuChoice) {
-            MenuChoices.CATALOG -> {
+    private fun setCurrentFragment(navChoice: NavChoices) {
+        when (navChoice) {
+            GdlActivity.Companion.NavChoices.MY_LIBRARY -> {
+                val f = CatalogDownloadedFragment()
+                // Need to call commitAllowingStateLoss instead of just commit to avoid crash on old Android versions
+                supportFragmentManager.beginTransaction().replace(R.id.content_frame, f).commitAllowingStateLoss()
+                setTitle(R.string.nav_my_library)
+            }
+            GdlActivity.Companion.NavChoices.CATALOG -> {
                 val f = CatalogFragment()
                 // Need to call commitAllowingStateLoss instead of just commit to avoid crash on old Android versions
                 supportFragmentManager.beginTransaction().replace(R.id.content_frame, f).commitAllowingStateLoss()
                 setTitle(R.string.catalog)
             }
-            MenuChoices.MY_BOOKS -> {
-                val f = CatalogDownloadedFragment()
-                supportFragmentManager.beginTransaction().replace(R.id.content_frame, f).commitAllowingStateLoss()
-                setTitle(R.string.nav_my_library)
+            else -> {
+                throw IllegalArgumentException("NavChoice $navChoice does not have a fragment")
             }
         }
-        updateNavigationRows()
     }
 
-    override fun onResume() {
-        super.onResume()
-        current_language.text = getString(R.string.nav_current_language, LanguageUtil.getCurrentLanguageText())
+    private fun setCheckedItem(menuItem: MenuItem) {
+        (0 until navigation.menu.size() - 1)
+                .map { navigation.menu.getItem(it) }
+                .forEach { it.isChecked = it == menuItem }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -146,48 +217,26 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
         mDrawerToggle.onConfigurationChanged(newConfig)
     }
 
-    fun onCloseDrawerClicked(view: View) {
-        drawer_layout.closeDrawers()
-    }
-
-    fun onLanguageClicked(view: View) {
-        Log.v(TAG, "onLanguageClicked")
-        val i = Intent(this, SelectLanguageActivity::class.java)
-        startActivity(i)
-    }
-
-    fun onMyLibraryClicked(view: View) {
-        Log.v(TAG, "onMyLibraryClicked")
-        if (currentMenuChoice == MenuChoices.MY_BOOKS) {
-            return
-        }
-        updateFragment(MenuChoices.MY_BOOKS)
-        drawer_layout.closeDrawers()
-    }
-
-    fun onCatalogClicked(view: View) {
-        Log.v(TAG, "onCatalogClicked")
-        if (currentMenuChoice == MenuChoices.CATALOG) {
-            return
-        }
-        updateFragment(MenuChoices.CATALOG)
-        drawer_layout.closeDrawers()
-    }
-
     override fun setTitle(title: CharSequence) {
-        val bar = supportActionBar
-        if (bar != null) {
-            supportActionBar?.title = title
-        }
+        supportActionBar?.title = title
     }
 
     override fun onDestroy() {
         super.onDestroy()
         Log.v(TAG, "onDestroy")
+
         mDrawerToggle.let {
             drawer_layout?.removeDrawerListener(it)
         }
-        Gdl.sharedPrefs.unregisterListener(langListener)
-        langListener = null
+
+        try {
+            if (broadcastReceiver != null) {
+                LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver!!)
+                broadcastReceiver = null
+            }
+        } catch (e: NullPointerException) {
+            Log.e(TAG, "Error removing local broadcast receiver")
+            e.printStackTrace()
+        }
     }
 }

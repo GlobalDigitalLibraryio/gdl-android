@@ -55,7 +55,7 @@
     <string name="nav_my_library">My Library</string>
     <string name="nav_menu_title">Menu</string>
     <string name="nav_language_header">Language</string>
-    <string name="nav_current_language">Books in %1$s</string>
+    <string name="nav_current_language">Book Language (%1$s)</string>
 
     <string name="book_downloading">Downloading</string>
 </resources>

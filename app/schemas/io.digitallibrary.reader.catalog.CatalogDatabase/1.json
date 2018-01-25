@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "2162b01d4540269a40d5cfa78abea483",
+    "identityHash": "55917379e7645399871e88e5f839f375",
     "entities": [
       {
         "tableName": "categories",
@@ -77,7 +77,7 @@
       },
       {
         "tableName": "books",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dbid` INTEGER, `id` TEXT NOT NULL, `title` TEXT, `downloaded` TEXT, `reading_level` INTEGER, `language` TEXT, `license` TEXT, `author` TEXT, `publisher` TEXT, `reading_position` TEXT, `thumb` TEXT, `epub_link` TEXT, `description` TEXT, `updated` TEXT, `created` TEXT, `published` TEXT, PRIMARY KEY(`dbid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dbid` INTEGER, `id` TEXT NOT NULL, `title` TEXT, `downloaded` TEXT, `reading_level` INTEGER, `language` TEXT, `license` TEXT, `author` TEXT, `publisher` TEXT, `reading_position` TEXT, `image` TEXT, `thumb` TEXT, `epub_link` TEXT, `description` TEXT, `updated` TEXT, `created` TEXT, `published` TEXT, `state` INTEGER, PRIMARY KEY(`dbid`))",
         "fields": [
           {
             "fieldPath": "dbid",
@@ -134,8 +134,14 @@
             "notNull": false
           },
           {
-            "fieldPath": "image",
+            "fieldPath": "readingPosition",
             "columnName": "reading_position",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "image",
+            "columnName": "image",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -173,6 +179,12 @@
             "fieldPath": "published",
             "columnName": "published",
             "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "state",
+            "affinity": "INTEGER",
             "notNull": false
           }
         ],
@@ -273,7 +285,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"2162b01d4540269a40d5cfa78abea483\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"55917379e7645399871e88e5f839f375\")"
     ]
   }
 }

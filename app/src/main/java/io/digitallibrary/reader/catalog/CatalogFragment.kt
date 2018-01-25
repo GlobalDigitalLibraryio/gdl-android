@@ -23,7 +23,9 @@ import kotlinx.coroutines.experimental.launch
 
 
 class CatalogFragment : Fragment() {
-    private var TAG = "CatalogFragment"
+    companion object {
+        private const val TAG = "CatalogFragment"
+    }
 
     private var broadcastReceiver: BroadcastReceiver? = null
 
@@ -81,7 +83,10 @@ class CatalogFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         try {
-            LocalBroadcastManager.getInstance(context!!).unregisterReceiver(broadcastReceiver!!)
+            if (broadcastReceiver != null) {
+                LocalBroadcastManager.getInstance(context!!).unregisterReceiver(broadcastReceiver!!)
+                broadcastReceiver = null
+            }
         } catch (e: NullPointerException) {
             Log.e(TAG, "Error removing local broadcast receiver")
             e.printStackTrace()

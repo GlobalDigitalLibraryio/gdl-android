@@ -22,9 +22,7 @@
 
     <style name="GdlTheme.ActionBarStyle" parent="@style/Widget.AppCompat.Light.ActionBar">
         <item name="elevation">4dp</item>
-        <!-- style for actionBar title -->
         <item name="titleTextStyle">@style/GdlTheme.ActionBarTitleText</item>
-        <!-- style for actionBar subtitle -->
         <item name="subtitleTextStyle">@style/GdlTheme.ActionBarTitleText</item>
     </style>
 
@@ -35,18 +33,11 @@
         <item name="android:typeface">sans</item>
     </style>
 
-    <style name="NavigationDrawerText" parent="@android:style/Theme.Translucent.NoTitleBar">
+    <style name="NavigationDrawer" parent="GdlTheme">
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:textColorSecondary">@color/white</item>
+        <item name="colorPrimary">@color/gdl_links</item>
     </style>
 
-    <style name="NavigationDrawerSubtitleText" parent="@android:style/Theme.Translucent.NoTitleBar">
-        <item name="android:textAllCaps">true</item>
-        <item name="android:textSize">10sp</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:textColorSecondary">@color/white</item>
-    </style>
     <style name="Theme.AppCompat.Translucent" parent="GdlTheme">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
