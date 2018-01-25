@@ -3,7 +3,6 @@
     <string name="app_name">Global Digital Library</string>
     <string name="app_short_name">GDL</string>
 
-
     <!-- Catalog strings -->
     <string name="catalog">Catalog</string>
     <string name="catalog_book_detail">Book Details</string>
@@ -25,9 +24,8 @@
     <string name="catalog_book_error_retry">Retry</string>
     <string name="catalog_book_download">Download</string>
     <string name="catalog_book_delete">Delete Book</string>
+    <string name="catalog_book_delete_confirm_dialog">Are you sure you want to delete \"%1$s\"?</string>
 
-
-    <!-- Accessibility strings used for content descriptions (Settings) -->
 
     <!-- Reader strings -->
     <string name="reader">Reader</string>
@@ -49,13 +47,25 @@
     <string name="languages_title">Book Language</string>
     <string name="error_fetching_languages">Error fetching languages</string>
 
+    <!--Navigation-->
     <string name="drawer_open">Open the navigation drawer</string>
     <string name="drawer_close">Close the navigation drawer</string>
     <string name="nav_catalog">Catalog</string>
     <string name="nav_my_library">My Library</string>
-    <string name="nav_menu_title">Menu</string>
     <string name="nav_language_header">Language</string>
     <string name="nav_current_language">Book Language (%1$s)</string>
 
     <string name="book_downloading">Downloading</string>
+
+    <!--My library-->
+    <string name="my_library_menu_edit">Edit</string>
+    <string name="my_library_menu_select_all">Select All</string>
+    <string name="my_library_menu_delete">Delete</string>
+    <string name="my_library_menu_cancel">Cancel</string>
+    <string name="my_library_confirm_delete_books">Are you sure you want to delete the selected book(s)?</string>
+
+    <!--Dialogs-->
+    <string name="dialog_delete">Delete</string>
+    <string name="dialog_cancel">Cancel</string>
+
 </resources>

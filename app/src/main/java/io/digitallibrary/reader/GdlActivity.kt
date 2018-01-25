@@ -184,7 +184,7 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
     private fun setCurrentFragment(navChoice: NavChoices) {
         when (navChoice) {
             GdlActivity.Companion.NavChoices.MY_LIBRARY -> {
-                val f = CatalogDownloadedFragment()
+                val f = MyLibraryFragment()
                 // Need to call commitAllowingStateLoss instead of just commit to avoid crash on old Android versions
                 supportFragmentManager.beginTransaction().replace(R.id.content_frame, f).commitAllowingStateLoss()
                 setTitle(R.string.nav_my_library)

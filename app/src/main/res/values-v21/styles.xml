@@ -4,11 +4,11 @@
         <item name="android:colorPrimary">@color/gdl_blue</item>
         <item name="android:colorPrimaryDark">@color/gdl_dark</item>
         <item name="android:colorAccent">@color/gdl_blue</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@color/dark_text</item>
         <item name="android:textColorSecondary">@color/white</item>
-        <item name="android:colorControlNormal">@color/white</item>
         <item name="android:actionBarTheme">@style/GdlTheme.ActionBarTheme</item>
         <item name="android:actionBarStyle">@style/GdlTheme.ActionBarStyle</item>
+        <item name="android:actionMenuTextColor">@color/white</item>
     </style>
 
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">

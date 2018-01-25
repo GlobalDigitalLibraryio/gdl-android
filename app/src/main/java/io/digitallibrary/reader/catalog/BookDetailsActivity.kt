@@ -1,5 +1,6 @@
 package io.digitallibrary.reader.catalog
 
+import android.app.AlertDialog
 import android.app.DownloadManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
@@ -47,6 +48,19 @@ class BookDetailsActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private var paused = false
+
+    override fun onPause() {
+        super.onPause()
+        // Need to check for this to kill long running coroutines when needed
+        paused = true
+    }
+
+    override fun onResume() {
+        super.onResume()
+        paused = false
     }
 
     private var book: Book? = null
@@ -178,8 +192,7 @@ class BookDetailsActivity : AppCompatActivity() {
         launch(CommonPool) {
             updateActionButtons()
             var isDownloading = isDownloading()
-            while (isDownloading) {
-                Log.i(TAG, "looping")
+            while (isDownloading && !paused) {
                 isDownloading = isDownloading()
             }
             updateActionButtons()
@@ -234,26 +247,15 @@ class BookDetailsActivity : AppCompatActivity() {
     }
 
     private fun deleteBook() {
-        launch(CommonPool) {
-            book?.let {
-                val bookDownload = Gdl.database.bookDownloadDao().getBookDownload(it.id)
-                if (bookDownload != null) {
-                    val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-                    bookDownload.downloadId?.let { downloadManager.remove(it) }
-                    Gdl.database.bookDownloadDao().delete(bookDownload)
-                }
+        book?.let {
 
-                it.downloaded?.let { uri ->
-                    val bookFile = File(URI(uri))
-                    if (bookFile.isFile) {
-                        bookFile.delete()
-                    }
-                }
-                it.downloaded = null
-                Gdl.database.bookDao().update(it)
-                Gdl.database.bookDownloadDao().delete(it.id)
-                updateActionButtons()
-            }
+            val confirmDialog = AlertDialog.Builder(this).create()
+            confirmDialog.setMessage(getString(R.string.my_library_confirm_delete_books))
+            confirmDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.dialog_delete), { _, _ ->
+                deleteBook(it)
+            })
+            confirmDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.dialog_cancel), { _, _ -> })
+            confirmDialog.show()
         }
     }
 }

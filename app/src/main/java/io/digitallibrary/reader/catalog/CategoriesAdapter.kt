@@ -24,12 +24,12 @@ class CategoriesAdapter(val fragment: Fragment, val callback: Callback) : Recycl
         private const val TYPE_CATEGORY = 1
     }
 
-    private var categories: List<Category>? = null
+    private var categories: List<Category> = emptyList()
 
     interface Callback {
-        fun onCategoryClicked(category: Category) { }
-        fun onBookClicked(book: Book) { }
-        fun onChangeLanguageClicked() { }
+        fun onCategoryClicked(category: Category) {}
+        fun onBookClicked(book: Book) {}
+        fun onChangeLanguageClicked() {}
     }
 
     fun updateCategories(newCategoriesList: List<Category>) {
@@ -66,13 +66,13 @@ class CategoriesAdapter(val fragment: Fragment, val callback: Callback) : Recycl
             }
             TYPE_CATEGORY -> {
                 val categoryHolder = holder as CategoryViewHolder
-                categoryHolder.bindValues(categories!![position-1])
+                categoryHolder.bindValues(categories[position-1])
             }
         }
     }
 
     override fun getItemCount(): Int {
-        return (categories?.size ?: 0) + 1
+        return categories.size + 1
     }
 
     inner class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -94,7 +94,11 @@ class CategoriesAdapter(val fragment: Fragment, val callback: Callback) : Recycl
             itemView.feed_title.text = category.title
 
             val recyclerView: RecyclerView = itemView.catalog_category_recyclerview
-            val adapter = BooksAdapter(fragment.context!!, callback)
+            val adapter = BooksAdapter(fragment.context!!, object: BooksAdapter.Callback {
+                override fun onBookClicked(book: Book) {
+                    callback.onBookClicked(book)
+                }
+            })
             recyclerView.adapter = adapter
 
             ViewModelProviders.of(fragment).get(CatalogViewModel::class.java).getBooks(category.id).observe(fragment, Observer {

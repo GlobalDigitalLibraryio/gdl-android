@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/cell_book"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:padding="4dp">
+
+    <ImageView
+        android:id="@+id/selected_checked"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:elevation="10dp"
+        android:src="@drawable/ic_check_circle_white_24dp"
+        android:translationZ="10dp" />
 
     <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/book_card_view"
@@ -13,8 +19,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         card_view:cardCornerRadius="0dp"
-        card_view:cardUseCompatPadding="true"
-        card_view:cardElevation="4dp">
+        card_view:cardElevation="4dp"
+        card_view:cardUseCompatPadding="true">
 
         <LinearLayout
             android:layout_width="85dp"
@@ -45,5 +51,11 @@
                 android:textColor="@color/dark_text"
                 android:textSize="11sp" />
         </LinearLayout>
+
+        <View
+            android:id="@+id/selected_frame"
+            android:layout_width="85dp"
+            android:layout_height="141dp"
+            android:background="@drawable/book_checked_frame" />
     </android.support.v7.widget.CardView>
-</LinearLayout>
+</RelativeLayout>

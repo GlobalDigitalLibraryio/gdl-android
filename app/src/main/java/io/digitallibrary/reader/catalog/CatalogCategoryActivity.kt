@@ -47,7 +47,7 @@ class CatalogCategoryActivity : AppCompatActivity() {
         val layoutManager = FlexboxLayoutManager(this)
         layoutManager.justifyContent = JustifyContent.CENTER
         recyclerView.layoutManager = layoutManager
-        val adapter = BooksAdapter(this, object: CategoriesAdapter.Callback {
+        val adapter = BooksAdapter(this, object: BooksAdapter.Callback {
                     override fun onBookClicked(book: Book) {
                         val intent = Intent(applicationContext, BookDetailsActivity::class.java)
                         intent.putExtra("book_id", book.id)
