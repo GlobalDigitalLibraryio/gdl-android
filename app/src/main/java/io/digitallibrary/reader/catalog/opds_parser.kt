@@ -199,24 +199,24 @@ fun updateCategories(categories: List<Feed.Entry>?, language: String): List<Cate
                 description = entry.summary
         )
     }.forEach {
-        val old = oldCategoryMap[it.id]
-        if (old != null) {
-            it.dbid = old.dbid
-            val oldTime = old.updated
+                val old = oldCategoryMap[it.id]
+                if (old != null) {
+                    it.dbid = old.dbid
+                    val oldTime = old.updated
 
-            if (it != old) {
-                dao.update(it)
-                if (oldTime != null && it.updated?.isAfter(old.updated) == true) {
+                    if (it != old) {
+                        dao.update(it)
+                        if (oldTime != null && it.updated?.isAfter(old.updated) == true) {
+                            categoriesToUpdate.add(it)
+                        }
+                    }
+
+                    oldCategoryMap.remove(it.id)
+                } else {
                     categoriesToUpdate.add(it)
+                    dao.insert(it)
                 }
             }
-
-            oldCategoryMap.remove(it.id)
-        } else {
-            categoriesToUpdate.add(it)
-            dao.insert(it)
-        }
-    }
 
     oldCategoryMap.values.forEach {
         val booksFromDeletedCategory = Gdl.database.bookDao().getBooks(it.id)
@@ -267,44 +267,44 @@ fun updateBooks(category: Category, books: List<Feed.Entry>, language: String, c
                     published = it.published
             )
         }.forEachIndexed { index, book ->
-            val old = oldBooks[book.id]
-            if (old != null) {
-                book.dbid = old.dbid
-                if (book != old) {
-                    Gdl.database.bookDao().update(book)
-                }
-                val oldMapping = oldBookCategoryMap[book.id]
+                    val old = oldBooks[book.id]
+                    if (old != null) {
+                        book.dbid = old.dbid
+                        if (book != old) {
+                            Gdl.database.bookDao().update(book)
+                        }
+                        val oldMapping = oldBookCategoryMap[book.id]
 
-                if (oldMapping != null) {
-                    if (oldMapping.viewOrder != index) {
-                        oldMapping.viewOrder = index
-                        Gdl.database.bookCategoryMapDao().update(oldMapping)
-                    }
-                } else {
-                    Log.e(TAG, "Have old book, but no BookCategoryMap. This should be impossible.")
-                    bookCategoryMapsToInsert.add(
-                            BookCategoryMap(
-                                    bookId = book.id,
-                                    categoryId = category.id,
-                                    viewOrder = index,
-                                    language = language
+                        if (oldMapping != null) {
+                            if (oldMapping.viewOrder != index) {
+                                oldMapping.viewOrder = index
+                                Gdl.database.bookCategoryMapDao().update(oldMapping)
+                            }
+                        } else {
+                            Log.e(TAG, "Have old book, but no BookCategoryMap. This should be impossible.")
+                            bookCategoryMapsToInsert.add(
+                                    BookCategoryMap(
+                                            bookId = book.id,
+                                            categoryId = category.id,
+                                            viewOrder = index,
+                                            language = language
+                                    )
                             )
-                    )
-                }
-                oldBooks.remove(book.id)
-                oldBookCategoryMap.remove(book.id)
-            } else {
-                booksToInsert.add(book)
-                bookCategoryMapsToInsert.add(
-                        BookCategoryMap(
-                                bookId = book.id,
-                                categoryId = category.id,
-                                viewOrder = index,
-                                language = language
+                        }
+                        oldBooks.remove(book.id)
+                        oldBookCategoryMap.remove(book.id)
+                    } else {
+                        booksToInsert.add(book)
+                        bookCategoryMapsToInsert.add(
+                                BookCategoryMap(
+                                        bookId = book.id,
+                                        categoryId = category.id,
+                                        viewOrder = index,
+                                        language = language
+                                )
                         )
-                )
-            }
-        }
+                    }
+                }
 
         Gdl.database.bookDao().insertList(booksToInsert)
         // We do not delete downloaded books
@@ -331,7 +331,9 @@ fun updateBooks(category: Category, books: List<Feed.Entry>, language: String, c
                              *   [null]
                              * which joinToString turned into the String "null" by default (bug?)
                              */
-                            author = it.author?.joinToString(transform = { str: String? -> str ?: "" }),
+                            author = it.author?.joinToString(transform = { str: String? ->
+                                str ?: ""
+                            }),
                             publisher = it.publisher,
                             image = it.links.orEmpty().firstOrNull { it.rel == AQ_IMAGE_LINK_REL }?.href,
                             thumb = it.links.orEmpty().firstOrNull { it.rel == AQ_IMAGE_THUMB_LINK_REL }?.href,
@@ -413,7 +415,11 @@ fun fetchFeed(recursive: Boolean = false) {
                 }
 
 
-        val categories: List<Category> = if (nav != null) { updateCategories(nav.body()?.entries, lang) } else { ArrayList() }
+        val categories: List<Category> = if (nav != null) {
+            updateCategories(nav.body()?.entries, lang)
+        } else {
+            ArrayList()
+        }
 
         val jobs: MutableList<Deferred<Unit>> = ArrayList(10)
 
@@ -440,13 +446,13 @@ fun fetchFeed(recursive: Boolean = false) {
 
             categories.forEach {
                 aqs.add(Pair(it, async(CommonPool) {
-                        try {
-                            parser.getAcquisitionFeed(it.link).execute()
-                        } catch (e: Exception) {
-                            Log.e(TAG, "getAcquisitionFeed for " + it.title + " failed")
-                            e.printStackTrace()
-                            null
-                        }
+                    try {
+                        parser.getAcquisitionFeed(it.link).execute()
+                    } catch (e: Exception) {
+                        Log.e(TAG, "getAcquisitionFeed for " + it.title + " failed")
+                        e.printStackTrace()
+                        null
+                    }
                 }))
             }
 

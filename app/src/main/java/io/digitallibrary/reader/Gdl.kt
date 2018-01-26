@@ -79,7 +79,7 @@ class Gdl : Application() {
         database = Room.databaseBuilder<CatalogDatabase>(this, CatalogDatabase::class.java, "catalog_db").build()
     }
 
-    class ReaderAppServices (context: Context, private val rr: Resources) {
+    class ReaderAppServices(context: Context, private val rr: Resources) {
         val bookmarks: ReaderBookmarks
         private val epubExec: ExecutorService
         val epubLoader: ReaderReadiumEPUBLoaderType

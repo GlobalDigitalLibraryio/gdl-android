@@ -11,7 +11,6 @@ import android.view.*
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import io.digitallibrary.reader.R
-import android.view.MenuInflater
 
 
 class MyLibraryFragment : Fragment() {
@@ -31,7 +30,7 @@ class MyLibraryFragment : Fragment() {
         val layoutManager = FlexboxLayoutManager(context)
         layoutManager.justifyContent = JustifyContent.CENTER
         recyclerView.layoutManager = layoutManager
-        adapter = BooksAdapter(context!!, object: BooksAdapter.Callback {
+        adapter = BooksAdapter(context!!, object : BooksAdapter.Callback {
             override fun onBookClicked(book: Book) {
                 val intent = Intent(context, BookDetailsActivity::class.java)
                 intent.putExtra("book_id", book.id)

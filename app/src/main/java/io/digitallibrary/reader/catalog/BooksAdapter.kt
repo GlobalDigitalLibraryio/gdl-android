@@ -11,7 +11,7 @@ import com.bumptech.glide.request.RequestOptions
 import io.digitallibrary.reader.R
 import kotlinx.android.synthetic.main.catalog_book.view.*
 
-class BooksAdapter(val providerContext : Context, val callback: Callback, val selectModeAllowed: Boolean = false) : RecyclerView.Adapter<BooksAdapter.BookViewHolder>() {
+class BooksAdapter(val providerContext: Context, val callback: Callback, val selectModeAllowed: Boolean = false) : RecyclerView.Adapter<BooksAdapter.BookViewHolder>() {
     companion object {
         private const val TAG = "BooksAdapter"
     }

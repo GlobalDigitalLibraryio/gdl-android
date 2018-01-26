@@ -27,7 +27,8 @@ class CatalogViewModel : ViewModel() {
                 dbCategories = Gdl.database.categoryDao().getLiveCategories(LanguageUtil.getCurrentLanguage())
                 dbCategories?.let {
                     categories.addSource(it, { categories.postValue(it) })
-                }            }
+                }
+            }
         }
         Gdl.sharedPrefs.registerListener(langListener)
     }

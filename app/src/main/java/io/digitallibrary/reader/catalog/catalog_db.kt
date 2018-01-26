@@ -116,7 +116,7 @@ data class BookCategoryMap(
 )
 
 @Dao
-interface BookCategoryMapDao{
+interface BookCategoryMapDao {
     @Insert
     fun insert(bookCategoryMap: List<BookCategoryMap>)
 
@@ -141,7 +141,7 @@ data class BookDownload(
 )
 
 @Dao
-interface BookDownloadDao{
+interface BookDownloadDao {
     @Insert
     fun insert(bookDownload: BookDownload)
 

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
@@ -47,13 +46,13 @@ class CatalogCategoryActivity : AppCompatActivity() {
         val layoutManager = FlexboxLayoutManager(this)
         layoutManager.justifyContent = JustifyContent.CENTER
         recyclerView.layoutManager = layoutManager
-        val adapter = BooksAdapter(this, object: BooksAdapter.Callback {
-                    override fun onBookClicked(book: Book) {
-                        val intent = Intent(applicationContext, BookDetailsActivity::class.java)
-                        intent.putExtra("book_id", book.id)
-                        startActivity(intent)
-                    }
-                }
+        val adapter = BooksAdapter(this, object : BooksAdapter.Callback {
+            override fun onBookClicked(book: Book) {
+                val intent = Intent(applicationContext, BookDetailsActivity::class.java)
+                intent.putExtra("book_id", book.id)
+                startActivity(intent)
+            }
+        }
         )
         recyclerView.adapter = adapter
 
