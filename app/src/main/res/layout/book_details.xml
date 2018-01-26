@@ -120,7 +120,7 @@
                                 style="?android:attr/borderlessButtonStyle"
                                 android:layout_width="@dimen/button_standard_width"
                                 android:layout_height="@dimen/button_standard_height"
-                                android:background="@drawable/button_blue"
+                                android:background="@drawable/button_green"
                                 android:shadowColor="#33000000"
                                 android:shadowDx="2"
                                 android:shadowDy="2"

@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import io.digitallibrary.reader.utilities.LanguageUtil
 import kotlinx.android.synthetic.main.select_language.*
+import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 
 class SelectLanguageActivity : AppCompatActivity() {
@@ -35,12 +36,9 @@ class SelectLanguageActivity : AppCompatActivity() {
     override fun onCreate(state: Bundle?) {
         super.onCreate(state)
         setContentView(R.layout.select_language)
-
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setTitle(R.string.languages_title)
-
         fetchLanguages()
     }
 

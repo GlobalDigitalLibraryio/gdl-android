@@ -43,7 +43,7 @@
         <activity
             android:name=".SelectLanguageActivity"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/GdlTheme" />
+            android:theme="@style/Settings" />
 
         <activity
             android:name=".reader.ReaderActivity"

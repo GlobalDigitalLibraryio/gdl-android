@@ -11,6 +11,7 @@ import android.view.MenuItem
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import io.digitallibrary.reader.R
+import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
@@ -34,13 +35,12 @@ class CatalogCategoryActivity : AppCompatActivity() {
 
         setContentView(R.layout.catalog_without_categories)
 
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         launch(UI) {
             val category = async { viewModel.getCategory(categoryId) }.await()
-            toolbar.title = category.title
+            supportActionBar?.title = category.title
         }
 
         val recyclerView: RecyclerView = findViewById(R.id.catalog_recyclerview)

@@ -19,6 +19,7 @@ import io.digitallibrary.reader.Gdl
 import io.digitallibrary.reader.R
 import io.digitallibrary.reader.reader.ReaderActivity
 import kotlinx.android.synthetic.main.book_details.*
+import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
@@ -72,7 +73,6 @@ class BookDetailsActivity : AppCompatActivity() {
 
         setContentView(R.layout.book_details)
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setTitle(R.string.catalog_book_detail)
@@ -160,7 +160,7 @@ class BookDetailsActivity : AppCompatActivity() {
             return STATUS_DOWNLOADED
         }
         book?.let {
-            val bookDownload = async { Gdl.database?.bookDownloadDao()?.getBookDownload(it.id) }.await()
+            val bookDownload = async { Gdl.database.bookDownloadDao().getBookDownload(it.id) }.await()
             if (bookDownload != null) {
                 val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
                 val newStatus = async {

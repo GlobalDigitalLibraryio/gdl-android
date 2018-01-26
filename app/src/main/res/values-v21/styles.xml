@@ -1,41 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <style name="GdlTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:colorPrimary">@color/gdl_blue</item>
-        <item name="android:colorPrimaryDark">@color/gdl_dark</item>
-        <item name="android:colorAccent">@color/gdl_blue</item>
-        <item name="android:textColor">@color/dark_text</item>
-        <item name="android:textColorSecondary">@color/white</item>
-        <item name="android:actionBarTheme">@style/GdlTheme.ActionBarTheme</item>
-        <item name="android:actionBarStyle">@style/GdlTheme.ActionBarStyle</item>
+
+    <style name="GdlTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="colorPrimary">@color/gdl_blue</item>
+        <item name="colorPrimaryDark">@color/gdl_dark</item>
+        <item name="colorAccent">@color/gdl_blue</item>
+        <item name="colorControlNormal">@color/white</item>
+        <item name="android:textColor">@color/gdl_links</item>
+        <item name="android:textColorPrimary">@color/dark_text</item>
         <item name="android:actionMenuTextColor">@color/white</item>
+    </style>
+
+    <style name="Header" parent="GdlTheme">
+        <item name="android:textColor">@color/dark_text</item>
+        <item name="android:textColorPrimary">@color/white</item>
+    </style>
+
+    <style name="Settings" parent="GdlTheme">
+        <item name="colorPrimary">@color/gray_desert_storm</item>
+        <item name="colorControlNormal">@color/dark_text</item>
+        <item name="android:textColorPrimary">@color/dark_text</item>
+        <item name="android:actionMenuTextColor">@color/dark_text</item>
     </style>
 
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/splash</item>
-    </style>
-
-    <style name="GdlTheme.ActionBarTheme" parent="@style/ThemeOverlay.AppCompat.ActionBar">
-        <item name="android:colorControlNormal">@color/white</item>
-        <item name="android:textColor">@color/white</item>
-    </style>
-
-    <style name="GdlTheme.ActionBarStyle" parent="@style/Widget.AppCompat.Light.ActionBar">
-        <item name="elevation">4dp</item>
-        <item name="titleTextStyle">@style/GdlTheme.ActionBarTitleText</item>
-        <item name="subtitleTextStyle">@style/GdlTheme.ActionBarTitleText</item>
-    </style>
-
-    <style name="GdlTheme.ActionBarTitleText">
-        <item name="android:textSize">20sp</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:textStyle">normal</item>
-        <item name="android:typeface">sans</item>
+        <item name="colorPrimaryDark">@color/gdl_dark</item>
     </style>
 
     <style name="NavigationDrawer" parent="GdlTheme">
         <item name="android:textSize">14sp</item>
-        <item name="colorPrimary">@color/gdl_links</item>
+        <item name="colorPrimary">@color/dark_text</item>
+        <item name="android:textColorPrimary">@color/dark_text</item>
+        <item name="colorControlHighlight">@color/navigation_selected</item>
+        <item name="listPreferredItemPaddingLeft">72dp</item>
+        <item name="listPreferredItemPaddingRight">72dp</item>
     </style>
 
     <style name="Theme.AppCompat.Translucent" parent="GdlTheme">
@@ -43,7 +44,5 @@
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
     </style>
 </resources>

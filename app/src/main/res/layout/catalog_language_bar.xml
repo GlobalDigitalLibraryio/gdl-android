@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="28dp"
+    android:elevation="2dp"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="28dp"
+        android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -14,8 +16,6 @@
             android:id="@+id/catalog_current_language"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/gray_desert_storm"
-            android:text="Books in English"
             android:textColor="@color/dark_text"
             android:textSize="13sp" />
 
@@ -33,10 +33,5 @@
             android:textColor="@color/gdl_links"
             android:textSize="13sp" />
     </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="#E3E3E3" />
 
 </LinearLayout>

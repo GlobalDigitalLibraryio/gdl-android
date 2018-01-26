@@ -100,7 +100,6 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
         setSupportActionBar(toolbar)
         supportFragmentManager.addOnBackStackChangedListener(this)
 
-
         mDrawerToggle = ActionBarDrawerToggle(this, drawer_layout, R.string.drawer_open, R.string.drawer_close)
 
         // Set the drawer toggle as the DrawerListener
@@ -136,27 +135,30 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
 
         launch(UI) {
             val menu: Menu = navigation.menu
-            NavChoices.values().forEach {
-                if (it != NavChoices.CATEGORIES) {
-                    val choice = menu.add(it.ordinal, it.ordinal, it.ordinal, getNavText(it))
-                    if (it == NavChoices.default()) {
-                        choice.isChecked = true
-                    }
-                }
-            }
+            menu.add(NavChoices.LANGUAGE.ordinal, NavChoices.LANGUAGE.ordinal, NavChoices.LANGUAGE.ordinal, getNavText(NavChoices.LANGUAGE))
+            val myLibrary = menu.add(NavChoices.CATALOG.ordinal, NavChoices.MY_LIBRARY.ordinal, NavChoices.MY_LIBRARY.ordinal, getNavText(NavChoices.MY_LIBRARY))
+            myLibrary.isCheckable = true
+            val catalog = menu.add(NavChoices.CATALOG.ordinal, NavChoices.CATALOG.ordinal, NavChoices.CATALOG.ordinal, getNavText(NavChoices.CATALOG))
+            catalog.isCheckable = true
+            catalog.isChecked = true
+
             navigation.setNavigationItemSelectedListener {
                 when (it.groupId) {
                     NavChoices.LANGUAGE.ordinal -> {
                         val intent = Intent(applicationContext, SelectLanguageActivity::class.java)
                         startActivity(intent)
                     }
-                    NavChoices.MY_LIBRARY.ordinal -> {
-                        setCurrentFragment(NavChoices.MY_LIBRARY)
-                        setCheckedItem(it)
-                    }
                     NavChoices.CATALOG.ordinal -> {
-                        setCurrentFragment(NavChoices.CATALOG)
-                        setCheckedItem(it)
+                        when (it.itemId) {
+                            NavChoices.MY_LIBRARY.ordinal -> {
+                                setCurrentFragment(NavChoices.MY_LIBRARY)
+                                setCheckedItem(it)
+                            }
+                            NavChoices.CATALOG.ordinal -> {
+                                setCurrentFragment(NavChoices.CATALOG)
+                                setCheckedItem(it)
+                            }
+                        }
                     }
                     NavChoices.CATEGORIES.ordinal -> {
                         val category = categories[it.itemId - 10]
