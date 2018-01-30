@@ -39,7 +39,6 @@ class BookDetailsActivity : AppCompatActivity() {
         private const val STATUS_FAILED = -4
     }
 
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
@@ -51,6 +50,7 @@ class BookDetailsActivity : AppCompatActivity() {
     }
 
     private var paused = false
+    private var canStartAnotherActivity = true
 
     override fun onPause() {
         super.onPause()
@@ -61,6 +61,7 @@ class BookDetailsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         paused = false
+        canStartAnotherActivity = true
     }
 
     private var book: Book? = null
@@ -253,7 +254,10 @@ class BookDetailsActivity : AppCompatActivity() {
             book?.let {
                 if (isDownloaded()) {
                     it.downloaded?.let { uri ->
-                        ReaderActivity.startActivity(this@BookDetailsActivity, it.id, File(URI(uri)))
+                        if (canStartAnotherActivity) {
+                            ReaderActivity.startActivity(this@BookDetailsActivity, it.id, File(URI(uri)))
+                            canStartAnotherActivity = false
+                        }
                     }
                 }
             }

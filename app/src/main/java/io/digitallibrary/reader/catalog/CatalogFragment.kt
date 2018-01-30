@@ -27,6 +27,7 @@ class CatalogFragment : Fragment() {
     }
 
     private var broadcastReceiver: BroadcastReceiver? = null
+    private var canStartAnotherActivity = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.catalog_with_categories, container, false)
@@ -36,20 +37,29 @@ class CatalogFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val adapter = CategoriesAdapter(this, object : CategoriesAdapter.Callback {
             override fun onCategoryClicked(category: Category) {
-                val intent = Intent(activity, CatalogCategoryActivity::class.java)
-                intent.putExtra("category_id", category.id)
-                startActivity(intent)
+                if (canStartAnotherActivity) {
+                    val intent = Intent(activity, CatalogCategoryActivity::class.java)
+                    intent.putExtra("category_id", category.id)
+                    startActivity(intent)
+                    canStartAnotherActivity = false
+                }
             }
 
             override fun onBookClicked(book: Book) {
-                val intent = Intent(activity, BookDetailsActivity::class.java)
-                intent.putExtra("book_id", book.id)
-                startActivity(intent)
+                if (canStartAnotherActivity) {
+                    val intent = Intent(activity, BookDetailsActivity::class.java)
+                    intent.putExtra("book_id", book.id)
+                    startActivity(intent)
+                    canStartAnotherActivity = false
+                }
             }
 
             override fun onChangeLanguageClicked() {
-                val intent = Intent(activity, SelectLanguageActivity::class.java)
-                startActivity(intent)
+                if (canStartAnotherActivity) {
+                    val intent = Intent(activity, SelectLanguageActivity::class.java)
+                    startActivity(intent)
+                    canStartAnotherActivity = false
+                }
             }
         })
 
@@ -76,6 +86,11 @@ class CatalogFragment : Fragment() {
             Log.e(TAG, "Error setting up local broadcast receiver")
             e.printStackTrace()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        canStartAnotherActivity = true
     }
 
     override fun onDestroyView() {

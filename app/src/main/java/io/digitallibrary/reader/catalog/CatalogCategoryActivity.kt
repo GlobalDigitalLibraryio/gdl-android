@@ -17,6 +17,8 @@ import kotlinx.coroutines.experimental.launch
 
 class CatalogCategoryActivity : AppCompatActivity() {
 
+    private var canStartAnotherActivity = true
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
@@ -25,6 +27,11 @@ class CatalogCategoryActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        canStartAnotherActivity = true
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,9 +55,12 @@ class CatalogCategoryActivity : AppCompatActivity() {
         recyclerView.layoutManager = layoutManager
         val adapter = BooksAdapter(this, object : BooksAdapter.Callback {
             override fun onBookClicked(book: Book) {
-                val intent = Intent(applicationContext, BookDetailsActivity::class.java)
-                intent.putExtra("book_id", book.id)
-                startActivity(intent)
+                if (canStartAnotherActivity) {
+                    val intent = Intent(applicationContext, BookDetailsActivity::class.java)
+                    intent.putExtra("book_id", book.id)
+                    startActivity(intent)
+                    canStartAnotherActivity = false
+                }
             }
         }
         )

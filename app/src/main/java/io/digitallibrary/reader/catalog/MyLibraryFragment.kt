@@ -20,6 +20,7 @@ class MyLibraryFragment : Fragment() {
     }
 
     private lateinit var adapter: BooksAdapter
+    private var canStartAnotherActivity = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.catalog_without_categories_without_toolbar, container, false)
@@ -32,9 +33,12 @@ class MyLibraryFragment : Fragment() {
         recyclerView.layoutManager = layoutManager
         adapter = BooksAdapter(context!!, object : BooksAdapter.Callback {
             override fun onBookClicked(book: Book) {
-                val intent = Intent(context, BookDetailsActivity::class.java)
-                intent.putExtra("book_id", book.id)
-                startActivity(intent)
+                if (canStartAnotherActivity) {
+                    val intent = Intent(context, BookDetailsActivity::class.java)
+                    intent.putExtra("book_id", book.id)
+                    startActivity(intent)
+                    canStartAnotherActivity = false
+                }
             }
 
             override fun onBookSelectionChanged() {
@@ -54,6 +58,11 @@ class MyLibraryFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        canStartAnotherActivity = true
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

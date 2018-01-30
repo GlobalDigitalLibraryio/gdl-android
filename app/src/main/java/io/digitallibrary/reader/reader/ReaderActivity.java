@@ -82,6 +82,8 @@ public final class ReaderActivity extends Activity
     private ImageView view_settings;
     private SharedPreferences.OnSharedPreferenceChangeListener brightnessListner;
 
+    private boolean canStartAnotherActivity = true;
+
     /**
      * Construct an activity.
      */
@@ -157,6 +159,12 @@ public final class ReaderActivity extends Activity
                 readium_js.getCurrentPage(ReaderActivity.this);
             }
         }, 300L);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        canStartAnotherActivity = true;
     }
 
     @Override
@@ -254,9 +262,12 @@ public final class ReaderActivity extends Activity
         view_settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final @com.io7m.jnull.Nullable View v) {
-                Intent i = new Intent(ReaderActivity.this, ReaderSettingsActivity.class);
-                ReaderActivity.this.startActivity(i);
-                ReaderActivity.this.overridePendingTransition(0, 0);
+                if (canStartAnotherActivity) {
+                    Intent i = new Intent(ReaderActivity.this, ReaderSettingsActivity.class);
+                    ReaderActivity.this.startActivity(i);
+                    ReaderActivity.this.overridePendingTransition(0, 0);
+                    canStartAnotherActivity = false;
+                }
             }
         });
 
@@ -392,9 +403,12 @@ public final class ReaderActivity extends Activity
         in_toc.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final @Nullable View v) {
-                final ReaderTOC sent_toc = ReaderTOC.fromPackage(p);
-                ReaderTOCActivity.startActivityForResult(ReaderActivity.this, sent_toc);
-                ReaderActivity.this.overridePendingTransition(0, 0);
+                if (canStartAnotherActivity) {
+                    final ReaderTOC sent_toc = ReaderTOC.fromPackage(p);
+                    ReaderTOCActivity.startActivityForResult(ReaderActivity.this, sent_toc);
+                    ReaderActivity.this.overridePendingTransition(0, 0);
+                    canStartAnotherActivity = false;
+                }
             }
         });
 
