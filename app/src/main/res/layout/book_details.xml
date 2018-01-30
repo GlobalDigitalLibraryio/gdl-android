@@ -34,6 +34,7 @@
                     card_view:cardUseCompatPadding="true">
 
                     <LinearLayout
+                        android:id="@+id/button_container"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="15dp"
@@ -72,140 +73,115 @@
                             android:textColor="@color/dark_text"
                             android:textSize="12sp" />
 
-                        <LinearLayout
-                            android:id="@+id/book_download_failed_container"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                        <Button
+                            android:id="@+id/book_download_retry"
+                            android:visibility="gone"
+                            style="?android:attr/borderlessButtonStyle"
+                            android:layout_width="@dimen/button_standard_width"
+                            android:layout_height="@dimen/button_standard_height"
+                            android:layout_gravity="center_horizontal"
                             android:layout_marginTop="15dp"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:visibility="gone">
+                            android:background="@drawable/button_blue"
+                            android:shadowColor="#33000000"
+                            android:shadowDx="2"
+                            android:shadowDy="2"
+                            android:shadowRadius="2"
+                            android:text="@string/catalog_book_error_retry"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/button_standard_text_size" />
 
-                            <Button
-                                android:id="@+id/book_download_retry"
-                                style="?android:attr/borderlessButtonStyle"
-                                android:layout_width="@dimen/button_standard_width"
-                                android:layout_height="@dimen/button_standard_height"
-                                android:background="@drawable/button_blue"
-                                android:shadowColor="#33000000"
-                                android:shadowDx="2"
-                                android:shadowDy="2"
-                                android:shadowRadius="2"
-                                android:text="@string/catalog_book_error_retry"
-                                android:textColor="@color/white"
-                                android:textSize="@dimen/button_standard_text_size" />
+                        <Button
+                            android:id="@+id/book_download_dismiss"
+                            android:visibility="gone"
+                            style="?android:attr/borderlessButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/button_standard_height"
+                            android:layout_gravity="center_horizontal"
+                            android:text="@string/catalog_book_error_dismiss"
+                            android:textAllCaps="false"
+                            android:textColor="@color/red_dark" />
 
-                            <Button
-                                android:id="@+id/book_download_dismiss"
-                                style="?android:attr/borderlessButtonStyle"
-                                android:layout_width="@dimen/button_standard_width"
-                                android:layout_height="@dimen/button_standard_height"
-                                android:layout_gravity="center_horizontal"
-                                android:text="@string/catalog_book_error_dismiss"
-                                android:textAllCaps="false"
-                                android:textColor="@color/red_dark" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/book_read_and_delete_container"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                        <Button
+                            android:id="@+id/book_read_book"
+                            android:visibility="gone"
+                            style="?android:attr/borderlessButtonStyle"
+                            android:layout_width="@dimen/button_standard_width"
+                            android:layout_height="@dimen/button_standard_height"
+                            android:layout_gravity="center_horizontal"
                             android:layout_marginTop="15dp"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:visibility="gone">
+                            android:background="@drawable/button_green"
+                            android:shadowColor="#33000000"
+                            android:shadowDx="2"
+                            android:shadowDy="2"
+                            android:shadowRadius="2"
+                            android:text="@string/catalog_book_read"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/button_standard_text_size" />
 
-                            <Button
-                                android:id="@+id/book_read_book"
-                                style="?android:attr/borderlessButtonStyle"
-                                android:layout_width="@dimen/button_standard_width"
-                                android:layout_height="@dimen/button_standard_height"
-                                android:background="@drawable/button_green"
-                                android:shadowColor="#33000000"
-                                android:shadowDx="2"
-                                android:shadowDy="2"
-                                android:shadowRadius="2"
-                                android:text="@string/catalog_book_read"
-                                android:textColor="@color/white"
-                                android:textSize="@dimen/button_standard_text_size" />
-
-                            <Button
-                                android:id="@+id/book_delete_book"
-                                style="?android:attr/borderlessButtonStyle"
-                                android:layout_width="@dimen/button_standard_width"
-                                android:layout_height="@dimen/button_standard_height"
-                                android:layout_gravity="center_horizontal"
-                                android:text="@string/catalog_book_delete"
-                                android:textAllCaps="false"
-                                android:textColor="@color/red_dark" />
-                        </LinearLayout>
+                        <Button
+                            android:id="@+id/book_delete_book"
+                            android:visibility="gone"
+                            style="?android:attr/borderlessButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/button_standard_height"
+                            android:layout_gravity="center_horizontal"
+                            android:text="@string/catalog_book_delete"
+                            android:textAllCaps="false"
+                            android:textColor="@color/red_dark" />
 
                         <LinearLayout
-                            android:id="@+id/book_downloading_container"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
+                            android:id="@+id/book_downloading"
+                            android:visibility="gone"
+                            android:layout_width="@dimen/button_standard_width"
+                            android:layout_height="@dimen/button_standard_height"
+                            android:layout_gravity="center_horizontal"
                             android:layout_marginTop="15dp"
-                            android:gravity="center_horizontal"
-                            android:orientation="vertical"
-                            android:visibility="gone">
+                            android:background="@drawable/button_gray"
+                            android:gravity="center_vertical">
 
-                            <LinearLayout
-                                android:layout_width="@dimen/button_standard_width"
-                                android:layout_height="@dimen/button_standard_height"
-                                android:layout_marginEnd="5dp"
-                                android:background="@drawable/button_gray"
-                                android:gravity="center_vertical">
+                            <ProgressBar
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginStart="12dp"
+                                android:indeterminateTint="@color/dark_text" />
 
-                                <ProgressBar
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
-                                    android:layout_marginStart="12dp"
-                                    android:indeterminateTint="@color/dark_text" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="10dp"
-                                    android:text="@string/book_downloading"
-                                    android:textAllCaps="true"
-                                    android:textColor="@color/dark_text"
-                                    android:textSize="@dimen/button_standard_text_size" />
-                            </LinearLayout>
-
-                            <Button
-                                android:id="@+id/book_download_cancel"
-                                style="?android:attr/borderlessButtonStyle"
-                                android:layout_width="@dimen/button_standard_width"
-                                android:layout_height="@dimen/button_standard_height"
-                                android:layout_gravity="center_horizontal"
-                                android:text="@string/catalog_cancel_downloading"
-                                android:textAllCaps="false"
-                                android:textColor="@color/red_dark" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:id="@+id/book_download_button_container"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="15dp"
-                            android:gravity="center_horizontal"
-                            android:orientation="horizontal"
-                            android:visibility="gone">
-
-                            <Button
-                                android:id="@+id/book_download_button"
-                                style="?android:attr/borderlessButtonStyle"
-                                android:layout_width="@dimen/button_standard_width"
-                                android:layout_height="@dimen/button_standard_height"
-                                android:background="@drawable/button_blue"
-                                android:shadowColor="#33000000"
-                                android:shadowDx="2"
-                                android:shadowDy="2"
-                                android:shadowRadius="2"
-                                android:text="@string/catalog_book_download"
-                                android:textColor="@color/white"
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:text="@string/book_downloading"
+                                android:textAllCaps="true"
+                                android:textColor="@color/dark_text"
                                 android:textSize="@dimen/button_standard_text_size" />
                         </LinearLayout>
+
+                        <Button
+                            android:id="@+id/book_download_cancel"
+                            android:visibility="gone"
+                            style="?android:attr/borderlessButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="@dimen/button_standard_height"
+                            android:layout_gravity="center_horizontal"
+                            android:text="@string/catalog_cancel_downloading"
+                            android:textAllCaps="false"
+                            android:textColor="@color/red_dark" />
+
+                        <Button
+                            android:id="@+id/book_download_button"
+                            android:visibility="gone"
+                            style="?android:attr/borderlessButtonStyle"
+                            android:layout_width="@dimen/button_standard_width"
+                            android:layout_height="@dimen/button_standard_height"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="15dp"
+                            android:background="@drawable/button_blue"
+                            android:shadowColor="#33000000"
+                            android:shadowDx="2"
+                            android:shadowDy="2"
+                            android:shadowRadius="2"
+                            android:text="@string/catalog_book_download"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/button_standard_text_size" />
                     </LinearLayout>
                 </android.support.v7.widget.CardView>
 

@@ -47,15 +47,14 @@ class ReaderSettingsActivity : AppCompatActivity() {
             }
         }
 
-        val brightness = getPreferences(Context.MODE_PRIVATE).getInt("reader_brightness", 50)
-        reader_settings_brightness.progress = brightness
+        reader_settings_brightness.progress = Gdl.sharedPrefs.getInt("reader_brightness", 50)
         reader_settings_brightness.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(@com.io7m.jnull.Nullable bar: SeekBar, progress: Int, from_user: Boolean) {
                 val backLightValue = progress.toFloat() / 100
                 val layoutParams = window.attributes
                 layoutParams.screenBrightness = backLightValue
                 window.attributes = layoutParams
-                getPreferences(Context.MODE_PRIVATE).edit().putInt("reader_brightness", progress).apply()
+                Gdl.sharedPrefs.putInt("reader_brightness", progress)
             }
 
             override fun onStartTrackingTouch(@com.io7m.jnull.Nullable bar: SeekBar) {
@@ -67,11 +66,6 @@ class ReaderSettingsActivity : AppCompatActivity() {
             }
         })
 
-        // set reader brightness.
-        val backLightValue = brightness.toFloat() / 100
-        val layoutParams = window.attributes
-        layoutParams.screenBrightness = backLightValue
-        window.attributes = layoutParams
         updateCheck()
     }
 

@@ -1,5 +1,6 @@
 package io.digitallibrary.reader.catalog
 
+import android.animation.LayoutTransition
 import android.app.AlertDialog
 import android.app.DownloadManager
 import android.arch.lifecycle.Observer
@@ -106,7 +107,7 @@ class BookDetailsActivity : AppCompatActivity() {
                         book_delete_book.setOnClickListener { deleteBook() }
                         book_read_book.setOnClickListener { readBook() }
                         initialized = true
-                        updateDownloadingState()
+                        updateDownloadingState(true)
                     }
                 } else {
                     updateDownloadingState()
@@ -115,33 +116,48 @@ class BookDetailsActivity : AppCompatActivity() {
         })
     }
 
-    private fun updateActionButtons() {
+    private fun updateActionButtons(activateTranstions: Boolean = false) {
         launch(UI) {
             when (getDownloadStatus()) {
                 STATUS_NOT_DOWNLOADED -> {
-                    book_download_failed_container.visibility = GONE
-                    book_downloading_container.visibility = GONE
-                    book_read_and_delete_container.visibility = GONE
-                    book_download_button_container.visibility = VISIBLE
+                    book_download_retry.visibility = GONE
+                    book_download_dismiss.visibility = GONE
+                    book_read_book.visibility = GONE
+                    book_delete_book.visibility = GONE
+                    book_downloading.visibility = GONE
+                    book_download_cancel.visibility = GONE
+                    book_download_button.visibility = VISIBLE
                 }
                 STATUS_DOWNLOADING -> {
-                    book_download_failed_container.visibility = GONE
-                    book_download_button_container.visibility = GONE
-                    book_read_and_delete_container.visibility = GONE
-                    book_downloading_container.visibility = VISIBLE
+                    book_download_retry.visibility = GONE
+                    book_download_dismiss.visibility = GONE
+                    book_read_book.visibility = GONE
+                    book_delete_book.visibility = GONE
+                    book_downloading.visibility = VISIBLE
+                    book_download_cancel.visibility = GONE
+                    book_download_button.visibility = GONE
                 }
                 STATUS_FAILED -> {
-                    book_downloading_container.visibility = GONE
-                    book_download_button_container.visibility = GONE
-                    book_read_and_delete_container.visibility = GONE
-                    book_download_failed_container.visibility = VISIBLE
+                    book_download_retry.visibility = VISIBLE
+                    book_download_dismiss.visibility = VISIBLE
+                    book_read_book.visibility = GONE
+                    book_delete_book.visibility = GONE
+                    book_downloading.visibility = GONE
+                    book_download_cancel.visibility = GONE
+                    book_download_button.visibility = GONE
                 }
                 STATUS_DOWNLOADED, DownloadManager.STATUS_SUCCESSFUL -> {
-                    book_download_failed_container.visibility = GONE
-                    book_downloading_container.visibility = GONE
-                    book_download_button_container.visibility = GONE
-                    book_read_and_delete_container.visibility = VISIBLE
+                    book_download_retry.visibility = GONE
+                    book_download_dismiss.visibility = GONE
+                    book_read_book.visibility = VISIBLE
+                    book_delete_book.visibility = VISIBLE
+                    book_downloading.visibility = GONE
+                    book_download_cancel.visibility = GONE
+                    book_download_button.visibility = GONE
                 }
+            }
+            if (activateTranstions) {
+                button_container.layoutTransition = LayoutTransition()
             }
         }
     }
@@ -186,9 +202,9 @@ class BookDetailsActivity : AppCompatActivity() {
         return getDownloadStatus() == STATUS_DOWNLOADING
     }
 
-    private fun updateDownloadingState() {
+    private fun updateDownloadingState(activateTranstions: Boolean = false) {
         launch(CommonPool) {
-            updateActionButtons()
+            updateActionButtons(activateTranstions)
             var isDownloading = isDownloading()
             while (isDownloading && !paused) {
                 isDownloading = isDownloading()

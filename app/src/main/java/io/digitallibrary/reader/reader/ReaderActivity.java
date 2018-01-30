@@ -1,7 +1,9 @@
 package io.digitallibrary.reader.reader;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -76,6 +79,7 @@ public final class ReaderActivity extends Activity
     private boolean web_view_resized;
     private ReaderBookLocation current_location;
     private ImageView view_settings;
+    private SharedPreferences.OnSharedPreferenceChangeListener brightnessListner;
 
     /**
      * Construct an activity.
@@ -281,7 +285,32 @@ public final class ReaderActivity extends Activity
         final ReaderReadiumEPUBLoaderType pl = rs.getEpubLoader();
         pl.loadEPUB(in_epub_file, this);
 
+        // set reader brightness.
+        final int brightness = Gdl.Companion.getSharedPrefs().getInt("reader_brightness", 50);
+        final float back_light_value = (float) brightness / 100;
+        final WindowManager.LayoutParams layout_params = getWindow().getAttributes();
+        layout_params.screenBrightness = back_light_value;
+        getWindow().setAttributes(layout_params);
+
+        brightnessListner = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if (key.equals("reader_brightness")) {
+                    updateBrightness();
+                }
+            }
+        };
+        Gdl.Companion.getSharedPrefs().registerListener(brightnessListner);
+        updateBrightness();
         updateColors(settings.getColorScheme());
+    }
+
+    private void updateBrightness() {
+        final int brightness = Gdl.Companion.getSharedPrefs().getInt("reader_brightness", 50);
+        final float back_light_value = (float) brightness / 100;
+        final WindowManager.LayoutParams layout_params = getWindow().getAttributes();
+        layout_params.screenBrightness = back_light_value;
+        getWindow().setAttributes(layout_params);
     }
 
     @Override
@@ -312,6 +341,8 @@ public final class ReaderActivity extends Activity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        Gdl.Companion.getSharedPrefs().unregisterListener(brightnessListner);
 
         final ReaderReadiumJavaScriptAPIType readium_js =
                 NullCheck.notNull(ReaderActivity.this.readium_js_api);

@@ -73,6 +73,16 @@ public class Prefs {
 
     /**
      * @param key preference key
+     * @return value
+     */
+    public int getInt(final String key, final int def) {
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
+        int val = prefs.getInt(key, def);
+        return val;
+    }
+
+    /**
+     * @param key preference key
      */
     public void remove(final String key) {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this.context);
