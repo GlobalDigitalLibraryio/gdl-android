@@ -42,6 +42,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="15dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/reader_accessibility_book_settings_close"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:onClick="onClose"
@@ -50,11 +51,10 @@
 
         </RelativeLayout>
 
-        <FrameLayout
+        <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#FFE3E3E3"
-            android:clickable="true" />
+            android:background="@color/divider" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -73,18 +73,16 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
                     android:contentDescription="@string/reader_accessibility_settings_decrease_font_size"
                     android:gravity="center"
                     android:text="A"
                     android:textColor="@color/dark_text"
                     android:textSize="16sp" />
 
-                <FrameLayout
+                <View
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
-                    android:background="#FFE3E3E3"
-                    android:clickable="true" />
+                    android:background="@color/divider" />
 
                 <TextView
                     android:id="@+id/reader_settings_text_larger"
@@ -92,7 +90,6 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
                     android:contentDescription="@string/reader_accessibility_settings_increase_font_size"
                     android:gravity="center"
                     android:text="A"
@@ -101,11 +98,10 @@
 
             </LinearLayout>
 
-            <FrameLayout
+            <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#FFE3E3E3"
-                android:clickable="true" />
+                android:background="@color/divider" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -118,7 +114,6 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@color/white"
-                    android:clickable="true"
                     android:contentDescription="@string/reader_accessibility_settings_black_on_white_text"
                     android:foreground="?attr/selectableItemBackground">
 
@@ -144,11 +139,10 @@
 
                 </RelativeLayout>
 
-                <FrameLayout
+                <View
                     android:layout_width="1dp"
                     android:layout_height="48dp"
-                    android:background="#FFE3E3E3"
-                    android:clickable="true" />
+                    android:background="@color/divider" />
 
                 <RelativeLayout
                     android:id="@+id/reader_settings_black_on_beige"
@@ -156,7 +150,6 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="#FFFFF2E6"
-                    android:clickable="true"
                     android:contentDescription="@string/reader_accessibility_settings_black_on_sepia_text"
                     android:foreground="?attr/selectableItemBackground">
 
@@ -186,7 +179,7 @@
                 <FrameLayout
                     android:layout_width="1dp"
                     android:layout_height="48dp"
-                    android:background="#FFE3E3E3" />
+                    android:background="@color/divider" />
 
                 <RelativeLayout
                     android:id="@+id/reader_settings_white_on_black"
@@ -194,7 +187,6 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="#FF444444"
-                    android:clickable="true"
                     android:contentDescription="@string/reader_accessibility_settings_white_on_black_text"
                     android:foreground="?attr/selectableItemBackground">
 
@@ -222,18 +214,16 @@
 
             </LinearLayout>
 
-            <FrameLayout
+            <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="#FFE3E3E3"
-                android:clickable="true" />
+                android:background="@color/divider" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
                 android:layout_marginEnd="20dp"
                 android:layout_marginStart="20dp"
-                android:clickable="true"
                 android:orientation="horizontal">
 
                 <ImageView
@@ -253,8 +243,8 @@
                     android:contentDescription="@string/reader_accessibility_settings_brightness_slider"
                     android:max="100"
                     android:maxHeight="2dp"
-                    android:progressDrawable="@drawable/progress"
-                    android:thumb="@drawable/progress_thumb" />
+                    android:progressDrawable="@drawable/progress_for_white_bg"
+                    android:thumb="@drawable/progress_thumb_for_white_bg" />
 
                 <ImageView
                     android:layout_width="22dp"

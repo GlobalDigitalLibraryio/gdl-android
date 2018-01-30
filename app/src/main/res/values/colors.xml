@@ -6,7 +6,7 @@
 
     <color name="gdl_blue">#1466B5</color>
 
-    <color name="gdl_links">#FF0085DD</color>
+    <color name="gdl_links">#0085DD</color>
 
     <!--Support colors-->
     <color name="red_dark">#AE0E16</color>
@@ -23,4 +23,10 @@
     <color name="gray_desert_storm">#F8F8F8</color>
 
     <color name="navigation_selected">#E9F1F9</color>
+
+    <color name="reader_progressbar_white">@color/gray_platinum</color>
+    <color name="reader_progressbar_black">#888888</color>
+    <color name="reader_progressbar_beige">#CDBBAA</color>
+
+    <color name="divider">@color/gray_platinum</color>
 </resources>

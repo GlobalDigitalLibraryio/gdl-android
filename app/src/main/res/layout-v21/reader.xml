@@ -6,7 +6,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/reader_background"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true">
 
     <!-- The main web view container, rendered at the lowest layer -->
 
@@ -127,8 +128,8 @@
                 android:layout_marginStart="16dp"
                 android:max="100"
                 android:maxHeight="2dp"
-                android:progressDrawable="@drawable/progress"
-                android:thumb="@drawable/progress_thumb" />
+                android:progressDrawable="@drawable/progress_for_white_bg"
+                android:thumb="@drawable/progress_thumb_for_white_bg" />
 
             <View
                 android:layout_width="match_parent"
