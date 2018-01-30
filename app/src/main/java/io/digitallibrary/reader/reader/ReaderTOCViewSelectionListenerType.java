@@ -8,11 +8,6 @@ import io.digitallibrary.reader.reader.ReaderTOC.TOCElement;
 
 public interface ReaderTOCViewSelectionListenerType
 {
-  /**
-   * No TOC item was selected.
-   */
-
-  void onTOCBackSelected();
 
   /**
    * The given TOC item was selected.

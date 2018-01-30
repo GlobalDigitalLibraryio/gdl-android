@@ -1,71 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/reader_toc_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
 
     <RelativeLayout
-        android:onClick="onBackgroundClicked"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="72dp"
+            android:text="@string/reader_toc"
+            android:textColor="@color/dark_text"
+            android:textSize="20sp" />
+
+        <ImageButton
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="15dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:onClick="onClose"
+            android:padding="0dp"
+            android:src="@drawable/ic_close_dark_gray_24dp" />
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#FFE3E3E3" />
+
+    <ListView
+        android:id="@+id/reader_toc_list"
+        android:divider="@null"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <LinearLayout
-        android:id="@+id/reader_toc_container"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_gravity="center"
-        android:layout_marginEnd="4dp"
-        android:layout_marginTop="34dp"
-        android:layout_marginBottom="96dp"
-        android:clipToPadding="false"
-        android:orientation="vertical"
-        android:padding="5dp">
-
-        <View
-            android:id="@+id/rectangle"
-            android:layout_width="20dp"
-            android:layout_height="10dp"
-            android:layout_gravity="end"
-            android:layout_marginEnd="6dp"
-            android:clickable="true"
-            android:background="@drawable/triangle"
-            android:clipToPadding="false"
-            android:elevation="2dp"
-            android:padding="10dp"
-            android:translationZ="2dp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:background="@drawable/rounded_square"
-            android:elevation="2dp"
-            android:orientation="vertical"
-            android:translationZ="2dp">
-
-            <TextView
-                android:id="@+id/reader_toc_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:textColor="@color/dark_text"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:textSize="16sp"
-                android:text="@string/reader_toc" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="3dp"
-                android:background="#FFEFF0F2"/>
-
-            <ListView
-                android:id="@+id/reader_toc_list"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-        </LinearLayout>
-    </LinearLayout>
-</RelativeLayout>
+</LinearLayout>

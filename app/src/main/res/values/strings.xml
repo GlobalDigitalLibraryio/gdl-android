@@ -30,6 +30,7 @@
     <!-- Reader strings -->
     <string name="reader">Reader</string>
     <string name="reader_toc">Table Of Contents</string>
+    <string name="reader_book_settings">Book Settings</string>
 
     <!-- Accessibility strings used for content descriptions (Reader) -->
     <string name="reader_accessibility_toc">Show table of contents</string>

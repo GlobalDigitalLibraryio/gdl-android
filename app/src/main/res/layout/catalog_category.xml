@@ -39,7 +39,6 @@
             android:paddingBottom="5dp"
             android:layout_alignParentEnd="true"
             android:layout_gravity="center_horizontal"
-
             android:layout_marginTop="5dp"
             android:text="@string/catalog_more_feed"
             android:textAllCaps="true"

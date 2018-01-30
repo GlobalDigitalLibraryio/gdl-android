@@ -22,13 +22,15 @@ import java.util.List;
 import io.digitallibrary.reader.Gdl;
 import io.digitallibrary.reader.R;
 import io.digitallibrary.reader.reader.ReaderTOC.TOCElement;
-import io.digitallibrary.reader.reader.widget.RectangleOutline;
 
 /**
  * A re-usable view of a table of contents.
  */
 public final class ReaderTOCView implements ListAdapter {
     private static final String TAG = "ReaderTOCView";
+
+    private static final int ELEMENT_START_MARGIN = 72;
+    private static final int ELEMENT_INDENT_MARGIN = 24;
 
     private final ArrayAdapter<TOCElement> adapter;
     private final Context context;
@@ -54,13 +56,6 @@ public final class ReaderTOCView implements ListAdapter {
 
         final ViewGroup in_layout = NullCheck.notNull((ViewGroup) in_inflater.inflate(R.layout.reader_toc, null));
         final ListView in_list_view = NullCheck.notNull((ListView) in_layout.findViewById(R.id.reader_toc_list));
-
-        // Check if we're running on Android 5.0 or higher
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // add triangle outline
-            final View in_rectangle = NullCheck.notNull((View) in_layout.findViewById(R.id.rectangle));
-            in_rectangle.setOutlineProvider(new RectangleOutline());
-        }
 
         final List<TOCElement> es = in_toc.getElements();
         this.adapter = new ArrayAdapter<>(in_context, 0, es);
@@ -127,10 +122,8 @@ public final class ReaderTOCView implements ListAdapter {
 
         final float scale = context.getResources().getDisplayMetrics().density;
 
-        final RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                Math.round(38 * scale));
-        p.setMargins((int) rs.screenDPToPixels((e.getIndent() + 1) * 15), 0, 0, 0);
+        final RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, Math.round(38 * scale));
+        p.setMargins((int) rs.screenDPToPixels((e.getIndent() * ELEMENT_INDENT_MARGIN) + ELEMENT_START_MARGIN), 0, 0, 0);
         text_view.setLayoutParams(p);
 
         item_view.setOnClickListener(new OnClickListener() {
@@ -142,6 +135,15 @@ public final class ReaderTOCView implements ListAdapter {
         });
 
         return item_view;
+    }
+
+    public void animateIn() {
+        view_layout.setY(-Gdl.Companion.getReaderAppServices().screenGetHeightPixels());
+        view_layout.animate().y(0f);
+    }
+
+    public void animateOut(Runnable callback) {
+        view_layout.animate().y(-Gdl.Companion.getReaderAppServices().screenGetHeightPixels()).withEndAction(callback);
     }
 
     @Override

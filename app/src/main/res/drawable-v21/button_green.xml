@@ -1,4 +1,4 @@
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="?android:colorControlHighlight">
-    <item android:drawable="@drawable/button_green_bg" />
+    android:color="#008251">
+    <item android:drawable="@drawable/button_green_default" />
 </ripple>

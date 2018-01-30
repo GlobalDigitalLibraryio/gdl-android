@@ -108,5 +108,9 @@ class Gdl : Application() {
         fun screenDPToPixels(dp: Int): Double {
             return (dp * rr.displayMetrics.density).toDouble() + 0.5
         }
+
+        fun screenGetHeightPixels(): Int {
+            return rr.displayMetrics.heightPixels
+        }
     }
 }

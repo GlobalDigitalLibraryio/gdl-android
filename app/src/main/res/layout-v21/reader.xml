@@ -55,11 +55,12 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="56dp">
+
             <View
-                android:layout_alignParentBottom="true"
-                android:background="#FFE3E3E3"
                 android:layout_width="match_parent"
-                android:layout_height="1dp" />
+                android:layout_height="1dp"
+                android:layout_alignParentBottom="true"
+                android:background="#FFE3E3E3" />
 
             <RelativeLayout
                 android:id="@+id/reader_hud_controls"
@@ -74,6 +75,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="5dp"
                     android:layout_marginStart="10dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/reader_accessibility_close"
                     android:onClick="onBackClicked"
                     android:padding="5dp"
@@ -86,6 +88,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="10dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/reader_accessibility_toc"
                     android:padding="5dp"
                     android:src="@drawable/ic_format_list_numbered_dark_24dp" />
@@ -98,6 +101,7 @@
                     android:layout_marginEnd="5dp"
                     android:layout_marginStart="10dp"
                     android:layout_toStartOf="@id/reader_toc"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/reader_accessibility_settings"
                     android:padding="5dp"
                     android:src="@drawable/ic_font_download_dark_24dp" />
@@ -127,9 +131,9 @@
                 android:thumb="@drawable/progress_thumb" />
 
             <View
-                android:background="#FFE3E3E3"
                 android:layout_width="match_parent"
-                android:layout_height="1dp" />
+                android:layout_height="1dp"
+                android:background="#FFE3E3E3" />
         </RelativeLayout>
     </RelativeLayout>
 

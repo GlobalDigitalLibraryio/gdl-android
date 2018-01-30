@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="46dp"
+    android:background="?attr/selectableItemBackground">
 
-    <!--Most of this is set in code-->
+    <!-- Margins are set in ReaderTocView.java -->
     <TextView
         android:id="@+id/reader_toc_element_text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerVertical="true"
         android:gravity="center_vertical"
-        android:text="Text"
+        android:text="@string/placeholder_short_title"
         android:textColor="@color/dark_text"
         android:textSize="14sp" />
 

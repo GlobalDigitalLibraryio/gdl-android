@@ -28,8 +28,7 @@ public final class ReaderTOCActivity extends AppCompatActivity implements Reader
     /**
      * The name of the argument containing the selected TOC item.
      */
-    public static final String TOC_SELECTED_ID =
-            "io.digitallibrary.reader.reader.ReaderTOCActivity.toc_selected";
+    public static final String TOC_SELECTED_ID = "io.digitallibrary.reader.reader.ReaderTOCActivity.toc_selected";
 
     /**
      * The activity request code (for retrieving the result of executing the
@@ -39,12 +38,6 @@ public final class ReaderTOCActivity extends AppCompatActivity implements Reader
 
 
     private @Nullable ReaderTOCView view;
-
-    /**
-     * Construct an activity.
-     */
-    public ReaderTOCActivity() {
-    }
 
     /**
      * Start a TOC activity. The user will be prompted to select a TOC item, and
@@ -67,8 +60,13 @@ public final class ReaderTOCActivity extends AppCompatActivity implements Reader
 
     @Override
     public void finish() {
-        super.finish();
-        this.overridePendingTransition(0, 0);
+        view.animateOut(new Runnable() {
+            @Override
+            public void run() {
+                ReaderTOCActivity.super.finish();
+                overridePendingTransition(0, 0);
+            }
+        });
     }
 
     @Override
@@ -80,12 +78,12 @@ public final class ReaderTOCActivity extends AppCompatActivity implements Reader
         final Intent input = NullCheck.notNull(this.getIntent());
         final Bundle args = NullCheck.notNull(input.getExtras());
 
-        final ReaderTOC in_toc =
-                NullCheck.notNull((ReaderTOC) args.getSerializable(ReaderTOCActivity.TOC_ID));
+        final ReaderTOC in_toc = NullCheck.notNull((ReaderTOC) args.getSerializable(ReaderTOCActivity.TOC_ID));
 
         final LayoutInflater inflater = NullCheck.notNull(this.getLayoutInflater());
-        this.view = new ReaderTOCView(inflater, this, in_toc, this);
-        this.setContentView(this.view.getLayoutView());
+        view = new ReaderTOCView(inflater, this, in_toc, this);
+        setContentView(this.view.getLayoutView());
+        view.animateIn();
     }
 
     @Override
@@ -96,19 +94,14 @@ public final class ReaderTOCActivity extends AppCompatActivity implements Reader
     }
 
     @Override
-    public void onTOCBackSelected() {
-        this.finish();
-    }
-
-    @Override
     public void onTOCItemSelected(final TOCElement e) {
         final Intent intent = new Intent();
         intent.putExtra(ReaderTOCActivity.TOC_SELECTED_ID, e);
-        this.setResult(Activity.RESULT_OK, intent);
-        this.finish();
+        setResult(Activity.RESULT_OK, intent);
+        finish();
     }
 
-    public void onBackgroundClicked(View view) {
+    public void onClose(View v) {
         finish();
     }
 }
