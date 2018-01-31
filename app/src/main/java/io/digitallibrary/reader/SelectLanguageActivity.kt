@@ -37,7 +37,7 @@ class SelectLanguageActivity : AppCompatActivity() {
         setContentView(R.layout.select_language)
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setTitle(R.string.languages_title)
+        supportActionBar?.setTitle(R.string.languages_selection_title)
         fetchLanguages()
     }
 

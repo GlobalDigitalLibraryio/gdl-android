@@ -86,7 +86,7 @@
                             android:shadowDx="2"
                             android:shadowDy="2"
                             android:shadowRadius="2"
-                            android:text="@string/catalog_book_error_retry"
+                            android:text="@string/book_details_action_download_error_retry"
                             android:textColor="@color/white"
                             android:textSize="@dimen/button_standard_text_size" />
 
@@ -97,7 +97,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="@dimen/button_standard_height"
                             android:layout_gravity="center_horizontal"
-                            android:text="@string/catalog_book_error_dismiss"
+                            android:text="@string/book_details_action_download_error_dismiss"
                             android:textAllCaps="false"
                             android:textColor="@color/red_dark" />
 
@@ -114,7 +114,7 @@
                             android:shadowDx="2"
                             android:shadowDy="2"
                             android:shadowRadius="2"
-                            android:text="@string/catalog_book_read"
+                            android:text="@string/book_details_action_read"
                             android:textColor="@color/white"
                             android:textSize="@dimen/button_standard_text_size" />
 
@@ -125,7 +125,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="@dimen/button_standard_height"
                             android:layout_gravity="center_horizontal"
-                            android:text="@string/catalog_book_delete"
+                            android:text="@string/book_details_action_delete_book"
                             android:textAllCaps="false"
                             android:textColor="@color/red_dark" />
 
@@ -149,7 +149,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="10dp"
-                                android:text="@string/book_downloading"
+                                android:text="@string/book_details_downloading"
                                 android:textAllCaps="true"
                                 android:textColor="@color/dark_text"
                                 android:textSize="@dimen/button_standard_text_size" />
@@ -162,7 +162,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="@dimen/button_standard_height"
                             android:layout_gravity="center_horizontal"
-                            android:text="@string/catalog_cancel_downloading"
+                            android:text="@string/book_details_action_cancel_downloading"
                             android:textAllCaps="false"
                             android:textColor="@color/red_dark" />
 
@@ -179,7 +179,7 @@
                             android:shadowDx="2"
                             android:shadowDy="2"
                             android:shadowRadius="2"
-                            android:text="@string/catalog_book_download"
+                            android:text="@string/book_details_action_download"
                             android:textColor="@color/white"
                             android:textSize="@dimen/button_standard_text_size" />
                     </LinearLayout>
@@ -201,7 +201,8 @@
                         android:id="@+id/book_cover"
                         android:layout_width="140dp"
                         android:layout_height="180dp"
-                        android:layout_margin="5dp" />
+                        android:layout_margin="5dp"
+                        android:contentDescription="@string/book_details_accessibility_book_cover" />
 
                 </android.support.v7.widget.CardView>
 
@@ -238,7 +239,7 @@
                                 android:layout_marginEnd="15dp"
                                 android:layout_marginStart="15dp"
                                 android:layout_marginTop="15dp"
-                                android:text="@string/book_published"
+                                android:text="@string/book_details_published"
                                 android:textAllCaps="true"
                                 android:textColor="@color/dark_text"
                                 android:textSize="12sp"
@@ -279,7 +280,7 @@
                                 android:shadowDx="2"
                                 android:shadowDy="2"
                                 android:shadowRadius="2"
-                                android:text="@string/book_level"
+                                android:text="@string/book_details_level"
                                 android:textAllCaps="true"
                                 android:textColor="@color/white"
                                 android:textSize="14sp"
@@ -296,7 +297,7 @@
                         android:layout_marginEnd="15dp"
                         android:layout_marginStart="15dp"
                         android:layout_marginTop="15dp"
-                        android:text="@string/book_authors"
+                        android:text="@string/book_details_authors"
                         android:textAllCaps="true"
                         android:textColor="@color/dark_text"
                         android:textSize="12sp"
@@ -319,7 +320,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="15dp"
                         android:layout_marginStart="15dp"
-                        android:text="@string/book_license"
+                        android:text="@string/book_details_license"
                         android:textAllCaps="true"
                         android:textColor="@color/dark_text"
                         android:textSize="12sp"

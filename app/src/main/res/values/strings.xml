@@ -5,38 +5,41 @@
 
     <!-- Catalog strings -->
     <string name="catalog">Catalog</string>
-    <string name="catalog_book_detail">Book Details</string>
-    <string name="catalog_cancel_downloading">Cancel Download</string>
+    <string name="catalog_book_details">Book Details</string>
     <string name="catalog_unknown_feed">Unknown</string>
     <string name="catalog_more_feed">More</string>
-    <string name="catalog_change_language">Change</string>
     <string name="catalog_current_language">Books in %1$s</string>
+    <string name="catalog_change_language">Change</string>
 
-    <string name="book_license">License</string>
-    <string name="book_authors">Authors</string>
-    <string name="book_level">Level %1$d</string>
-    <string name="book_publisher">From %1$s</string>
-    <string name="book_published">Published</string>
+    <string name="catalog_accessibility_book_cover">Book cover</string>
 
-    <!-- Catalog book detail strings -->
-    <string name="catalog_book_read">Read</string>
-    <string name="catalog_book_error_dismiss">Dismiss</string>
-    <string name="catalog_book_error_retry">Retry</string>
-    <string name="catalog_book_download">Download</string>
-    <string name="catalog_book_delete">Delete Book</string>
-    <string name="catalog_book_delete_confirm_dialog">Are you sure you want to delete \"%1$s\"?</string>
+    <!-- Book details -->
+    <string name="book_details_license">License</string>
+    <string name="book_details_authors">Authors</string>
+    <string name="book_details_level">Level %1$d</string>
+    <string name="book_details_publisher">From %1$s</string>
+    <string name="book_details_published">Published</string>
+    <string name="book_details_action_read">Read</string>
+    <string name="book_details_downloading">Downloading</string>
+    <string name="book_details_action_download_error_dismiss">Dismiss</string>
+    <string name="book_details_action_download_error_retry">Retry</string>
+    <string name="book_details_action_download">Download</string>
+    <string name="book_details_action_cancel_downloading">Cancel Download</string>
+    <string name="book_details_action_delete_book">Delete Book</string>
+    <string name="book_details_action_delete_book_confirm_dialog">Are you sure you want to delete \"%1$s\"?</string>
 
+    <string name="book_details_accessibility_book_cover">Book cover</string>
 
     <!-- Reader strings -->
     <string name="reader">Reader</string>
     <string name="reader_toc">Table Of Contents</string>
     <string name="reader_book_settings">Reader Settings</string>
 
-    <!-- Accessibility strings used for content descriptions (Reader) -->
     <string name="reader_accessibility_toc">Show table of contents</string>
+    <string name="reader_accessibility_toc_close_toc">Close table of contents</string>
     <string name="reader_accessibility_settings">Show reader settings</string>
     <string name="reader_accessibility_close">Close the book</string>
-    <string name="reader_accessibility_book_settings_close">Close reader settings</string>
+    <string name="reader_accessibility_settings_close_settings">Close reader settings</string>
     <string name="reader_accessibility_settings_white_on_black_text">White on black text</string>
     <string name="reader_accessibility_settings_black_on_sepia_text">Black on sepia text</string>
     <string name="reader_accessibility_settings_black_on_white_text">Black on white text</string>
@@ -44,28 +47,28 @@
     <string name="reader_accessibility_settings_increase_font_size">Increase font size</string>
     <string name="reader_accessibility_settings_brightness_slider">Brightness slider</string>
 
-    <string name="languages_title">Book Language</string>
-    <string name="error_fetching_languages">Error fetching languages</string>
+    <!-- Languages selection screen -->
+    <string name="languages_selection_title">Book Language</string>
+    <string name="languages_selection_error_fetching_languages">Error fetching languages</string>
 
-    <!--Navigation-->
-    <string name="drawer_open">Open the navigation drawer</string>
-    <string name="drawer_close">Close the navigation drawer</string>
-    <string name="nav_catalog">Catalog</string>
-    <string name="nav_my_library">My Library</string>
-    <string name="nav_language_header">Language</string>
-    <string name="nav_current_language">Book Language (%1$s)</string>
+    <string name="languages_selection_accessibility_row_is_checked">Row is checked</string>
 
-    <string name="book_downloading">Downloading</string>
+    <!-- Navigation -->
+    <string name="navigation_drawer_open">Open the navigation drawer</string>
+    <string name="navigation_drawer_close">Close the navigation drawer</string>
+    <string name="navigation_choice_catalog">Catalog</string>
+    <string name="navigation_choice_my_library">My Library</string>
+    <string name="navigation_choice_select_language">Book Language (%1$s)</string>
 
-    <!--My library-->
+    <!-- My library -->
     <string name="my_library_menu_edit">Edit</string>
     <string name="my_library_menu_select_all">Select All</string>
     <string name="my_library_menu_delete">Delete</string>
     <string name="my_library_menu_cancel">Cancel</string>
     <string name="my_library_confirm_delete_books">Are you sure you want to delete the selected book(s)?</string>
 
-    <!--Dialogs-->
-    <string name="dialog_delete">Delete</string>
-    <string name="dialog_cancel">Cancel</string>
+    <!-- Dialogs -->
+    <string name="dialog_action_delete">Delete</string>
+    <string name="dialog_action_cancel">Cancel</string>
 
 </resources>

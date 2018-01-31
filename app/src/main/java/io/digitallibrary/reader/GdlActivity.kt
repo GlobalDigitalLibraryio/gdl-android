@@ -80,9 +80,9 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
 
     private fun getNavText(navChoice: NavChoices): String {
         return when (navChoice) {
-            NavChoices.LANGUAGE -> getString(R.string.nav_current_language, LanguageUtil.getCurrentLanguageText())
-            NavChoices.MY_LIBRARY -> getString(R.string.nav_my_library)
-            NavChoices.CATALOG -> getString(R.string.nav_catalog)
+            NavChoices.LANGUAGE -> getString(R.string.navigation_choice_select_language, LanguageUtil.getCurrentLanguageText())
+            NavChoices.MY_LIBRARY -> getString(R.string.navigation_choice_my_library)
+            NavChoices.CATALOG -> getString(R.string.navigation_choice_catalog)
             else -> throw IllegalArgumentException("NavChoice $navChoice does not have a menu text")
         }
     }
@@ -98,7 +98,7 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
         setSupportActionBar(toolbar)
         supportFragmentManager.addOnBackStackChangedListener(this)
 
-        mDrawerToggle = ActionBarDrawerToggle(this, drawer_layout, R.string.drawer_open, R.string.drawer_close)
+        mDrawerToggle = ActionBarDrawerToggle(this, drawer_layout, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
 
         // Set the drawer toggle as the DrawerListener
         drawer_layout.addDrawerListener(mDrawerToggle)
@@ -202,7 +202,7 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
                 val f = MyLibraryFragment()
                 // Need to call commitAllowingStateLoss instead of just commit to avoid crash on old Android versions
                 supportFragmentManager.beginTransaction().replace(R.id.content_frame, f).commitAllowingStateLoss()
-                setTitle(R.string.nav_my_library)
+                setTitle(R.string.navigation_choice_my_library)
             }
             GdlActivity.Companion.NavChoices.CATALOG -> {
                 val f = CatalogFragment()

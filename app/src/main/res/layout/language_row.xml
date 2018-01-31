@@ -11,7 +11,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:src="@drawable/ic_check_green_24dp"
-        android:visibility="invisible" />
+        android:visibility="invisible"
+        android:contentDescription="@string/languages_selection_accessibility_row_is_checked" />
 
     <TextView
         android:id="@+id/language_name"

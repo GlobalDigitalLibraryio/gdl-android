@@ -90,11 +90,11 @@ class MyLibraryFragment : Fragment() {
     private fun deleteSelectedBooks() {
         val confirmDialog = AlertDialog.Builder(activity).create()
         confirmDialog.setMessage(getString(R.string.my_library_confirm_delete_books))
-        confirmDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.dialog_delete), { _, _ ->
+        confirmDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.dialog_action_delete), { _, _ ->
             deleteBooks(adapter.getSelectedBooks())
             adapter.setSelectMode(false)
         })
-        confirmDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.dialog_cancel), { _, _ -> })
+        confirmDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.dialog_action_cancel), { _, _ -> })
         confirmDialog.show()
     }
 

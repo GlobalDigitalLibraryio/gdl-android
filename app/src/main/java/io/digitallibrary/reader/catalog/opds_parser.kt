@@ -219,8 +219,12 @@ fun updateCategories(categories: List<Feed.Entry>?, language: String): List<Cate
             }
 
     oldCategoryMap.values.forEach {
-        val booksFromDeletedCategory = Gdl.database.bookDao().getBooks(it.id)
-        Gdl.database.bookDao().delete(booksFromDeletedCategory.filter { it.downloaded == null })
+        val booksFromDeletedCategory = Gdl.database.bookDao().getBooks(it.id).filter { it.downloaded == null }
+        booksFromDeletedCategory.forEach {
+            Gdl.readerAppServices.bookmarks.removeBookmark(it.id)
+        }
+        Gdl.database.bookDownloadDao().delete(booksFromDeletedCategory.map { it.id })
+        Gdl.database.bookDao().delete(booksFromDeletedCategory)
         dao.delete(it)
     }
 
@@ -307,8 +311,15 @@ fun updateBooks(category: Category, books: List<Feed.Entry>, language: String, c
                 }
 
         Gdl.database.bookDao().insertList(booksToInsert)
+
+        val booksToDelete = oldBooks.values.filter { it.downloaded == null }
+        booksToDelete.forEach {
+            Gdl.readerAppServices.bookmarks.removeBookmark(it.id)
+        }
+        Gdl.database.bookDownloadDao().delete(booksToDelete.map { it.id })
+
         // We do not delete downloaded books
-        Gdl.database.bookDao().delete(oldBooks.values.filter { it.downloaded == null }.toList())
+        Gdl.database.bookDao().delete(booksToDelete)
         Gdl.database.bookCategoryMapDao().insert(bookCategoryMapsToInsert)
         Gdl.database.bookCategoryMapDao().delete(oldBookCategoryMap.values.toList())
     } else {

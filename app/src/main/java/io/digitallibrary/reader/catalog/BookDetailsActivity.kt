@@ -75,7 +75,7 @@ class BookDetailsActivity : AppCompatActivity() {
 
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setTitle(R.string.catalog_book_detail)
+        supportActionBar?.setTitle(R.string.catalog_book_details)
 
         val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
 
@@ -92,9 +92,9 @@ class BookDetailsActivity : AppCompatActivity() {
                                     .apply(RequestOptions().centerCrop().placeholder(R.drawable.book_image_placeholder))
                                     .into(book_cover)
                             book_title.text = it.title
-                            book_publisher.text = getString(R.string.book_publisher, it.publisher)
+                            book_publisher.text = getString(R.string.book_details_publisher, it.publisher)
                             book_description.text = it.description
-                            book_level.text = getString(R.string.book_level, it.readingLevel)
+                            book_level.text = getString(R.string.book_details_level, it.readingLevel)
                             book_authors.text = it.author
                             book_license.text = it.license
                             book_published.text = it.published?.format(formatter)
@@ -270,10 +270,10 @@ class BookDetailsActivity : AppCompatActivity() {
 
             val confirmDialog = AlertDialog.Builder(this).create()
             confirmDialog.setMessage(getString(R.string.my_library_confirm_delete_books))
-            confirmDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.dialog_delete), { _, _ ->
+            confirmDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.dialog_action_delete), { _, _ ->
                 deleteBook(it)
             })
-            confirmDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.dialog_cancel), { _, _ -> })
+            confirmDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.dialog_action_cancel), { _, _ -> })
             confirmDialog.show()
         }
     }

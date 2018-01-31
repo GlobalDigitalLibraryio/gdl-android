@@ -151,6 +151,9 @@ interface BookDownloadDao {
     @Query("DELETE FROM book_downloads WHERE book_id = :bookId")
     fun delete(bookId: String)
 
+    @Query("DELETE FROM book_downloads WHERE book_id = :bookId")
+    fun delete(bookId: List<String>)
+
     @Query("SELECT * FROM book_downloads WHERE book_id = :bookId")
     fun getBookDownload(bookId: String?): BookDownload?
 

@@ -42,7 +42,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="15dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/reader_accessibility_book_settings_close"
+                android:contentDescription="@string/reader_accessibility_settings_close_settings"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:onClick="onClose"

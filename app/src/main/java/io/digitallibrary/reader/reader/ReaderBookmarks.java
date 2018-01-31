@@ -61,6 +61,13 @@ public final class ReaderBookmarks {
         }
     }
 
+    public void removeBookmark(final String id) {
+        NullCheck.notNull(id);
+        final Editor e = ReaderBookmarks.this.bookmarks.edit();
+        e.remove(id);
+        e.apply();
+    }
+
     public void setBookmark(final String id, final ReaderBookLocation bookmark) {
         NullCheck.notNull(id);
         NullCheck.notNull(bookmark);
