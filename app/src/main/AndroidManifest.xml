@@ -40,6 +40,21 @@
             android:theme="@style/GdlTheme" />
 
         <activity
+            android:name=".HandleLinkActivity"
+            android:contentDescription="@string/app_name"
+            android:label="@string/app_short_name"
+            android:theme="@style/Theme.AppCompat.Translucent">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data
+                    android:scheme="content"
+                    android:host="com.android.providers.downloads.documents"
+                    android:mimeType="application/x-gdl-book" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".SelectLanguageActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/Settings" />
@@ -82,8 +97,8 @@
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
                 <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
+                <action android:name="android.intent.action.VIEW_DOWNLOADS" />
             </intent-filter>
         </receiver>
-
     </application>
 </manifest>

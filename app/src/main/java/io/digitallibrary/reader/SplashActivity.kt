@@ -13,7 +13,11 @@ class SplashActivity : AppCompatActivity() {
 
         val i = Intent(this, GdlActivity::class.java)
         i.putExtra("reload", true)
-        this.startActivity(i)
-        this.finish()
+        val id = intent.getLongExtra("download_id", -1)
+        if (id >= 0) {
+            i.putExtra("download_id", id)
+        }
+        startActivity(i)
+        finish()
     }
 }

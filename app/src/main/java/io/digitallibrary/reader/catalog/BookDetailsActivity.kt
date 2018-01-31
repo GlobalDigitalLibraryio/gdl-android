@@ -223,6 +223,7 @@ class BookDetailsActivity : AppCompatActivity() {
                     val request = DownloadManager.Request(Uri.parse(it.ePubLink)).setDestinationInExternalFilesDir(applicationContext, null, "books/" + it.id + ".epub")
                     request.setTitle(it.title)
                     request.setDescription(applicationContext.getString(R.string.app_name))
+                    request.setMimeType("application/x-gdl-book")
                     val reqId = downloadManager.enqueue(request)
                     Gdl.database.bookDownloadDao().insert(BookDownload(bookId = it.id, downloadId = reqId))
                     updateDownloadingState()

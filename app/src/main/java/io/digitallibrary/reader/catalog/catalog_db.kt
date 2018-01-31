@@ -43,7 +43,7 @@ interface BookDao {
     fun delete(books: List<Book>)
 
     @Query("SELECT * FROM books WHERE id = :bookId")
-    fun getBook(bookId: String): Book
+    fun getBook(bookId: String): Book?
 
     @Query("SELECT * FROM books WHERE id = :bookId")
     fun getLiveBook(bookId: String): LiveData<Book>

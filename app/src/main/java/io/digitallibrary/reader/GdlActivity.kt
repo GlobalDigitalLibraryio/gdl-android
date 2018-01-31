@@ -2,10 +2,7 @@ package io.digitallibrary.reader
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.FragmentManager
@@ -20,6 +17,7 @@ import io.digitallibrary.reader.catalog.*
 import io.digitallibrary.reader.utilities.LanguageUtil
 import kotlinx.android.synthetic.main.main.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 
@@ -173,6 +171,21 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
         }
 
         setCurrentFragment(NavChoices.default())
+
+        val id = intent.getLongExtra("download_id", -1)
+        if (id >= 0) {
+            launch(CommonPool) {
+                Gdl.database.bookDownloadDao().getBookDownload(id)?.let {
+                    it.bookId?.let {
+                        Gdl.database.bookDao().getBook(it)?.let {
+                            val intent = Intent(applicationContext, BookDetailsActivity::class.java)
+                            intent.putExtra("book_id", it.id)
+                            startActivity(intent)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun updateMenuCategories(categories: List<Category>) {
