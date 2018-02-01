@@ -73,7 +73,7 @@ class MyLibraryFragment : Fragment() {
                     empty_message.animate().alpha(0f).setDuration(shortDuration).setListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator?) {
                             super.onAnimationEnd(animation)
-                            empty_message.visibility = View.GONE
+                            empty_message?.visibility = View.GONE
                         }
                     })
                 } else {
@@ -83,7 +83,7 @@ class MyLibraryFragment : Fragment() {
                     recycler_view.animate().alpha(0f).setDuration(shortDuration).setListener(object : AnimatorListenerAdapter() {
                         override fun onAnimationEnd(animation: Animator?) {
                             super.onAnimationEnd(animation)
-                            recycler_view.visibility = View.GONE
+                            recycler_view?.visibility = View.GONE
                         }
                     })
                 }

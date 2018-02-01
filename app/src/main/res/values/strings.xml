@@ -58,7 +58,7 @@
     <string name="navigation_drawer_close">Close the navigation drawer</string>
     <string name="navigation_choice_catalog">Catalog</string>
     <string name="navigation_choice_my_library">My Library</string>
-    <string name="navigation_choice_select_language">Book Language (%1$s)</string>
+    <string name="navigation_choice_select_language">Book Language</string>
 
     <!-- My library -->
     <string name="my_library_menu_edit">Edit</string>

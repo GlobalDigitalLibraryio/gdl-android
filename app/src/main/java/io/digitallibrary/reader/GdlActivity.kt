@@ -83,7 +83,7 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
 
     private fun getNavText(navChoice: NavChoices): String {
         return when (navChoice) {
-            NavChoices.LANGUAGE -> getString(R.string.navigation_choice_select_language, LanguageUtil.getCurrentLanguageText())
+            NavChoices.LANGUAGE -> getString(R.string.navigation_choice_select_language)
             NavChoices.MY_LIBRARY -> getString(R.string.navigation_choice_my_library)
             NavChoices.CATALOG -> getString(R.string.navigation_choice_catalog)
             else -> throw IllegalArgumentException("NavChoice $navChoice does not have a menu text")

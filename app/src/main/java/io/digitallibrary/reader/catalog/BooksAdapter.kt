@@ -1,6 +1,7 @@
 package io.digitallibrary.reader.catalog
 
 import android.content.Context
+import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
 import android.util.SparseBooleanArray
 import android.view.LayoutInflater
@@ -72,9 +73,26 @@ class BooksAdapter(val providerContext: Context, val callback: Callback, val sel
     }
 
     fun updateBooks(newBooksList: List<Book>) {
+        DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize(): Int {
+                return books.size
+            }
+
+            override fun getNewListSize(): Int {
+                return newBooksList.size
+            }
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return books[oldItemPosition].id == newBooksList[newItemPosition].id
+            }
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                // If the position changed, we need to bind again to update position in click listeners
+                return (oldItemPosition == newItemPosition) && books[oldItemPosition] == newBooksList[newItemPosition]
+            }
+        }).dispatchUpdatesTo(this)
         books = newBooksList
         selectedBooks = SparseBooleanArray(books.size)
-        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookViewHolder {
