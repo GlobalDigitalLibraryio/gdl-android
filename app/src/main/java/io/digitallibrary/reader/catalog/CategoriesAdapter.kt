@@ -13,8 +13,8 @@ import android.view.ViewGroup
 import io.digitallibrary.reader.Gdl
 import io.digitallibrary.reader.R
 import io.digitallibrary.reader.utilities.LanguageUtil
-import kotlinx.android.synthetic.main.catalog_category.view.*
-import kotlinx.android.synthetic.main.catalog_language_bar.view.*
+import kotlinx.android.synthetic.main.item_catalog_category.view.*
+import kotlinx.android.synthetic.main.item_catalog_language_bar.view.*
 
 
 class CategoriesAdapter(val fragment: Fragment, val callback: Callback) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -40,11 +40,11 @@ class CategoriesAdapter(val fragment: Fragment, val callback: Callback) : Recycl
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when (viewType) {
             TYPE_HEADER -> {
-                val languageBar = LayoutInflater.from(parent.context).inflate(R.layout.catalog_language_bar, parent, false)
+                val languageBar = LayoutInflater.from(parent.context).inflate(R.layout.item_catalog_language_bar, parent, false)
                 return HeaderViewHolder(languageBar)
             }
             TYPE_CATEGORY -> {
-                val categoryView = LayoutInflater.from(parent.context).inflate(R.layout.catalog_category, parent, false)
+                val categoryView = LayoutInflater.from(parent.context).inflate(R.layout.item_catalog_category, parent, false)
                 return CategoryViewHolder(categoryView)
             }
         }

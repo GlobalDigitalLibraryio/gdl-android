@@ -5,7 +5,7 @@ import android.content.ContentUris
 import android.content.Intent
 import android.os.Bundle
 
-class HandleLinkActivity : Activity() {
+class HandleIntentsActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val i = Intent(applicationContext, SplashActivity::class.java)

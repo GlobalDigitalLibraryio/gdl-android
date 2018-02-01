@@ -15,7 +15,7 @@ import android.view.Menu
 import android.view.MenuItem
 import io.digitallibrary.reader.catalog.*
 import io.digitallibrary.reader.utilities.LanguageUtil
-import kotlinx.android.synthetic.main.main.*
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.android.UI
@@ -93,7 +93,7 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
         super.onCreate(state)
         Log.v(TAG, "onCreate")
 
-        setContentView(R.layout.main)
+        setContentView(R.layout.activity_main)
 
         setSupportActionBar(toolbar)
         supportFragmentManager.addOnBackStackChangedListener(this)
@@ -160,7 +160,7 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
                     }
                     NavChoices.CATEGORIES.ordinal -> {
                         val category = categories[it.itemId - 10]
-                        val intent = Intent(applicationContext, CatalogCategoryActivity::class.java)
+                        val intent = Intent(applicationContext, CatalogActivity::class.java)
                         intent.putExtra("category_id", category.id)
                         startActivity(intent)
                     }

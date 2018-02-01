@@ -40,7 +40,7 @@
             android:theme="@style/GdlTheme" />
 
         <activity
-            android:name=".HandleLinkActivity"
+            android:name=".HandleIntentsActivity"
             android:contentDescription="@string/app_name"
             android:label="@string/app_short_name"
             android:theme="@style/Theme.AppCompat.Translucent">
@@ -79,7 +79,7 @@
             android:theme="@style/Theme.AppCompat.Translucent" />
 
         <activity
-            android:name=".catalog.CatalogCategoryActivity"
+            android:name=".catalog.CatalogActivity"
             android:configChanges="orientation|screenSize"
             android:contentDescription="@string/catalog"
             android:label="@string/catalog"

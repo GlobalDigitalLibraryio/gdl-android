@@ -17,7 +17,7 @@ import com.bumptech.glide.request.RequestOptions
 import io.digitallibrary.reader.Gdl
 import io.digitallibrary.reader.R
 import io.digitallibrary.reader.reader.ReaderActivity
-import kotlinx.android.synthetic.main.book_details.*
+import kotlinx.android.synthetic.main.activity_book_details.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.android.UI
@@ -71,7 +71,7 @@ class BookDetailsActivity : AppCompatActivity() {
         val bookId = intent.getStringExtra("book_id")
         val viewModel = ViewModelProviders.of(this).get(CatalogViewModel::class.java)
 
-        setContentView(R.layout.book_details)
+        setContentView(R.layout.activity_book_details)
 
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

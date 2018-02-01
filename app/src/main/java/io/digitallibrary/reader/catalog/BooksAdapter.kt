@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import io.digitallibrary.reader.R
-import kotlinx.android.synthetic.main.catalog_book.view.*
+import kotlinx.android.synthetic.main.item_catalog_book.view.*
 
 class BooksAdapter(val providerContext: Context, val callback: Callback, val selectModeAllowed: Boolean = false) : RecyclerView.Adapter<BooksAdapter.BookViewHolder>() {
     companion object {
@@ -78,7 +78,7 @@ class BooksAdapter(val providerContext: Context, val callback: Callback, val sel
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookViewHolder {
-        return BookViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.catalog_book, parent, false))
+        return BookViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_catalog_book, parent, false))
     }
 
     override fun onBindViewHolder(holder: BookViewHolder, position: Int) {

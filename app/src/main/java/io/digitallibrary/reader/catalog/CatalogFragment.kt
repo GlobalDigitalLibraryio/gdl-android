@@ -16,7 +16,7 @@ import android.view.ViewGroup
 import io.digitallibrary.reader.Gdl
 import io.digitallibrary.reader.R
 import io.digitallibrary.reader.SelectLanguageActivity
-import kotlinx.android.synthetic.main.catalog_with_categories.*
+import kotlinx.android.synthetic.main.fragment_catalog.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 
@@ -30,7 +30,7 @@ class CatalogFragment : Fragment() {
     private var canStartAnotherActivity = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.catalog_with_categories, container, false)
+        return inflater.inflate(R.layout.fragment_catalog, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -38,7 +38,7 @@ class CatalogFragment : Fragment() {
         val adapter = CategoriesAdapter(this, object : CategoriesAdapter.Callback {
             override fun onCategoryClicked(category: Category) {
                 if (canStartAnotherActivity) {
-                    val intent = Intent(activity, CatalogCategoryActivity::class.java)
+                    val intent = Intent(activity, CatalogActivity::class.java)
                     intent.putExtra("category_id", category.id)
                     startActivity(intent)
                     canStartAnotherActivity = false

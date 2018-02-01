@@ -2,7 +2,6 @@ package io.digitallibrary.reader.reader;
 
 import android.content.Context;
 import android.database.DataSetObserver;
-import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,7 +53,7 @@ public final class ReaderTOCView implements ListAdapter {
         NullCheck.notNull(in_toc);
         NullCheck.notNull(in_listener);
 
-        final ViewGroup in_layout = NullCheck.notNull((ViewGroup) in_inflater.inflate(R.layout.reader_toc, null));
+        final ViewGroup in_layout = NullCheck.notNull((ViewGroup) in_inflater.inflate(R.layout.activity_reader_toc, null));
         final ListView in_list_view = NullCheck.notNull((ListView) in_layout.findViewById(R.id.reader_toc_list));
 
         final List<TOCElement> es = in_toc.getElements();
@@ -106,7 +105,7 @@ public final class ReaderTOCView implements ListAdapter {
         if (reuse != null) {
             item_view = (ViewGroup) reuse;
         } else {
-            item_view = (ViewGroup) this.inflater.inflate(R.layout.reader_toc_element, parent, false);
+            item_view = (ViewGroup) this.inflater.inflate(R.layout.item_reader_toc_row, parent, false);
         }
 
         /*

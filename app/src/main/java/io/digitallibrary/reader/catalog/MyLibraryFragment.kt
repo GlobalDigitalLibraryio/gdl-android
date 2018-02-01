@@ -23,7 +23,7 @@ class MyLibraryFragment : Fragment() {
     private var canStartAnotherActivity = true
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.catalog_without_categories_without_toolbar, container, false)
+        val view = inflater.inflate(R.layout.fragment_my_library, container, false)
 
         val viewModel = ViewModelProviders.of(this).get(CatalogViewModel::class.java)
 

@@ -1,7 +1,6 @@
 package io.digitallibrary.reader.reader;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -172,7 +171,7 @@ public final class ReaderActivity extends Activity
         Log.d(TAG, "starting");
 
         super.onCreate(state);
-        this.setContentView(R.layout.reader);
+        this.setContentView(R.layout.activity_reader);
 
         final Intent i = NullCheck.notNull(this.getIntent());
         final Bundle a = NullCheck.notNull(i.getExtras());

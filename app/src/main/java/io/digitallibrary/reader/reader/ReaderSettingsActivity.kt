@@ -1,13 +1,12 @@
 package io.digitallibrary.reader.reader
 
-import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.SeekBar
 import io.digitallibrary.reader.Gdl
 import io.digitallibrary.reader.R
-import kotlinx.android.synthetic.main.reader_settings.*
+import kotlinx.android.synthetic.main.activity_reader_settings.*
 
 class ReaderSettingsActivity : AppCompatActivity() {
 
@@ -16,7 +15,7 @@ class ReaderSettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.reader_settings)
+        setContentView(R.layout.activity_reader_settings)
 
         animateIn()
 

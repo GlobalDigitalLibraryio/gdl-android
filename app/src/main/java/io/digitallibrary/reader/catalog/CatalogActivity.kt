@@ -15,7 +15,7 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
 
-class CatalogCategoryActivity : AppCompatActivity() {
+class CatalogActivity : AppCompatActivity() {
 
     private var canStartAnotherActivity = true
 
@@ -39,7 +39,7 @@ class CatalogCategoryActivity : AppCompatActivity() {
         val categoryId = intent.getStringExtra("category_id")
         val viewModel = ViewModelProviders.of(this).get(CatalogViewModel::class.java)
 
-        setContentView(R.layout.catalog_without_categories)
+        setContentView(R.layout.activity_catalog)
 
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
