@@ -3,19 +3,13 @@
     <!--Primary colors-->
     <color name="gdl_primary">#20588F</color>
     <color name="gdl_dark">#184673</color>
-
     <color name="gdl_blue">#1466B5</color>
-
     <color name="gdl_links">#0085DD</color>
-
-    <!--Support colors-->
     <color name="red_dark">#AE0E16</color>
-
     <color name="green_highlight">#EDFFF4</color>
     <color name="gdl_green">#00BA6E</color>
-
-    <!--Grays-->
     <color name="dark_text">#444444</color>
+    <color name="gray_text">#888888</color>
     <color name="white">#FFFFFF</color>
 
     <color name="gray_platinum">#E3E3E3</color>

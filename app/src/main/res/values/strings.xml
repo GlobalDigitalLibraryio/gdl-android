@@ -66,6 +66,8 @@
     <string name="my_library_menu_delete">Delete</string>
     <string name="my_library_menu_cancel">Cancel</string>
     <string name="my_library_confirm_delete_books">Are you sure you want to delete the selected book(s)?</string>
+    <string name="my_library_no_books_title">No books in your library</string>
+    <string name="my_library_no_books_message">Add books by downloading them from the catalog</string>
 
     <!-- Dialogs -->
     <string name="dialog_action_delete">Delete</string>

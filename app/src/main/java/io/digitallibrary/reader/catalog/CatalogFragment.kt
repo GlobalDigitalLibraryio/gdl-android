@@ -63,7 +63,7 @@ class CatalogFragment : Fragment() {
             }
         })
 
-        catalog_recyclerview.adapter = adapter
+        recycler_view.adapter = adapter
 
         swipe_refresh_layout.setOnRefreshListener { Gdl.fetchOpdsFeed() }
         swipe_refresh_layout.setColorSchemeResources(R.color.gdl_links,  R.color.gdl_green)

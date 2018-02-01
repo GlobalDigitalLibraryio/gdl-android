@@ -1,5 +1,7 @@
 package io.digitallibrary.reader.catalog
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
@@ -11,6 +13,7 @@ import android.view.*
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import io.digitallibrary.reader.R
+import kotlinx.android.synthetic.main.fragment_my_library.*
 
 
 class MyLibraryFragment : Fragment() {
@@ -27,7 +30,7 @@ class MyLibraryFragment : Fragment() {
 
         val viewModel = ViewModelProviders.of(this).get(CatalogViewModel::class.java)
 
-        val recyclerView: RecyclerView = view.findViewById(R.id.catalog_recyclerview)
+        val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
         val layoutManager = FlexboxLayoutManager(context)
         layoutManager.justifyContent = JustifyContent.CENTER
         recyclerView.layoutManager = layoutManager
@@ -47,9 +50,45 @@ class MyLibraryFragment : Fragment() {
         }, true)
         recyclerView.adapter = adapter
 
+        var initialView = true
+        val shortDuration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+
         viewModel.getDownloadedBooks().observe(this, Observer {
             it?.let { adapter.updateBooks(it) }
             activity?.invalidateOptionsMenu()
+            if (initialView) {
+                // initial state is set without animations
+                if (it?.isNotEmpty() == true) {
+                    recycler_view.visibility = View.VISIBLE
+                } else {
+                    empty_message.visibility = View.VISIBLE
+                }
+                initialView = false
+            } else {
+                // animate between states
+                if (it?.isNotEmpty() == true) {
+                    recycler_view.visibility = View.VISIBLE
+                    recycler_view.alpha = 0f
+                    recycler_view.animate().alpha(1f).setDuration(shortDuration).setListener(null)
+                    empty_message.animate().alpha(0f).setDuration(shortDuration).setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator?) {
+                            super.onAnimationEnd(animation)
+                            empty_message.visibility = View.GONE
+                        }
+                    })
+                } else {
+                    empty_message.visibility = View.VISIBLE
+                    empty_message.alpha = 0f
+                    empty_message.animate().alpha(1f).setDuration(shortDuration).setListener(null)
+                    recycler_view.animate().alpha(0f).setDuration(shortDuration).setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator?) {
+                            super.onAnimationEnd(animation)
+                            recycler_view.visibility = View.GONE
+                        }
+                    })
+                }
+
+            }
         })
 
         return view

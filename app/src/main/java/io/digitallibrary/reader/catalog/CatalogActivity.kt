@@ -49,7 +49,7 @@ class CatalogActivity : AppCompatActivity() {
             supportActionBar?.title = category.title
         }
 
-        val recyclerView: RecyclerView = findViewById(R.id.catalog_recyclerview)
+        val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
         val layoutManager = FlexboxLayoutManager(this)
         layoutManager.justifyContent = JustifyContent.CENTER
         recyclerView.layoutManager = layoutManager
