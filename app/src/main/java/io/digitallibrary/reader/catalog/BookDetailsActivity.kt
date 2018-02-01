@@ -94,7 +94,12 @@ class BookDetailsActivity : AppCompatActivity() {
                             book_title.text = it.title
                             book_publisher.text = getString(R.string.book_details_publisher, it.publisher)
                             book_description.text = it.description
-                            book_level.text = getString(R.string.book_details_level, it.readingLevel)
+                            if (it.readingLevel != null) {
+                                book_level_container.visibility = VISIBLE
+                                book_level.text = getString(R.string.book_details_level, it.readingLevel)
+                            } else {
+                                book_level_container.visibility = GONE
+                            }
                             book_authors.text = it.author
                             book_license.text = it.license
                             book_published.text = it.published?.format(formatter)

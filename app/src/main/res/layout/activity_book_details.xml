@@ -257,6 +257,7 @@
                         </LinearLayout>
 
                         <RelativeLayout
+                            android:id="@+id/book_level_container"
                             android:layout_width="90dp"
                             android:layout_height="30dp"
                             android:layout_alignParentEnd="true"
@@ -280,7 +281,7 @@
                                 android:shadowDx="2"
                                 android:shadowDy="2"
                                 android:shadowRadius="2"
-                                android:text="@string/book_details_level"
+                                android:text="@string/placeholder_book_level"
                                 android:textAllCaps="true"
                                 android:textColor="@color/white"
                                 android:textSize="14sp"

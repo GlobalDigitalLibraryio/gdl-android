@@ -27,6 +27,9 @@
   <string name="placeholder_date">
     2017-10-22
   </string>
+  <string name="placeholder_book_level">
+    Level 2
+  </string>
   <string name="placeholder_language">
     Books in English
   </string>
