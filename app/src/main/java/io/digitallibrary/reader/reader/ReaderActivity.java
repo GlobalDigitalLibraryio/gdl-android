@@ -82,6 +82,7 @@ public final class ReaderActivity extends Activity
     private SharedPreferences.OnSharedPreferenceChangeListener brightnessListner;
 
     private boolean canStartAnotherActivity = true;
+    private boolean isDraggingProgressBar = false;
 
     /**
      * Construct an activity.
@@ -384,6 +385,8 @@ public final class ReaderActivity extends Activity
         final Package p = NullCheck.notNull(c.getDefaultPackage());
 
         final TextView in_title_text = NullCheck.notNull(this.view_title_text);
+        final SeekBar in_seek_bar = NullCheck.notNull(this.view_progress_bar);
+
         UIThread.runOnUIThread(new Runnable() {
             @Override
             public void run() {
@@ -391,7 +394,7 @@ public final class ReaderActivity extends Activity
             }
         });
 
-        /**
+        /*
          * Configure the TOC button.
          */
 
@@ -399,19 +402,56 @@ public final class ReaderActivity extends Activity
 
         final View in_toc = NullCheck.notNull(this.view_toc);
 
+        final ReaderTOC toc = ReaderTOC.fromPackage(p);
+
         in_toc.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final @Nullable View v) {
                 if (canStartAnotherActivity) {
-                    final ReaderTOC sent_toc = ReaderTOC.fromPackage(p);
-                    ReaderTOCActivity.startActivityForResult(ReaderActivity.this, sent_toc);
+                    ReaderTOCActivity.startActivityForResult(ReaderActivity.this, toc);
                     ReaderActivity.this.overridePendingTransition(0, 0);
                     canStartAnotherActivity = false;
                 }
             }
         });
 
-        /**
+        final int tocSize = toc.getElements().size();
+
+        final ReaderReadiumJavaScriptAPIType js = NullCheck.notNull(readium_js_api);
+
+        in_seek_bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+
+                    final float newLoc = tocSize * (progress / 100f);
+                    int chapter = (int) newLoc;
+
+                    // Not sure how to set loc in chapter yet
+                    // int percentInChapter = (int) ((newLoc - (float) chapter) * 100f);
+
+                    // Avoid going past the end, since we start counting on 0
+                    if (chapter >= tocSize) {
+                        chapter = tocSize - 1;
+                    }
+
+                    final TOCElement tocElement = toc.getElements().get(chapter);
+                    js.openContentURL(tocElement.getContentRef(), tocElement.getSourceHref());
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                isDraggingProgressBar = true;
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                isDraggingProgressBar = false;
+            }
+        });
+
+        /*
          * Get a reference to the web server. Start it if necessary (the callbacks
          * will still be executed if the server is already running).
          */
@@ -572,9 +612,11 @@ public final class ReaderActivity extends Activity
         UIThread.runOnUIThread(new Runnable() {
             @Override
             public void run() {
-                final double p = e.getProgressFractional();
-                in_progress_bar.setMax(100);
-                in_progress_bar.setProgress((int) (100.0 * p));
+                if (!isDraggingProgressBar) {
+                    final double p = e.getProgressFractional();
+                    in_progress_bar.setMax(100);
+                    in_progress_bar.setProgress((int) (100.0 * p));
+                }
 
                 final List<OpenPage> pages = e.getOpenPages();
                 if (pages.isEmpty()) {
