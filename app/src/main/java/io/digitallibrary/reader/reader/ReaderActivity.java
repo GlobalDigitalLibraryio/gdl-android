@@ -65,7 +65,6 @@ public final class ReaderActivity extends Activity
     private ReaderJavaScriptAPIType simplified_js_api;
     private ViewGroup view_hud;
     private ProgressBar view_loading;
-    private SeekBar view_progress_bar;
     private TextView view_progress_text;
     private View view_root;
     private TextView view_title_text;
@@ -143,11 +142,9 @@ public final class ReaderActivity extends Activity
 
         final WebView in_web_view = NullCheck.notNull(this.view_web_view);
         final TextView in_progress_text = NullCheck.notNull(this.view_progress_text);
-        final SeekBar in_progress_bar = NullCheck.notNull(this.view_progress_bar);
 
         in_web_view.setVisibility(View.INVISIBLE);
         in_progress_text.setVisibility(View.INVISIBLE);
-        in_progress_bar.setVisibility(View.INVISIBLE);
 
         this.web_view_resized = true;
         UIThread.runOnUIThreadDelayed(new Runnable() {
@@ -206,8 +203,6 @@ public final class ReaderActivity extends Activity
                 NullCheck.notNull((TextView) this.findViewById(R.id.reader_title_text));
         final TextView in_progress_text =
                 NullCheck.notNull((TextView) this.findViewById(R.id.reader_position_text));
-        final SeekBar in_progress_bar =
-                NullCheck.notNull((SeekBar) in_hud.findViewById(R.id.reader_position_progress));
 
         final ProgressBar in_loading =
                 NullCheck.notNull((ProgressBar) this.findViewById(R.id.reader_loading));
@@ -221,7 +216,6 @@ public final class ReaderActivity extends Activity
         this.reader_back = NullCheck.notNull((ImageView) this.findViewById(R.id.reader_back));
 
         in_loading.setVisibility(View.VISIBLE);
-        in_progress_bar.setVisibility(View.INVISIBLE);
         in_progress_text.setVisibility(View.INVISIBLE);
         in_webview.setVisibility(View.INVISIBLE);
         in_hud.setVisibility(View.VISIBLE);
@@ -229,7 +223,6 @@ public final class ReaderActivity extends Activity
 
         this.view_loading = in_loading;
         this.view_progress_text = in_progress_text;
-        this.view_progress_bar = in_progress_bar;
         this.view_title_text = in_title_text;
         this.view_web_view = in_webview;
         this.view_hud = in_hud;
@@ -384,6 +377,7 @@ public final class ReaderActivity extends Activity
         final Package p = NullCheck.notNull(c.getDefaultPackage());
 
         final TextView in_title_text = NullCheck.notNull(this.view_title_text);
+
         UIThread.runOnUIThread(new Runnable() {
             @Override
             public void run() {
@@ -391,7 +385,7 @@ public final class ReaderActivity extends Activity
             }
         });
 
-        /**
+        /*
          * Configure the TOC button.
          */
 
@@ -399,19 +393,20 @@ public final class ReaderActivity extends Activity
 
         final View in_toc = NullCheck.notNull(this.view_toc);
 
+        final ReaderTOC toc = ReaderTOC.fromPackage(p);
+
         in_toc.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(final @Nullable View v) {
                 if (canStartAnotherActivity) {
-                    final ReaderTOC sent_toc = ReaderTOC.fromPackage(p);
-                    ReaderTOCActivity.startActivityForResult(ReaderActivity.this, sent_toc);
+                    ReaderTOCActivity.startActivityForResult(ReaderActivity.this, toc);
                     ReaderActivity.this.overridePendingTransition(0, 0);
                     canStartAnotherActivity = false;
                 }
             }
         });
 
-        /**
+        /*
          * Get a reference to the web server. Start it if necessary (the callbacks
          * will still be executed if the server is already running).
          */
@@ -450,22 +445,16 @@ public final class ReaderActivity extends Activity
                 reader_settings.setImageResource(R.drawable.ic_font_download_dark_24dp);
                 reader_toc.setImageResource(R.drawable.ic_format_list_numbered_dark_24dp);
                 reader_back.setImageResource(R.drawable.ic_arrow_back_dark_24dp);
-                view_progress_bar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_for_beige_bg));
-                view_progress_bar.setThumb(getResources().getDrawable(R.drawable.progress_thumb_for_beige_bg));
                 break;
             case SCHEME_BLACK_ON_WHITE:
                 reader_settings.setImageResource(R.drawable.ic_font_download_dark_24dp);
                 reader_toc.setImageResource(R.drawable.ic_format_list_numbered_dark_24dp);
                 reader_back.setImageResource(R.drawable.ic_arrow_back_dark_24dp);
-                view_progress_bar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_for_white_bg));
-                view_progress_bar.setThumb(getResources().getDrawable(R.drawable.progress_thumb_for_white_bg));
                 break;
             case SCHEME_WHITE_ON_BLACK:
                 reader_settings.setImageResource(R.drawable.ic_font_download_light_24dp);
                 reader_toc.setImageResource(R.drawable.ic_format_list_numbered_light_24dp);
                 reader_back.setImageResource(R.drawable.ic_arrow_back_light_24dp);
-                view_progress_bar.setProgressDrawable(getResources().getDrawable(R.drawable.progress_for_black_bg));
-                view_progress_bar.setThumb(getResources().getDrawable(R.drawable.progress_thumb_for_black_bg));
                 break;
         }
     }
@@ -519,12 +508,10 @@ public final class ReaderActivity extends Activity
 
         final WebView in_web_view = NullCheck.notNull(this.view_web_view);
         final ProgressBar in_loading = NullCheck.notNull(this.view_loading);
-        final SeekBar in_progress_bar = NullCheck.notNull(this.view_progress_bar);
         final TextView in_progress_text = NullCheck.notNull(this.view_progress_text);
 
         in_loading.setVisibility(View.GONE);
         in_web_view.setVisibility(View.VISIBLE);
-        in_progress_bar.setVisibility(View.VISIBLE);
         in_progress_text.setVisibility(View.INVISIBLE);
 
         final ReaderSettingsType settings = rs.getSettings();
@@ -564,7 +551,6 @@ public final class ReaderActivity extends Activity
          */
 
         final TextView in_progress_text = NullCheck.notNull(this.view_progress_text);
-        final SeekBar in_progress_bar = NullCheck.notNull(this.view_progress_bar);
 
         final Container container = NullCheck.notNull(this.epub_container);
         final Package default_package = NullCheck.notNull(container.getDefaultPackage());
@@ -572,10 +558,6 @@ public final class ReaderActivity extends Activity
         UIThread.runOnUIThread(new Runnable() {
             @Override
             public void run() {
-                final double p = e.getProgressFractional();
-                in_progress_bar.setMax(100);
-                in_progress_bar.setProgress((int) (100.0 * p));
-
                 final List<OpenPage> pages = e.getOpenPages();
                 if (pages.isEmpty()) {
                     in_progress_text.setText("");
@@ -619,7 +601,6 @@ public final class ReaderActivity extends Activity
                 @Override
                 public void run() {
                     in_web_view.setVisibility(View.VISIBLE);
-                    in_progress_bar.setVisibility(View.VISIBLE);
                     in_progress_text.setVisibility(View.VISIBLE);
                     simplified_js.pageHasChanged();
                 }
