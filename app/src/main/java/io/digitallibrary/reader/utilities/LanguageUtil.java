@@ -1,91 +1,44 @@
 package io.digitallibrary.reader.utilities;
 
-import android.content.Context;
-
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.Volley;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import io.digitallibrary.reader.Gdl;
 import io.digitallibrary.reader.Prefs;
+import io.digitallibrary.reader.catalog.OpdsParser;
 
+/**
+ * Language selection utility functions.
+ */
 public class LanguageUtil {
-    public static final String TAG = "LANG SET";
+    private static final String TAG = "LanguageUtil";
 
-    private static final String API_URL = "https://api.staging.digitallibrary.io/book-api/v1/languages";
-    private static final String FALLBACK_LANG = "eng";
-    private static final String FALLBACK_LANG_TEXT = "English";
     private static final String PREF_ID_CURRENT_LANG = "io.digitallibrary.reader.LANG";
-    private static final String PREF_ID_CURRENT_LANG_TEXT = "io.digitallibrary.reader.LANG_TEXT";
-
-    public static void getLanguageListFromServer(Context ctx, final Callback callback) {
-        final RequestQueue queue = Volley.newRequestQueue(ctx);
-        JsonArrayRequest jar = new JsonArrayRequest(Request.Method.GET, API_URL, null, new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray jsonArray) {
-                Map<String, String> m = new HashMap<>();
-                try {
-                    for (int i = 0; i != jsonArray.length(); ++i) {
-                        JSONObject lang = jsonArray.getJSONObject(i);
-                        m.put(lang.getString("name"), lang.getString("code"));
-                    }
-                    callback.onSuccess(m);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    callback.onError();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                callback.onError();
-            }
-        });
-        queue.add(jar);
-    }
 
     public static String getLangPrefKey() {
         return PREF_ID_CURRENT_LANG;
     }
 
+    /**
+     * Get the currently selected languageLink. Defaults to English if none is selected.
+     *
+     * @return The root rootLink to the currently selected languageLink.
+     */
     public static String getCurrentLanguage() {
         Prefs p = Gdl.Companion.getSharedPrefs();
-        String current_lang = p.getString(PREF_ID_CURRENT_LANG);
-        if (current_lang != null && current_lang.length() > 0) {
-            return current_lang;
+        String currentLanguageRootLink = p.getString(PREF_ID_CURRENT_LANG);
+        if (currentLanguageRootLink != null && currentLanguageRootLink.length() > 0) {
+            return currentLanguageRootLink;
         } else {
-            return FALLBACK_LANG;
+            return OpdsParser.INITIAL_LANGUAGE;
         }
     }
 
-    public static String getCurrentLanguageText() {
+    /**
+     * Set the current book languageLink. This will trigger a new parse operation on the
+     * new languageLink.
+     *
+     * @param languageRootLink The root rootLink to the wanted languageLink.
+     */
+    public static void setLanguage(String languageRootLink) {
         Prefs p = Gdl.Companion.getSharedPrefs();
-        String current_lang = p.getString(PREF_ID_CURRENT_LANG_TEXT);
-        if (current_lang != null && current_lang.length() > 0) {
-            return current_lang;
-        } else {
-            return FALLBACK_LANG_TEXT;
-        }
-    }
-
-    public static void setLanguage(String lang, String langText) {
-        Prefs p = Gdl.Companion.getSharedPrefs();
-        p.putString(PREF_ID_CURRENT_LANG_TEXT, langText);
-        p.putString(PREF_ID_CURRENT_LANG, lang);
-    }
-
-    public interface Callback {
-        void onSuccess(Map<String, String> languages);
-        void onError();
+        p.putString(PREF_ID_CURRENT_LANG, languageRootLink);
     }
 }

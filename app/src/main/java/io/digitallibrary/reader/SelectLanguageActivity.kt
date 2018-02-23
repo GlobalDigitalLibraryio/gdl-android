@@ -1,5 +1,9 @@
 package io.digitallibrary.reader
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -11,10 +15,10 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import io.digitallibrary.reader.catalog.Language
 import io.digitallibrary.reader.utilities.LanguageUtil
 import kotlinx.android.synthetic.main.activity_select_language.*
 import kotlinx.android.synthetic.main.toolbar.*
-import java.util.*
 
 class SelectLanguageActivity : AppCompatActivity() {
     companion object {
@@ -38,62 +42,70 @@ class SelectLanguageActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setTitle(R.string.languages_selection_title)
-        fetchLanguages()
-    }
 
-    private fun fetchLanguages() {
-        LanguageUtil.getLanguageListFromServer(this, object : LanguageUtil.Callback {
-            override fun onSuccess(languages: Map<String, String>) {
-                val langArray = ArrayList(languages.keys)
-                Collections.sort(langArray)
-                var selected = -1
-                for (i in langArray.indices) {
-                    if (langArray[i] == LanguageUtil.getCurrentLanguageText()) {
-                        selected = i
-                        continue
-                    }
-                }
-                val langItemsAdapter = object : ArrayAdapter<String>(this@SelectLanguageActivity, R.layout.item_language_row, R.id.language_name, langArray) {
-                    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-                        val v = super.getView(position, convertView, parent)
-                        if (position == selected) {
-                            v.isSelected = true
-                            v.findViewById<View>(R.id.checked).visibility = View.VISIBLE
-                            v.findViewById<TextView>(R.id.language_name).setTextColor(ContextCompat.getColor(context, R.color.gdl_green))
-                        } else {
-                            v.findViewById<View>(R.id.checked).visibility = View.INVISIBLE
-                            v.findViewById<TextView>(R.id.language_name).setTextColor(ContextCompat.getColor(context, R.color.dark_text))
-                        }
-                        return v
-                    }
-                }
+        var currentLanguageText = ""
+        val languages: MutableList<Language> = ArrayList()
 
-                spinner.visibility = View.GONE
-                language_list.visibility = View.VISIBLE
-                language_list.adapter = langItemsAdapter
-                language_list.setItemChecked(selected, true)
-                language_list.onItemClickListener = AdapterView.OnItemClickListener { _, view, position, _ ->
-                    selected = position
-                    val newLang = langArray[position]
-                    val newLangCode = languages[newLang]
-                    val oldLang = LanguageUtil.getCurrentLanguage()
-                    LanguageUtil.setLanguage(newLangCode, newLang)
-                    view.findViewById<View>(R.id.checked).visibility = View.VISIBLE
-                    view.findViewById<TextView>(R.id.language_name).setTextColor(ContextCompat.getColor(baseContext, R.color.gdl_green))
-                    langItemsAdapter.notifyDataSetChanged()
-                    if (oldLang != newLang) {
-                        Gdl.fetchOpdsFeed()
-                    }
-                    val intent = Intent(LANGUAGE_SELECTED)
-                    LocalBroadcastManager.getInstance(Gdl.appContext).sendBroadcast(intent)
-                    finish()
+        val langItemsAdapter = object : ArrayAdapter<String>(this@SelectLanguageActivity, R.layout.item_language_row, R.id.language_name) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val v = super.getView(position, convertView, parent)
+                if (getItem(position) == currentLanguageText) {
+                    v.isSelected = true
+                    v.findViewById<View>(R.id.checked).visibility = View.VISIBLE
+                    v.findViewById<TextView>(R.id.language_name).setTextColor(ContextCompat.getColor(context, R.color.gdl_green))
+                } else {
+                    v.findViewById<View>(R.id.checked).visibility = View.INVISIBLE
+                    v.findViewById<TextView>(R.id.language_name).setTextColor(ContextCompat.getColor(context, R.color.dark_text))
                 }
+                return v
             }
+        }
 
-            override fun onError() {
-                spinner.visibility = View.GONE
-                error_msg.visibility = View.VISIBLE
+        language_list.adapter = langItemsAdapter
+
+        ViewModelProviders.of(this).get(LanguagesViewModel::class.java).currentLanguageText.observe(this, Observer {
+            it?.let { currentLanguageText = it }
+        })
+
+        val shortDuration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+        ViewModelProviders.of(this).get(LanguagesViewModel::class.java).languages.observe(this, Observer {
+            it?.let {
+                if (it.isEmpty()) {
+                    spinner.visibility = View.VISIBLE
+                    spinner.alpha = 0f
+                    spinner.animate().alpha(1f).setDuration(shortDuration).setListener(null)
+                    language_list.animate().alpha(0f).setDuration(shortDuration).setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator?) {
+                            super.onAnimationEnd(animation)
+                            language_list.visibility = View.GONE
+                        }
+                    })
+                } else {
+                    language_list.visibility = View.VISIBLE
+                    language_list.alpha = 0f
+                    language_list.animate().alpha(1f).setDuration(shortDuration).setListener(null)
+                    spinner.animate().alpha(0f).setDuration(shortDuration).setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator?) {
+                            super.onAnimationEnd(animation)
+                            spinner.visibility = View.GONE
+                        }
+                    })
+                }
+
+                languages.clear()
+                languages.addAll(it)
+                langItemsAdapter.clear()
+                langItemsAdapter.addAll(it.map { it.languageName })
+                langItemsAdapter.notifyDataSetChanged()
             }
         })
+
+        language_list.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+            LanguageUtil.setLanguage(languages[position].link)
+            Gdl.fetchOpdsFeed()
+            val intent = Intent(LANGUAGE_SELECTED)
+            LocalBroadcastManager.getInstance(Gdl.appContext).sendBroadcast(intent)
+            finish()
+        }
     }
 }

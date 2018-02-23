@@ -5,16 +5,21 @@ import android.arch.persistence.room.*
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
-@Entity(tableName = "books", indices = [(Index(value = [("id")], name = "book_id_index", unique = true))])
+const val BOOK_STATE_REMOVED_FROM_GDL = 1
+
+/**
+ * Table for books.
+ */
+@Entity(tableName = "books")
 data class Book(
         @PrimaryKey
-        var dbid: Long? = null,
         var id: String = "",
         var title: String? = null,
         var downloaded: String? = null,
         @ColumnInfo(name = "reading_level")
         var readingLevel: Int? = null,
-        var language: String? = null,
+        @ColumnInfo(name = "language_link")
+        var languageLink: String? = null,
         var license: String? = null,
         var author: String? = null,
         var publisher: String? = null,
@@ -24,118 +29,196 @@ data class Book(
         var thumb: String? = null,
         @ColumnInfo(name = "epub_link")
         var ePubLink: String? = null,
+        @ColumnInfo(name = "pdf_link")
+        var pdfLink: String? = null,
         var description: String? = null,
         var updated: OffsetDateTime? = null,
         var created: OffsetDateTime? = null,
         var published: OffsetDateTime? = null,
+        var version: Long? = null,
         var state: Int? = null
 )
 
 @Dao
-interface BookDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertList(books: List<Book>)
+abstract class BookDao {
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract fun insert(book: Book): Long
 
     @Update
-    fun update(book: Book)
+    abstract fun update(book: Book)
+
+    @Update
+    abstract fun update(book: List<Book>)
 
     @Delete
-    fun delete(books: List<Book>)
+    abstract fun delete(books: List<Book>)
+
+    @Transaction
+    open fun insertOrUpdate(books: List<Book>) {
+        books.forEach {
+            val id = insert(it)
+            if (id == -1L) {
+                update(it)
+            }
+        }
+    }
+
+    @Query("DELETE FROM books WHERE language_link = :languageLink AND downloaded IS NULL AND version < :currentVersion")
+    abstract fun deleteOldNotDownloaded(languageLink: String, currentVersion: Long)
+
+    @Query("SELECT * FROM books WHERE language_link = :languageLink AND  downloaded IS NOT NULL AND version < :currentVersion")
+    abstract fun getOldDownloaded(languageLink: String, currentVersion: Long): List<Book>
 
     @Query("SELECT * FROM books WHERE id = :bookId")
-    fun getBook(bookId: String): Book?
+    abstract fun getBook(bookId: String): Book?
 
     @Query("SELECT * FROM books WHERE id = :bookId")
-    fun getLiveBook(bookId: String): LiveData<Book>
+    abstract fun getLiveBook(bookId: String): LiveData<Book>
 
-    @Query(value = "SELECT books.dbid, id, title, downloaded, reading_level, books.language, " +
-            "license, author, publisher, reading_position, image, thumb, epub_link, description, updated, " +
-            "created, published, state FROM books JOIN book_categories_map ON books.id = book_categories_map.book_id " +
-            "WHERE book_categories_map.category_id = :categoryId ORDER BY book_categories_map.view_order")
-    fun getBooks(categoryId: String): List<Book>
+    @Query(value = "SELECT id, title, downloaded, reading_level, books.language_link, license, author, " +
+            "publisher, reading_position, image, thumb, epub_link, pdf_link, description, updated, " +
+            "created, published, books.version, state " +
+            "FROM books JOIN book_selections_map " +
+            "ON books.id = book_selections_map.book_id " +
+            "WHERE book_selections_map.selection_link = :selectionLink " +
+            "ORDER BY book_selections_map.view_order")
+    abstract fun getBooks(selectionLink: String): List<Book>
 
-    @Query(value = "SELECT books.dbid, id, title, downloaded, reading_level, books.language, " +
-            "license, author, publisher, reading_position, image, thumb, epub_link, description, updated, " +
-            "created, published, state FROM books JOIN book_categories_map ON books.id = book_categories_map.book_id " +
-            "WHERE book_categories_map.category_id = :categoryId ORDER BY book_categories_map.view_order")
-    fun getLiveBooks(categoryId: String): LiveData<List<Book>>
+    @Query(value = "SELECT id, title, downloaded, reading_level, books.language_link, license, author, " +
+            "publisher, reading_position, image, thumb, epub_link, pdf_link, description, updated, " +
+            "created, published, books.version, state " +
+            "FROM books JOIN book_selections_map " +
+            "ON books.id = book_selections_map.book_id " +
+            "WHERE book_selections_map.selection_link = :selectionLink " +
+            "ORDER BY book_selections_map.view_order")
+    abstract fun getLiveBooks(selectionLink: String): LiveData<List<Book>>
 
-    @Query("SELECT * FROM books WHERE downloaded NOT NULL")
-    fun getLiveDownloadedBooks(): LiveData<List<Book>>
+    @Query("SELECT * FROM books WHERE downloaded IS NOT NULL")
+    abstract fun getLiveDownloadedBooks(): LiveData<List<Book>>
 
-    @Query("SELECT COUNT(dbid) FROM books WHERE language = :language LIMIT 1")
-    fun haveLanguage(language: String): Boolean
+    @Query("SELECT COUNT(id) FROM books WHERE language_link = :languageLink LIMIT 1")
+    abstract fun haveLanguage(languageLink: String): Boolean
+
+    @Query("SELECT MAX(version) FROM books WHERE language_link = :languageLink")
+    abstract fun maxVersion(languageLink: String): Long
 }
 
-@Entity(tableName = "categories", indices = [(Index(value = [("id")], name = "category_id_index", unique = true))])
-data class Category(
+/**
+ * Table with the available selections (Level 1-5, New Arrivals, etc.) for each language.
+ */
+@Entity(tableName = "selections")
+data class Selection(
         @PrimaryKey
-        var dbid: Long? = null,
-        var id: String = "",
+        @ColumnInfo(name = "root_link")
+        var rootLink: String = "",
         var title: String? = "",
-        var link: String? = "",
-        var language: String? = null,
+        @ColumnInfo(name = "language_link")
+        var languageLink: String? = null,
         @ColumnInfo(name = "view_order")
-        var viewOrder: Int? = null,
-        var updated: OffsetDateTime? = null,
-        var description: String? = ""
+        var viewOrder: Int? = null
 )
 
 @Dao
-interface CategoryDao {
+abstract class SelectionDao {
     @Insert
-    fun insert(category: Category)
+    abstract fun insert(selection: List<Selection>)
 
     @Update
-    fun update(category: Category)
+    abstract fun update(selection: List<Selection>)
 
     @Delete
-    fun delete(category: Category)
+    abstract fun delete(selection: List<Selection>)
 
-    @Query("SELECT * FROM categories WHERE id = :categoryId")
-    fun getCategory(categoryId: String): Category
+    @Transaction
+    open fun updateSelections(selectionsToInsert: List<Selection>, selectionsToDelete: List<Selection>, selectionsToUpdate: List<Selection>) {
+        insert(selectionsToInsert)
+        delete(selectionsToDelete)
+        update(selectionsToUpdate)
+    }
 
-    @Query("SELECT * FROM categories WHERE language = :language ORDER BY view_order")
-    fun getCategories(language: String): List<Category>
+    @Query("SELECT * FROM selections WHERE root_link = :rootLink")
+    abstract fun getSelection(rootLink: String): Selection
 
-    @Query("SELECT * FROM categories WHERE language = :language ORDER BY view_order")
-    fun getLiveCategories(language: String): LiveData<List<Category>>
+    @Query("SELECT * FROM selections WHERE language_link = :languageLink ORDER BY view_order")
+    abstract fun getSelections(languageLink: String): List<Selection>
+
+    @Query("SELECT * FROM selections WHERE language_link = :languageLink ORDER BY view_order")
+    abstract fun getLiveSelections(languageLink: String): LiveData<List<Selection>>
 }
 
-@Entity(tableName = "book_categories_map")
-data class BookCategoryMap(
-        @PrimaryKey
-        var dbid: Long? = null,
+/**
+ * Table that keep tack of which selections a book belongs to. This also keeps track of the
+ * order books are shown in the UI.
+ */
+@Entity(tableName = "book_selections_map",
+        primaryKeys = ["book_id", "selection_link"],
+        foreignKeys = [
+            ForeignKey(entity = Book::class,
+                    parentColumns = ["id"],
+                    childColumns = ["book_id"],
+                    onDelete = ForeignKey.CASCADE),
+            ForeignKey(entity = Selection::class,
+                    parentColumns = ["root_link"],
+                    childColumns = ["selection_link"],
+                    onDelete = ForeignKey.CASCADE)
+        ],
+        indices = [
+            Index(value = ["selection_link", "view_order"],
+                    name = "selection_link_view_order_index",
+                    unique = false)
+        ])
+data class BookSelectionMap(
         @ColumnInfo(name = "book_id")
-        var bookId: String? = null,
-        @ColumnInfo(name = "category_id")
-        var categoryId: String? = null,
+        var bookId: String = "",
+        @ColumnInfo(name = "selection_link")
+        var selectionLink: String = "",
         @ColumnInfo(name = "view_order")
         var viewOrder: Int? = null,
-        var language: String? = null
+        @ColumnInfo(name = "language_link")
+        var languageLink: String? = null,
+        var version: Long? = null
 )
 
 @Dao
-interface BookCategoryMapDao {
-    @Insert
-    fun insert(bookCategoryMap: List<BookCategoryMap>)
+abstract class BookSelectionMapDao {
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    abstract fun insert(bookSelectionMap: BookSelectionMap): Long
 
     @Update
-    fun update(bookCategoryMap: BookCategoryMap)
+    abstract fun update(bookSelectionMap: BookSelectionMap)
+
+    @Transaction
+    open fun insertOrUpdate(books: List<BookSelectionMap>) {
+        books.forEach {
+            val id = insert(it)
+            if (id == -1L) {
+                update(it)
+            }
+        }
+    }
 
     @Delete
-    fun delete(bookCategoryMap: List<BookCategoryMap>)
+    abstract fun delete(bookSelectionMap: List<BookSelectionMap>)
 
-    @Query(value = "SELECT * FROM book_categories_map WHERE category_id = :categoryId ORDER BY view_order")
-    fun getBookCategoryMaps(categoryId: String): List<BookCategoryMap>
+    @Query("DELETE FROM book_selections_map WHERE language_link = :languageLink AND version < :currentVersion")
+    abstract fun deleteOld(languageLink: String, currentVersion: Long)
 }
 
-@Entity(tableName = "book_downloads")
+
+/**
+ * Table that maps books to downlands in the DownloadManager.
+ */
+@Entity(tableName = "book_downloads",
+        foreignKeys = [
+            ForeignKey(entity = Book::class,
+                    parentColumns = ["id"],
+                    childColumns = ["book_id"],
+                    onDelete = ForeignKey.CASCADE)
+        ])
 data class BookDownload(
         @PrimaryKey
-        var dbid: Long? = null,
         @ColumnInfo(name = "book_id")
-        var bookId: String? = null,
+        var bookId: String = "",
         @ColumnInfo(name = "download_id")
         var downloadId: Long? = null
 )
@@ -151,15 +234,59 @@ interface BookDownloadDao {
     @Query("DELETE FROM book_downloads WHERE book_id = :bookId")
     fun delete(bookId: String)
 
-    @Query("DELETE FROM book_downloads WHERE book_id = :bookId")
+    @Query("DELETE FROM book_downloads WHERE book_id in (:bookId)")
     fun delete(bookId: List<String>)
 
     @Query("SELECT * FROM book_downloads WHERE book_id = :bookId")
-    fun getBookDownload(bookId: String?): BookDownload?
+    fun getBookDownload(bookId: String): BookDownload?
 
     @Query("SELECT * FROM book_downloads WHERE download_id = :downloadId")
-    fun getBookDownload(downloadId: Long?): BookDownload?
+    fun getBookDownload(downloadId: Long): BookDownload?
 
+}
+
+/**
+ * List of available book languages.
+ *
+ * This list is used by the Language Selection activity.
+ */
+@Entity(tableName = "languages")
+data class Language(
+        @PrimaryKey
+        var link: String = "",
+        @ColumnInfo(name = "language_name")
+        var languageName: String? = null,
+        var updated: OffsetDateTime? = null,
+        @ColumnInfo(name = "view_order")
+        var viewOrder: Int? = null
+)
+
+@Dao
+abstract class LanguageDao {
+    @Insert
+    abstract fun insert(language: List<Language>)
+
+    @Delete
+    abstract fun delete(language: List<Language>)
+
+    @Update
+    abstract fun update(language: List<Language>)
+
+    @Transaction
+    open fun updateLanguages(languagesToInsert: List<Language>, languagesToDelete: List<Language>, languagesToUpdate: List<Language>) {
+        insert(languagesToInsert)
+        delete(languagesToDelete)
+        update(languagesToUpdate)
+    }
+
+    @Query("SELECT * FROM languages WHERE link = :link")
+    abstract fun getLanguage(link: String): Language?
+
+    @Query("SELECT * FROM languages ORDER BY view_order")
+    abstract fun getLanguages(): List<Language>
+
+    @Query("SELECT * FROM languages ORDER BY view_order")
+    abstract fun getLiveLanguages(): LiveData<List<Language>>
 }
 
 object TimeTypeConverters {
@@ -181,10 +308,11 @@ object TimeTypeConverters {
 }
 
 @TypeConverters(TimeTypeConverters::class)
-@Database(entities = [(Category::class), (Book::class), (BookDownload::class), (BookCategoryMap::class)], version = 1)
+@Database(entities = [Selection::class, Book::class, BookDownload::class, BookSelectionMap::class, Language::class], version = 1)
 abstract class CatalogDatabase : RoomDatabase() {
     abstract fun bookDao(): BookDao
-    abstract fun categoryDao(): CategoryDao
-    abstract fun bookCategoryMapDao(): BookCategoryMapDao
+    abstract fun selectionDao(): SelectionDao
+    abstract fun bookSelectionMapDao(): BookSelectionMapDao
     abstract fun bookDownloadDao(): BookDownloadDao
+    abstract fun languageDao(): LanguageDao
 }

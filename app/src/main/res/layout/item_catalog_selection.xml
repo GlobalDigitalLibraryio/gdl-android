@@ -21,7 +21,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:paddingTop="5dp"
-            android:text="@string/catalog_unknown_feed"
+            android:text="@string/selections_unknown_feed"
             android:textAllCaps="true"
             android:textColor="@color/dark_text"
             android:textSize="16sp" />
@@ -40,7 +40,7 @@
             android:layout_alignParentEnd="true"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="5dp"
-            android:text="@string/catalog_more_feed"
+            android:text="@string/selections_more_feed"
             android:textAllCaps="true"
             android:textColor="@color/gdl_links"
             android:textSize="14sp" />
@@ -48,7 +48,7 @@
     </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/catalog_category_recyclerview"
+        android:id="@+id/catalog_selection_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="170dp"
         android:layout_below="@id/feed_header"
@@ -62,7 +62,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_below="@+id/catalog_category_recyclerview"
+        android:layout_below="@+id/catalog_selection_recycler_view"
         android:background="#E3E3E3" />
 
 </RelativeLayout>

@@ -17,7 +17,6 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import io.digitallibrary.reader.catalog.*
-import io.digitallibrary.reader.utilities.LanguageUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.experimental.CommonPool
@@ -85,12 +84,12 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
         return when (navChoice) {
             NavChoices.LANGUAGE -> getString(R.string.navigation_choice_select_language)
             NavChoices.MY_LIBRARY -> getString(R.string.navigation_choice_my_library)
-            NavChoices.CATALOG -> getString(R.string.navigation_choice_catalog)
+            NavChoices.CATALOG -> getString(R.string.navigation_choice_selections)
             else -> throw IllegalArgumentException("NavChoice $navChoice does not have a menu text")
         }
     }
 
-    private lateinit var categories: List<Category>
+    private lateinit var selections: List<Selection>
 
     override fun onCreate(state: Bundle?) {
         super.onCreate(state)
@@ -127,9 +126,9 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
             e.printStackTrace()
         }
 
-        ViewModelProviders.of(this).get(CatalogViewModel::class.java).getCategories().observe(this, Observer {
+        ViewModelProviders.of(this).get(CatalogViewModel::class.java).getSelections().observe(this, Observer {
             it?.let {
-                categories = it
+                selections = it
                 updateMenuCategories(it)
             }
         })
@@ -162,9 +161,9 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
                         }
                     }
                     NavChoices.CATEGORIES.ordinal -> {
-                        val category = categories[it.itemId - 10]
+                        val selection = selections[it.itemId - 10]
                         val intent = Intent(applicationContext, CatalogActivity::class.java)
-                        intent.putExtra("category_id", category.id)
+                        intent.putExtra("selection_link", selection.rootLink)
                         startActivity(intent)
                     }
                 }
@@ -191,11 +190,11 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
         }
     }
 
-    private fun updateMenuCategories(categories: List<Category>) {
+    private fun updateMenuCategories(selections: List<Selection>) {
         val menu: Menu = navigation.menu
         menu.removeGroup(NavChoices.CATEGORIES.ordinal)
-        categories.forEachIndexed { index, category ->
-            menu.add(NavChoices.CATEGORIES.ordinal, index + 10, NavChoices.CATEGORIES.ordinal, category.title)
+        selections.forEachIndexed { index, selection ->
+            menu.add(NavChoices.CATEGORIES.ordinal, index + 10, NavChoices.CATEGORIES.ordinal, selection.title)
         }
     }
 
@@ -205,13 +204,13 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
                 val f = MyLibraryFragment()
                 // Need to call commitAllowingStateLoss instead of just commit to avoid crash on old Android versions
                 supportFragmentManager.beginTransaction().replace(R.id.content_frame, f).commitAllowingStateLoss()
-                setTitle(R.string.navigation_choice_my_library)
+                setTitle(R.string.my_library_title)
             }
             GdlActivity.Companion.NavChoices.CATALOG -> {
                 val f = CatalogFragment()
                 // Need to call commitAllowingStateLoss instead of just commit to avoid crash on old Android versions
                 supportFragmentManager.beginTransaction().replace(R.id.content_frame, f).commitAllowingStateLoss()
-                setTitle(R.string.catalog)
+                setTitle(R.string.selections_title)
             }
             else -> {
                 throw IllegalArgumentException("NavChoice $navChoice does not have a fragment")

@@ -36,7 +36,7 @@ class CatalogActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val categoryId = intent.getStringExtra("category_id")
+        val selectionLink = intent.getStringExtra("selection_link")
         val viewModel = ViewModelProviders.of(this).get(CatalogViewModel::class.java)
 
         setContentView(R.layout.activity_catalog)
@@ -45,8 +45,8 @@ class CatalogActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         launch(UI) {
-            val category = async { viewModel.getCategory(categoryId) }.await()
-            supportActionBar?.title = category.title
+            val selection = async { viewModel.getSelection(selectionLink) }.await()
+            supportActionBar?.title = selection.title
         }
 
         val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
@@ -66,7 +66,7 @@ class CatalogActivity : AppCompatActivity() {
         )
         recyclerView.adapter = adapter
 
-        viewModel.getBooks(categoryId).observe(this, Observer {
+        viewModel.getBooks(selectionLink).observe(this, Observer {
             it?.let { adapter.updateBooks(it) }
         })
     }

@@ -4,13 +4,14 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.ViewModel
 import android.content.SharedPreferences
+import android.util.Log
 import io.digitallibrary.reader.Gdl
 import io.digitallibrary.reader.utilities.LanguageUtil
 
 class CatalogViewModel : ViewModel() {
 
-    private var categories: MediatorLiveData<List<Category>> = MediatorLiveData()
-    private var dbCategories: LiveData<List<Category>>? = null
+    private var categories: MediatorLiveData<List<Selection>> = MediatorLiveData()
+    private var dbSelections: LiveData<List<Selection>>? = null
     private var books: MutableMap<String, LiveData<List<Book>>> = HashMap()
     private var book: LiveData<Book>? = null
 
@@ -21,11 +22,12 @@ class CatalogViewModel : ViewModel() {
     init {
         langListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             if (key === LanguageUtil.getLangPrefKey()) {
-                dbCategories?.let {
+                Log.i("ARGH", "Updating languageLink selections")
+                dbSelections?.let {
                     categories.removeSource(it)
                 }
-                dbCategories = Gdl.database.categoryDao().getLiveCategories(LanguageUtil.getCurrentLanguage())
-                dbCategories?.let {
+                dbSelections = Gdl.database.selectionDao().getLiveSelections(LanguageUtil.getCurrentLanguage())
+                dbSelections?.let {
                     categories.addSource(it, { categories.postValue(it) })
                 }
             }
@@ -38,25 +40,25 @@ class CatalogViewModel : ViewModel() {
         Gdl.sharedPrefs.unregisterListener(langListener)
     }
 
-    fun getCategories(): LiveData<List<Category>> {
-        if (dbCategories == null) {
-            dbCategories = Gdl.database.categoryDao().getLiveCategories(LanguageUtil.getCurrentLanguage())
-            dbCategories?.let {
+    fun getSelections(): LiveData<List<Selection>> {
+        if (dbSelections == null) {
+            dbSelections = Gdl.database.selectionDao().getLiveSelections(LanguageUtil.getCurrentLanguage())
+            dbSelections?.let {
                 categories.addSource(it, { categories.postValue(it) })
             }
         }
         return categories
     }
 
-    fun getBooks(categoryId: String): LiveData<List<Book>> {
-        if (!books.containsKey(categoryId)) {
-            books[categoryId] = Gdl.database.bookDao().getLiveBooks(categoryId)
+    fun getBooks(selectionLink: String): LiveData<List<Book>> {
+        if (!books.containsKey(selectionLink)) {
+            books[selectionLink] = Gdl.database.bookDao().getLiveBooks(selectionLink)
         }
-        return books[categoryId]!!
+        return books[selectionLink]!!
     }
 
-    fun getCategory(categoryId: String): Category {
-        return Gdl.database.categoryDao().getCategory(categoryId)
+    fun getSelection(selectionLink: String): Selection {
+        return Gdl.database.selectionDao().getSelection(selectionLink)
     }
 
     fun getBook(bookId: String): LiveData<Book> {

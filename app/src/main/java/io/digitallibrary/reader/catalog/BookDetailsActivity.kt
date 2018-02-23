@@ -75,7 +75,7 @@ class BookDetailsActivity : AppCompatActivity() {
 
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setTitle(R.string.catalog_book_details)
+        supportActionBar?.setTitle(R.string.selections_book_details)
 
         val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
 

@@ -35,8 +35,8 @@
         <activity
             android:name=".GdlActivity"
             android:configChanges="orientation|screenSize"
-            android:contentDescription="@string/catalog"
-            android:label="@string/catalog"
+            android:contentDescription="@string/selections_title"
+            android:label="@string/selections_title"
             android:theme="@style/GdlTheme" />
 
         <activity
@@ -81,14 +81,14 @@
         <activity
             android:name=".catalog.CatalogActivity"
             android:configChanges="orientation|screenSize"
-            android:contentDescription="@string/catalog"
-            android:label="@string/catalog"
+            android:contentDescription="@string/selections_title"
+            android:label="@string/selections_title"
             android:theme="@style/GdlTheme" />
         <activity
             android:name=".catalog.BookDetailsActivity"
             android:configChanges="orientation|screenSize"
-            android:contentDescription="@string/catalog"
-            android:label="@string/catalog"
+            android:contentDescription="@string/selections_title"
+            android:label="@string/selections_title"
             android:theme="@style/GdlTheme" />
 
         <receiver

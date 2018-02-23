@@ -11,29 +11,30 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import io.digitallibrary.reader.Gdl
+import io.digitallibrary.reader.LanguagesViewModel
 import io.digitallibrary.reader.R
-import io.digitallibrary.reader.utilities.LanguageUtil
-import kotlinx.android.synthetic.main.item_catalog_category.view.*
 import kotlinx.android.synthetic.main.item_catalog_language_bar.view.*
+import kotlinx.android.synthetic.main.item_catalog_selection.view.*
 
 
-class CategoriesAdapter(val fragment: Fragment, val callback: Callback) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class SelectionsAdapter(val fragment: Fragment, val callback: Callback) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         private const val TYPE_HEADER = 0
-        private const val TYPE_CATEGORY = 1
+        private const val TYPE_SELECTION = 1
     }
 
-    private var categories: List<Category> = emptyList()
+    private var selections: List<Selection> = emptyList()
+    private var currentLanguage: String = ""
 
     interface Callback {
-        fun onCategoryClicked(category: Category) {}
+        fun onSelectionClicked(selection: Selection) {}
         fun onBookClicked(book: Book) {}
         fun onChangeLanguageClicked() {}
     }
 
-    fun updateCategories(newCategoriesList: List<Category>) {
-        categories = newCategoriesList
+    fun updateCategories(newCategoriesList: List<Selection>) {
+        selections = newCategoriesList
         notifyDataSetChanged()
     }
 
@@ -43,9 +44,9 @@ class CategoriesAdapter(val fragment: Fragment, val callback: Callback) : Recycl
                 val languageBar = LayoutInflater.from(parent.context).inflate(R.layout.item_catalog_language_bar, parent, false)
                 return HeaderViewHolder(languageBar)
             }
-            TYPE_CATEGORY -> {
-                val categoryView = LayoutInflater.from(parent.context).inflate(R.layout.item_catalog_category, parent, false)
-                return CategoryViewHolder(categoryView)
+            TYPE_SELECTION -> {
+                val categoryView = LayoutInflater.from(parent.context).inflate(R.layout.item_catalog_selection, parent, false)
+                return SelectionViewHolder(categoryView)
             }
         }
         throw RuntimeException("No type matches $viewType")
@@ -55,7 +56,7 @@ class CategoriesAdapter(val fragment: Fragment, val callback: Callback) : Recycl
         if (position == 0) {
             return TYPE_HEADER
         }
-        return TYPE_CATEGORY
+        return TYPE_SELECTION
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
@@ -64,36 +65,40 @@ class CategoriesAdapter(val fragment: Fragment, val callback: Callback) : Recycl
                 val headerHolder = holder as HeaderViewHolder
                 headerHolder.bindValues()
             }
-            TYPE_CATEGORY -> {
-                val categoryHolder = holder as CategoryViewHolder
-                categoryHolder.bindValues(categories[position - 1])
+            TYPE_SELECTION -> {
+                val selectionHolder = holder as SelectionViewHolder
+                selectionHolder.bindValues(selections[position - 1])
             }
         }
     }
 
     override fun getItemCount(): Int {
-        return categories.size + 1
+        return selections.size + 1
     }
 
     inner class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun bindValues() {
             itemView.catalog_change_language.setOnClickListener { callback.onChangeLanguageClicked() }
-            val language = LanguageUtil.getCurrentLanguageText()
-            val text = Gdl.appContext.getString(R.string.catalog_current_language, language)
-            val spanText = SpannableString(text)
-            val langStartIndex = text.indexOf(language)
-            spanText.setSpan(StyleSpan(BOLD), langStartIndex, langStartIndex + language.length, 0)
-            itemView.catalog_current_language.text = spanText
+
+            ViewModelProviders.of(fragment).get(LanguagesViewModel::class.java).currentLanguageText.observe(fragment, Observer {
+                it?.let {
+                    val text = Gdl.appContext.getString(R.string.selections_current_language, it)
+                    val spanText = SpannableString(text)
+                    val langStartIndex = text.indexOf(it)
+                    spanText.setSpan(StyleSpan(BOLD), langStartIndex, langStartIndex + it.length, 0)
+                    itemView.catalog_current_language.text = spanText
+                }
+            })
         }
     }
 
-    inner class CategoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class SelectionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        fun bindValues(category: Category) {
-            itemView.feed_title.text = category.title
+        fun bindValues(selection: Selection) {
+            itemView.feed_title.text = selection.title
 
-            val recyclerView: RecyclerView = itemView.catalog_category_recyclerview
+            val recyclerView: RecyclerView = itemView.catalog_selection_recycler_view
             val adapter = BooksAdapter(fragment.context!!, object : BooksAdapter.Callback {
                 override fun onBookClicked(book: Book) {
                     callback.onBookClicked(book)
@@ -101,11 +106,11 @@ class CategoriesAdapter(val fragment: Fragment, val callback: Callback) : Recycl
             })
             recyclerView.adapter = adapter
 
-            ViewModelProviders.of(fragment).get(CatalogViewModel::class.java).getBooks(category.id).observe(fragment, Observer {
+            ViewModelProviders.of(fragment).get(CatalogViewModel::class.java).getBooks(selection.rootLink).observe(fragment, Observer {
                 it?.let { adapter.updateBooks(it) }
             })
 
-            itemView.feed_more.setOnClickListener { callback.onCategoryClicked(category) }
+            itemView.feed_more.setOnClickListener { callback.onSelectionClicked(selection) }
         }
     }
 }

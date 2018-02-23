@@ -2,21 +2,15 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "55917379e7645399871e88e5f839f375",
+    "identityHash": "2247deb35ba2e4d497ca34c4dbb80922",
     "entities": [
       {
-        "tableName": "categories",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dbid` INTEGER, `id` TEXT NOT NULL, `title` TEXT, `link` TEXT, `language` TEXT, `view_order` INTEGER, `updated` TEXT, `description` TEXT, PRIMARY KEY(`dbid`))",
+        "tableName": "selections",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`root_link` TEXT NOT NULL, `title` TEXT, `language_link` TEXT, `view_order` INTEGER, PRIMARY KEY(`root_link`))",
         "fields": [
           {
-            "fieldPath": "dbid",
-            "columnName": "dbid",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
-          {
-            "fieldPath": "id",
-            "columnName": "id",
+            "fieldPath": "rootLink",
+            "columnName": "root_link",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -27,14 +21,8 @@
             "notNull": false
           },
           {
-            "fieldPath": "link",
-            "columnName": "link",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "language",
-            "columnName": "language",
+            "fieldPath": "languageLink",
+            "columnName": "language_link",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -43,48 +31,21 @@
             "columnName": "view_order",
             "affinity": "INTEGER",
             "notNull": false
-          },
-          {
-            "fieldPath": "updated",
-            "columnName": "updated",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "description",
-            "columnName": "description",
-            "affinity": "TEXT",
-            "notNull": false
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "dbid"
+            "root_link"
           ],
           "autoGenerate": false
         },
-        "indices": [
-          {
-            "name": "category_id_index",
-            "unique": true,
-            "columnNames": [
-              "id"
-            ],
-            "createSql": "CREATE UNIQUE INDEX `category_id_index` ON `${TABLE_NAME}` (`id`)"
-          }
-        ],
+        "indices": [],
         "foreignKeys": []
       },
       {
         "tableName": "books",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dbid` INTEGER, `id` TEXT NOT NULL, `title` TEXT, `downloaded` TEXT, `reading_level` INTEGER, `language` TEXT, `license` TEXT, `author` TEXT, `publisher` TEXT, `reading_position` TEXT, `image` TEXT, `thumb` TEXT, `epub_link` TEXT, `description` TEXT, `updated` TEXT, `created` TEXT, `published` TEXT, `state` INTEGER, PRIMARY KEY(`dbid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT, `downloaded` TEXT, `reading_level` INTEGER, `language_link` TEXT, `license` TEXT, `author` TEXT, `publisher` TEXT, `reading_position` TEXT, `image` TEXT, `thumb` TEXT, `epub_link` TEXT, `pdf_link` TEXT, `description` TEXT, `updated` TEXT, `created` TEXT, `published` TEXT, `version` INTEGER, `state` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
-          {
-            "fieldPath": "dbid",
-            "columnName": "dbid",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
           {
             "fieldPath": "id",
             "columnName": "id",
@@ -110,8 +71,8 @@
             "notNull": false
           },
           {
-            "fieldPath": "language",
-            "columnName": "language",
+            "fieldPath": "languageLink",
+            "columnName": "language_link",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -158,6 +119,12 @@
             "notNull": false
           },
           {
+            "fieldPath": "pdfLink",
+            "columnName": "pdf_link",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
             "fieldPath": "description",
             "columnName": "description",
             "affinity": "TEXT",
@@ -182,6 +149,12 @@
             "notNull": false
           },
           {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
             "fieldPath": "state",
             "columnName": "state",
             "affinity": "INTEGER",
@@ -190,37 +163,22 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "dbid"
+            "id"
           ],
           "autoGenerate": false
         },
-        "indices": [
-          {
-            "name": "book_id_index",
-            "unique": true,
-            "columnNames": [
-              "id"
-            ],
-            "createSql": "CREATE UNIQUE INDEX `book_id_index` ON `${TABLE_NAME}` (`id`)"
-          }
-        ],
+        "indices": [],
         "foreignKeys": []
       },
       {
         "tableName": "book_downloads",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dbid` INTEGER, `book_id` TEXT, `download_id` INTEGER, PRIMARY KEY(`dbid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`book_id` TEXT NOT NULL, `download_id` INTEGER, PRIMARY KEY(`book_id`), FOREIGN KEY(`book_id`) REFERENCES `books`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
-          {
-            "fieldPath": "dbid",
-            "columnName": "dbid",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
           {
             "fieldPath": "bookId",
             "columnName": "book_id",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "downloadId",
@@ -231,34 +189,40 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "dbid"
+            "book_id"
           ],
           "autoGenerate": false
         },
         "indices": [],
-        "foreignKeys": []
+        "foreignKeys": [
+          {
+            "table": "books",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "book_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       },
       {
-        "tableName": "book_categories_map",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dbid` INTEGER, `book_id` TEXT, `category_id` TEXT, `view_order` INTEGER, `language` TEXT, PRIMARY KEY(`dbid`))",
+        "tableName": "book_selections_map",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`book_id` TEXT NOT NULL, `selection_link` TEXT NOT NULL, `view_order` INTEGER, `language_link` TEXT, `version` INTEGER, PRIMARY KEY(`book_id`, `selection_link`), FOREIGN KEY(`book_id`) REFERENCES `books`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`selection_link`) REFERENCES `selections`(`root_link`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
-          {
-            "fieldPath": "dbid",
-            "columnName": "dbid",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
           {
             "fieldPath": "bookId",
             "columnName": "book_id",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
-            "fieldPath": "categoryId",
-            "columnName": "category_id",
+            "fieldPath": "selectionLink",
+            "columnName": "selection_link",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "viewOrder",
@@ -267,15 +231,93 @@
             "notNull": false
           },
           {
-            "fieldPath": "language",
-            "columnName": "language",
+            "fieldPath": "languageLink",
+            "columnName": "language_link",
             "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "INTEGER",
             "notNull": false
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "dbid"
+            "book_id",
+            "selection_link"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "selection_link_view_order_index",
+            "unique": false,
+            "columnNames": [
+              "selection_link",
+              "view_order"
+            ],
+            "createSql": "CREATE  INDEX `selection_link_view_order_index` ON `${TABLE_NAME}` (`selection_link`, `view_order`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "books",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "book_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "selections",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "selection_link"
+            ],
+            "referencedColumns": [
+              "root_link"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "languages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`link` TEXT NOT NULL, `language_name` TEXT, `updated` TEXT, `view_order` INTEGER, PRIMARY KEY(`link`))",
+        "fields": [
+          {
+            "fieldPath": "link",
+            "columnName": "link",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "languageName",
+            "columnName": "language_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "updated",
+            "columnName": "updated",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "viewOrder",
+            "columnName": "view_order",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "link"
           ],
           "autoGenerate": false
         },
@@ -285,7 +327,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"55917379e7645399871e88e5f839f375\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"2247deb35ba2e4d497ca34c4dbb80922\")"
     ]
   }
 }

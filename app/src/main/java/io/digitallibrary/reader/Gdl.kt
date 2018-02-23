@@ -7,13 +7,15 @@ import android.content.res.Resources
 import android.os.Process
 import android.util.Log
 import io.digitallibrary.reader.catalog.CatalogDatabase
-import io.digitallibrary.reader.catalog.fetchFeed
+import io.digitallibrary.reader.catalog.OpdsParser
 import io.digitallibrary.reader.reader.*
+import okhttp3.OkHttpClient
 import java.io.IOException
 import java.net.ServerSocket
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
+
 
 /**
  * Global application state.
@@ -30,13 +32,15 @@ class Gdl : Application() {
         private lateinit var INSTANCE: Gdl
 
         lateinit var database: CatalogDatabase
+        lateinit var httpClient: OkHttpClient
+        lateinit var opdsOpdsParser: OpdsParser
 
         val appContext: Context by lazy {
             INSTANCE.applicationContext
         }
 
-        fun fetchOpdsFeed() {
-            fetchFeed(false)
+        fun fetchOpdsFeed(callback: OpdsParser.Callback? = null) {
+            opdsOpdsParser.start(callback)
         }
 
         val sharedPrefs: Prefs by lazy {
@@ -54,7 +58,7 @@ class Gdl : Application() {
 
                 override fun newThread(r: Runnable): Thread {
                     /*
-                     * Apparently, it's necessary to use {@link android.os.Process} to set
+                     * Apparently, it's necessary to use {@rootLink android.os.Process} to set
                      * the thread priority, rather than the standard Java thread
                      * functions.
                      */
@@ -77,6 +81,9 @@ class Gdl : Application() {
         Log.d(TAG, "starting app: pid " + Process.myPid())
         Gdl.INSTANCE = this
         database = Room.databaseBuilder<CatalogDatabase>(this, CatalogDatabase::class.java, "catalog_db").build()
+        httpClient = OkHttpClient()
+        httpClient.dispatcher().maxRequestsPerHost = 8
+        opdsOpdsParser = OpdsParser()
     }
 
     class ReaderAppServices(context: Context, private val rr: Resources) {
