@@ -22,7 +22,6 @@ class CatalogViewModel : ViewModel() {
     init {
         langListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             if (key === LanguageUtil.getLangPrefKey()) {
-                Log.i("ARGH", "Updating languageLink selections")
                 dbSelections?.let {
                     categories.removeSource(it)
                 }
