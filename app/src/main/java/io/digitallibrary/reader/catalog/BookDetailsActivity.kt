@@ -27,6 +27,8 @@ import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 import java.io.File
 import java.net.URI
+import android.content.Intent
+import android.support.v4.content.FileProvider
 
 
 class BookDetailsActivity : AppCompatActivity() {
@@ -225,13 +227,18 @@ class BookDetailsActivity : AppCompatActivity() {
                 val bookDownload = Gdl.database.bookDownloadDao().getBookDownload(it.id)
                 if (bookDownload == null) {
                     val downloadManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-                    val request = DownloadManager.Request(Uri.parse(it.ePubLink)).setDestinationInExternalFilesDir(applicationContext, null, "books/" + it.id + ".epub")
-                    request.setTitle(it.title)
-                    request.setDescription(applicationContext.getString(R.string.app_name))
-                    request.setMimeType("application/x-gdl-book")
-                    val reqId = downloadManager.enqueue(request)
-                    Gdl.database.bookDownloadDao().insert(BookDownload(bookId = it.id, downloadId = reqId))
-                    updateDownloadingState()
+                    val link = it.ePubLink ?: it.pdfLink
+                    if (link != null) {
+                        // We don't want any ':' in the file name
+                        val bookFileName = it.id.split(":").last() + if (it.ePubLink != null) ".epub" else ".pdf"
+                        val request = DownloadManager.Request(Uri.parse(link)).setDestinationInExternalFilesDir(applicationContext, null, bookFileName)
+                        request.setTitle(it.title)
+                        request.setDescription(applicationContext.getString(R.string.app_name))
+                        request.setMimeType("application/x-gdl-book")
+                        val reqId = downloadManager.enqueue(request)
+                        Gdl.database.bookDownloadDao().insert(BookDownload(bookId = it.id, downloadId = reqId))
+                        updateDownloadingState()
+                    }
                 }
             }
         }
@@ -261,8 +268,18 @@ class BookDetailsActivity : AppCompatActivity() {
                 if (isDownloaded()) {
                     it.downloaded?.let { uri ->
                         if (canStartAnotherActivity) {
-                            ReaderActivity.startActivity(this@BookDetailsActivity, it.id, File(URI(uri)))
-                            canStartAnotherActivity = false
+                            val bookFile = File(URI(uri))
+                            if (bookFile.name.endsWith(".epub")) {
+                                ReaderActivity.startActivity(this@BookDetailsActivity, it.id, bookFile)
+                                canStartAnotherActivity = false
+                            } else if (bookFile.name.endsWith(".pdf")) {
+                                val pdfUri = FileProvider.getUriForFile(applicationContext, applicationContext.packageName + ".provider", bookFile)
+                                val intent = Intent(Intent.ACTION_VIEW)
+                                intent.setDataAndType(pdfUri, "application/pdf")
+                                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                startActivity(intent)
+                                canStartAnotherActivity = false
+                            }
                         }
                     }
                 }
