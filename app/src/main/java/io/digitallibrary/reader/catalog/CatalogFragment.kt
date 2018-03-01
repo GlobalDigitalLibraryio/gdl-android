@@ -59,11 +59,11 @@ class CatalogFragment : Fragment() {
 
         swipe_refresh_layout.setOnRefreshListener { Gdl.fetchOpdsFeed(object : OpdsParser.Callback {
             override fun onFinished() {
-                swipe_refresh_layout.isRefreshing = false
+                swipe_refresh_layout?.isRefreshing = false
             }
 
             override fun onError(error: OpdsParser.Error?, message: String?) {
-                swipe_refresh_layout.isRefreshing = false
+                swipe_refresh_layout?.isRefreshing = false
             }
         }) }
         swipe_refresh_layout.setColorSchemeResources(R.color.gdl_links,  R.color.gdl_green)
