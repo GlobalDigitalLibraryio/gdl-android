@@ -53,12 +53,22 @@ abstract class BookDao {
     @Delete
     abstract fun delete(books: List<Book>)
 
+    /**
+     * Insert if book doesn't already exist.
+     * Update if book id exists in db.
+     * When updating, we need to get the old fields that are not from the OPDS feeds
+     * and copy them to the new book, so we don't overwrite any data we need.
+     */
     @Transaction
     open fun insertOrUpdate(books: List<Book>) {
-        books.forEach {
-            val id = insert(it)
+        books.forEach { newBook ->
+            val id = insert(newBook)
             if (id == -1L) {
-                update(it)
+                getBook(newBook.id)?.let { oldBook ->
+                    newBook.downloaded = oldBook.downloaded
+                    newBook.readingPosition = oldBook.readingPosition
+                }
+                update(newBook)
             }
         }
     }
