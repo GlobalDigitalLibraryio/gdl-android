@@ -274,13 +274,16 @@ data class Language(
 @Dao
 abstract class LanguageDao {
     @Insert
-    abstract fun insert(language: List<Language>)
+    abstract fun insert(languages: List<Language>)
 
     @Delete
-    abstract fun delete(language: List<Language>)
+    abstract fun delete(languages: List<Language>)
 
     @Update
-    abstract fun update(language: List<Language>)
+    abstract fun update(language: Language)
+
+    @Update
+    abstract fun update(languages: List<Language>)
 
     @Transaction
     open fun updateLanguages(languagesToInsert: List<Language>, languagesToDelete: List<Language>, languagesToUpdate: List<Language>) {

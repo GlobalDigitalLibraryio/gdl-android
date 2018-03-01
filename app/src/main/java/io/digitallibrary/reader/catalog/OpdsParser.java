@@ -1,6 +1,7 @@
 package io.digitallibrary.reader.catalog;
 
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import org.threeten.bp.OffsetDateTime;
@@ -104,25 +105,20 @@ public class OpdsParser {
         /**
          * Class to keep track of all tasks that needs to run to update selections and books
          * for one language. Synchronises all parsing threads.
+         *
+         * Also contains some data needed by all tasks.
          */
         private class LanguageTasksMonitor {
             private List<Callback> callbacks = new ArrayList<>(10);
             private Set<AsyncTask> subTasks = new HashSet<>(10);
+            private XmlPullParserFactory xmlPullParserFactory;
             private boolean haveError = false;
-            private boolean haveStarted = false;
-            private long version;
+            private long version = -1;
             private String languageLink;
+            private OffsetDateTime updated;
 
             LanguageTasksMonitor(String languageLink) {
                 this.languageLink = languageLink;
-            }
-
-            public long getVersion() {
-                return version;
-            }
-
-            public void setVersion(long version) {
-                this.version = version;
             }
 
             public void failed(final Error error, final String message) {
@@ -133,6 +129,7 @@ public class OpdsParser {
                 lock.unlock();
 
                 for (final Callback c : cs) {
+                    // All callbacks should be called on the UI thread
                     UIThread.runOnUIThread(new Runnable() {
                         @Override
                         public void run() {
@@ -213,7 +210,6 @@ public class OpdsParser {
                         ParseFacetsTask updateJob = new ParseFacetsTask(this);
                         addTask(updateJob);
                         updateJob.execute(languageLink);
-                        haveStarted = true;
                     }
                 } finally {
                     lock.unlock();
@@ -233,7 +229,6 @@ public class OpdsParser {
         private String currentLanguage = null;
         private List<Language> languages = new ArrayList<>(20);
         private List<Selection> selections = new ArrayList<>(10);
-        private OffsetDateTime updated = null;
         private OffsetDateTime oldUpdated = null;
 
         ParseFacetsTask(ProgressMonitor.LanguageTasksMonitor taskMonitor) {
@@ -269,7 +264,7 @@ public class OpdsParser {
                 Request request = new Request.Builder().url(url).build();
                 Response response;
 
-                Log.i(TAG, "Calling url: " + url);
+                Log.v(TAG, "ParseFacetsTask calling url: " + url);
 
                 try {
                     response = client.newCall(request).execute();
@@ -285,9 +280,10 @@ public class OpdsParser {
                     return null;
                 }
 
-                XmlPullParser xpp;
                 try {
-                    xpp = XmlPullParserFactory.newInstance().newPullParser();
+                    // Save the XmlPullParserFactory in the taskMonitor, so we don't recreate it later.
+                    taskMonitor.xmlPullParserFactory = XmlPullParserFactory.newInstance();
+                    XmlPullParser xpp = taskMonitor.xmlPullParserFactory.newPullParser();
                     xpp.setInput(response.body().charStream());
 
                     int langCounter = 0;
@@ -329,15 +325,7 @@ public class OpdsParser {
                             while (!(eventType == XmlPullParser.END_TAG && xpp.getName().equals(UPDATED))) {
                                 if (eventType == XmlPullParser.TEXT) {
                                     String value = xpp.getText();
-                                    updated = TimeTypeConverters.toOffsetDateTime(value);
-
-                                    /* TODO update when backend fixes the updated field
-                                    if (updated != null && updated.equals(oldUpdated)) {
-                                        // We are done
-                                        Log.i(TAG, "No need to update");
-                                        return null;
-                                    }
-                                    */
+                                    taskMonitor.updated = TimeTypeConverters.toOffsetDateTime(value);
                                 }
                                 eventType = xpp.next();
                             }
@@ -395,10 +383,14 @@ public class OpdsParser {
                         selectionDao.updateSelections(newSelections, new ArrayList<>(oldSelections.values()), updatedSelections);
                     }
 
-                    long version = Gdl.Companion.getDatabase().bookDao().maxVersion(languageLink) + 1;
-                    taskMonitor.setVersion(version);
+                    if (taskMonitor.updated != null && taskMonitor.updated.equals(oldUpdated)) {
+                        // We are done - we are not setting taskMonitor.version, so
+                        // we can check for that in PostUpdateTask
+                        Log.v(TAG, "No need to update");
+                        return null;
+                     }
 
-
+                    taskMonitor.version = Gdl.Companion.getDatabase().bookDao().maxVersion(languageLink) + 1;
 
                     for (Selection s : selections) {
                         ParseSelectionPageTask parseJob = new ParseSelectionPageTask(taskMonitor);
@@ -445,7 +437,6 @@ public class OpdsParser {
         private ProgressMonitor.LanguageTasksMonitor taskMonitor;
         private List<Book> books = new ArrayList<>(20);
         private List<BookSelectionMap> bookSelectionMaps = new ArrayList<>(20);
-        private OffsetDateTime updated = null;
         private String next = null;
 
         ParseSelectionPageTask(ProgressMonitor.LanguageTasksMonitor taskMonitor) {
@@ -473,6 +464,8 @@ public class OpdsParser {
                     url = selection.getRootLink();
                 }
 
+                Log.v(TAG, "ParseSelectionPageTask calling url: " + url);
+
                 Request request = new Request.Builder().url(url).build();
 
                 try {
@@ -489,9 +482,8 @@ public class OpdsParser {
                     return null;
                 }
 
-                XmlPullParser xpp;
                 try {
-                    xpp = XmlPullParserFactory.newInstance().newPullParser();
+                    XmlPullParser xpp = taskMonitor.xmlPullParserFactory.newPullParser();
                     xpp.setInput(response.body().charStream());
 
                     // Parse facets
@@ -503,7 +495,7 @@ public class OpdsParser {
 
                             Book b = new Book();
                             b.setLanguageLink(selection.getLanguageLink());
-                            b.setVersion(taskMonitor.getVersion());
+                            b.setVersion(taskMonitor.version);
 
                             while (!(eventType == XmlPullParser.END_TAG && xpp.getName().equals(ENTRY))) {
                                 if (taskMonitor.haveError) {
@@ -632,17 +624,9 @@ public class OpdsParser {
                             bsm.setLanguageLink(selection.getLanguageLink());
                             bsm.setSelectionLink(selection.getRootLink());
                             bsm.setViewOrder(viewOrderCounter++);
-                            bsm.setVersion(taskMonitor.getVersion());
+                            bsm.setVersion(taskMonitor.version);
                             bookSelectionMaps.add(bsm);
 
-                        } else if (eventType == XmlPullParser.START_TAG && xpp.getName().equals(UPDATED)) {
-                            while (!(eventType == XmlPullParser.END_TAG && xpp.getName().equals(UPDATED))) {
-                                if (eventType == XmlPullParser.TEXT) {
-                                    String value = xpp.getText();
-                                    updated = TimeTypeConverters.toOffsetDateTime(value);
-                                }
-                                eventType = xpp.next();
-                            }
                         } else if (eventType == XmlPullParser.START_TAG && xpp.getName().equals(LINK)) {
                             String rel = xpp.getAttributeValue(null, LINK_ATTR_REL);
                             if (rel != null && rel.equals(LINK_ATTR_REL_VALUE_NEXT)) {
@@ -684,6 +668,11 @@ public class OpdsParser {
         }
     }
 
+    /**
+     * Task that runs when all OPDS feeds have been parsed.
+     *
+     * Cleans up and calls callbacks.
+     */
     private static class PostUpdateTask extends AsyncTask<Void, Void, Void> {
         private ProgressMonitor.LanguageTasksMonitor taskMonitor;
 
@@ -693,34 +682,62 @@ public class OpdsParser {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            // Delete old not downloaded books
-            BookDao bookDao = Gdl.Companion.getDatabase().bookDao();
-            bookDao.deleteOldNotDownloaded(taskMonitor.languageLink, taskMonitor.version);
-            List<Book> oldDownloadedBooks = bookDao.getOldDownloaded(taskMonitor.languageLink, taskMonitor.version);
-            for (Book b : oldDownloadedBooks) {
-                b.setState(Catalog_dbKt.BOOK_STATE_REMOVED_FROM_GDL);
-                bookDao.update(b);
+            // If taskMonitor.version isn't set, we haven't updated the books
+            if (taskMonitor.version != -1) {
+                // Delete old not downloaded books
+                BookDao bookDao = Gdl.Companion.getDatabase().bookDao();
+                bookDao.deleteOldNotDownloaded(taskMonitor.languageLink, taskMonitor.version);
+                List<Book> oldDownloadedBooks = bookDao.getOldDownloaded(taskMonitor.languageLink, taskMonitor.version);
+                for (Book b : oldDownloadedBooks) {
+                    b.setState(Catalog_dbKt.BOOK_STATE_REMOVED_FROM_GDL);
+                    bookDao.update(b);
+                }
+                Gdl.Companion.getDatabase().bookSelectionMapDao().deleteOld(taskMonitor.languageLink, taskMonitor.version);
+
+                if (taskMonitor.updated != null) {
+                    LanguageDao langDao = Gdl.Companion.getDatabase().languageDao();
+                    Language lang = langDao.getLanguage(taskMonitor.languageLink);
+                    lang.setUpdated(taskMonitor.updated);
+                    langDao.update(lang);
+                }
+
+                Gdl.Companion.getDatabase().bookSelectionMapDao().deleteOld(taskMonitor.languageLink, taskMonitor.version);
             }
-            Gdl.Companion.getDatabase().bookSelectionMapDao().deleteOld(taskMonitor.languageLink, taskMonitor.version);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            // onPostExecute is called from the UI thread
             taskMonitor.finish();
         }
     }
 
+    /**
+     * Error types returned by the {@link Callback} given to {@link #start}.
+     */
     public enum Error {
         HTTP_IO_ERROR,
         HTTP_REQUEST_FAILED,
         XML_PARSING_ERROR,
     }
 
+    /**
+     * Callback called by {@link #start} when parsing current language is done.
+     */
     public interface Callback {
+        /**
+         * Called when finished to parse current language without errors.
+         */
         void onFinished();
-        void onError(Error error, String message);
+
+        /**
+         * Called when parsing current language failed.
+         * @param error Type of {@link Error}
+         * @param message Might be a message describing the error, or null.
+         */
+        void onError(Error error, @Nullable String message);
     }
 
     /**
