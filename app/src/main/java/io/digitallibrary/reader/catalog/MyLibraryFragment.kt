@@ -66,28 +66,19 @@ class MyLibraryFragment : Fragment() {
                 initialView = false
             } else {
                 // animate between states
-                if (it?.isNotEmpty() == true) {
-                    recycler_view.visibility = View.VISIBLE
-                    recycler_view.alpha = 0f
-                    recycler_view.animate().alpha(1f).setDuration(shortDuration).setListener(null)
-                    empty_message.animate().alpha(0f).setDuration(shortDuration).setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator?) {
-                            super.onAnimationEnd(animation)
-                            empty_message?.visibility = View.GONE
-                        }
-                    })
-                } else {
-                    empty_message.visibility = View.VISIBLE
-                    empty_message.alpha = 0f
-                    empty_message.animate().alpha(1f).setDuration(shortDuration).setListener(null)
-                    recycler_view.animate().alpha(0f).setDuration(shortDuration).setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator?) {
-                            super.onAnimationEnd(animation)
-                            recycler_view?.visibility = View.GONE
-                        }
-                    })
-                }
+                val fadeFromView = if (it?.isNotEmpty() == true) { empty_message } else { recycler_view }
+                val fadeToView = if (it?.isNotEmpty() == true) { recycler_view } else { empty_message }
 
+                fadeFromView.animate().alpha(0f).setDuration(shortDuration).setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        fadeFromView.visibility = View.GONE
+                    }
+                })
+
+                fadeToView.visibility = View.VISIBLE
+                fadeToView.alpha = 0f
+                fadeToView.animate().alpha(1f).setDuration(shortDuration).setListener(null)
             }
         })
 

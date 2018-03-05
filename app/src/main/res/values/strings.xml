@@ -3,13 +3,13 @@
     <string name="app_name">Global Digital Library</string>
     <string name="app_short_name">GDL</string>
 
-    <!-- Catalog strings -->
-    <string name="catalog">Catalog</string>
-    <string name="catalog_book_details">Book Details</string>
-    <string name="catalog_unknown_feed">Unknown</string>
-    <string name="catalog_more_feed">More</string>
-    <string name="catalog_current_language">Books in %1$s</string>
-    <string name="catalog_change_language">Change</string>
+    <!-- Selections strings -->
+    <string name="selections_title">Selections</string>
+    <string name="selections_book_details">Book Details</string>
+    <string name="selections_unknown_feed">Unknown</string>
+    <string name="selections_more_feed">More</string>
+    <string name="selections_current_language">Books in %1$s</string>
+    <string name="selections_change_language">Change</string>
 
     <string name="catalog_accessibility_book_cover">Book cover</string>
 
@@ -56,11 +56,12 @@
     <!-- Navigation -->
     <string name="navigation_drawer_open">Open the navigation drawer</string>
     <string name="navigation_drawer_close">Close the navigation drawer</string>
-    <string name="navigation_choice_catalog">Catalog</string>
+    <string name="navigation_choice_selections">Selections</string>
     <string name="navigation_choice_my_library">My Library</string>
     <string name="navigation_choice_select_language">Book Language</string>
 
     <!-- My library -->
+    <string name="my_library_title">My Library</string>
     <string name="my_library_menu_edit">Edit</string>
     <string name="my_library_menu_select_all">Select All</string>
     <string name="my_library_menu_delete">Delete</string>

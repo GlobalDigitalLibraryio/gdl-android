@@ -29,7 +29,7 @@
             android:paddingEnd="8dp"
             android:paddingStart="8dp"
             android:paddingTop="0dp"
-            android:text="@string/catalog_change_language"
+            android:text="@string/selections_change_language"
             android:textColor="@color/gdl_links"
             android:textSize="13sp" />
     </LinearLayout>
