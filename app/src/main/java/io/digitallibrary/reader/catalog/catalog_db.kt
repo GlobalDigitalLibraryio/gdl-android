@@ -157,7 +157,7 @@ abstract class SelectionDao {
 }
 
 /**
- * Table that keep tack of which selections a book belongs to. This also keeps track of the
+ * Table that keep track of which selections a book belongs to. This also keeps track of the
  * order books are shown in the UI.
  */
 @Entity(tableName = "book_selections_map",
@@ -216,7 +216,7 @@ abstract class BookSelectionMapDao {
 
 
 /**
- * Table that maps books to downlands in the DownloadManager.
+ * Table that maps books to downloads in the DownloadManager.
  */
 @Entity(tableName = "book_downloads",
         foreignKeys = [
@@ -244,8 +244,8 @@ interface BookDownloadDao {
     @Query("DELETE FROM book_downloads WHERE book_id = :bookId")
     fun delete(bookId: String)
 
-    @Query("DELETE FROM book_downloads WHERE book_id in (:bookId)")
-    fun delete(bookId: List<String>)
+    @Query("DELETE FROM book_downloads WHERE book_id in (:bookIds)")
+    fun delete(bookIds: List<String>)
 
     @Query("SELECT * FROM book_downloads WHERE book_id = :bookId")
     fun getBookDownload(bookId: String): BookDownload?
