@@ -1,5 +1,6 @@
 package io.digitallibrary.reader.catalog
 
+import android.arch.paging.PagedListAdapter
 import android.content.Context
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.RecyclerView
@@ -12,87 +13,97 @@ import com.bumptech.glide.request.RequestOptions
 import io.digitallibrary.reader.R
 import kotlinx.android.synthetic.main.item_catalog_book.view.*
 
-class BooksAdapter(val providerContext: Context, val callback: Callback, val selectModeAllowed: Boolean = false) : RecyclerView.Adapter<BooksAdapter.BookViewHolder>() {
+/**
+ * Adapter for showing books in recycler views. Have support for select mode.
+ * This adapter will use paging, to avoid loading to many books into memory at the same time.
+ */
+class BooksAdapter(val providerContext: Context, val callback: Callback, val selectModeAllowed: Boolean = false) : PagedListAdapter<Book, BooksAdapter.BookViewHolder>(BooksAdapter.diffCallback) {
     companion object {
         private const val TAG = "BooksAdapter"
+
+        private val diffCallback = object : DiffUtil.ItemCallback<Book>() {
+            override fun areItemsTheSame(oldBook: Book, newBook: Book): Boolean {
+                return oldBook.id == newBook.id
+            }
+            override fun areContentsTheSame(oldBook: Book, newBook: Book): Boolean {
+                return oldBook == newBook
+            }
+        }
     }
 
+    /**
+     * Callbacks for different events from the adapter
+     */
     interface Callback {
+        /**
+         * Called when a book is clicked
+         *
+         * @param book The selected book
+         */
         fun onBookClicked(book: Book) {}
+
+        /**
+         * Called every time the list of selected books changes
+         */
         fun onBookSelectionChanged() {}
     }
 
-    private var books: List<Book> = emptyList()
     private var selectedBooks: SparseBooleanArray = SparseBooleanArray()
 
     var selectModeActive = false
 
     fun setSelectMode(active: Boolean, initialSelected: Int = -1) {
-        val notify = selectModeActive != active
-        selectModeActive = active
-        if (notify) {
-            selectedBooks = SparseBooleanArray(books.size)
-            if (initialSelected >= 0) {
-                selectedBooks.put(initialSelected, true)
+        if (selectModeAllowed) {
+            val notify = selectModeActive != active
+            selectModeActive = active
+            if (notify) {
+                selectedBooks = SparseBooleanArray(itemCount)
+                if (initialSelected >= 0) {
+                    selectedBooks.put(initialSelected, true)
+                }
+                notifyDataSetChanged()
             }
-            notifyDataSetChanged()
+            callback.onBookSelectionChanged()
         }
-        callback.onBookSelectionChanged()
-    }
-
-    private fun SparseBooleanArray.containsAnyTrue(): Boolean {
-        return (0 until books.size).any { get(it) }
-    }
-
-    private fun SparseBooleanArray.selectAll() {
-        (0 until books.size).forEach { put(it, true) }
-    }
-
-    fun size(): Int {
-        return books.size
     }
 
     fun isAnySelected(): Boolean {
-        return selectedBooks.containsAnyTrue()
+        return (0 until itemCount).any { selectedBooks.get(it) }
     }
 
-    fun getSelectedBooks(): List<Book> {
-        return books.filterIndexed { index, _ -> selectedBooks[index] }
+    fun forEachSelected(callback: (Book) -> Unit) {
+        (0 until itemCount).forEach {
+            if (selectedBooks[it]) {
+                getItem(it)?.let(callback)
+            }
+        }
     }
 
     fun selectAll() {
-        selectedBooks.selectAll()
+        (0 until itemCount).forEach { selectedBooks.put(it, true) }
         notifyDataSetChanged()
         callback.onBookSelectionChanged()
     }
 
-    fun toggleItem(position: Int) {
-        selectedBooks.put(position, !selectedBooks[position])
-        notifyItemChanged(position)
-        callback.onBookSelectionChanged()
+    private fun toggleItem(book: Book) {
+        val position = getPosition(book)
+        if (position != -1) {
+            selectedBooks.put(position, !selectedBooks[position])
+            notifyItemChanged(position)
+            callback.onBookSelectionChanged()
+        }
+
     }
 
-    fun updateBooks(newBooksList: List<Book>) {
-        DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun getOldListSize(): Int {
-                return books.size
+    private fun getPosition(book: Book): Int {
+        (0 until itemCount).forEach { i ->
+            getItem(i)?.let{
+                if (it.id == book.id) {
+                    return i
+                }
             }
-
-            override fun getNewListSize(): Int {
-                return newBooksList.size
-            }
-
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return books[oldItemPosition].id == newBooksList[newItemPosition].id
-            }
-
-            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                // If the position changed, we need to bind again to update position in click listeners
-                return (oldItemPosition == newItemPosition) && books[oldItemPosition] == newBooksList[newItemPosition]
-            }
-        }).dispatchUpdatesTo(this)
-        books = newBooksList
-        selectedBooks = SparseBooleanArray(books.size)
+        }
+        return -1
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookViewHolder {
@@ -100,11 +111,9 @@ class BooksAdapter(val providerContext: Context, val callback: Callback, val sel
     }
 
     override fun onBindViewHolder(holder: BookViewHolder, position: Int) {
-        holder.bindValues(books[position], position)
-    }
-
-    override fun getItemCount(): Int {
-        return books.size
+        getItem(position)?.let {
+            holder.bindValues(it, position)
+        }
     }
 
     inner class BookViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -112,25 +121,28 @@ class BooksAdapter(val providerContext: Context, val callback: Callback, val sel
             itemView.cell_book_title.text = book.title
             itemView.setOnClickListener {
                 if (selectModeActive) {
-                    toggleItem(position)
+                    toggleItem(book)
                 } else {
                     callback.onBookClicked(book)
                 }
             }
-            itemView.setOnLongClickListener {
-                if (!selectModeActive && selectModeAllowed) {
-                    setSelectMode(true)
-                    toggleItem(position)
-                    true
-                } else {
-                    false
+
+            if (selectModeAllowed) {
+                itemView.setOnLongClickListener {
+                    if (!selectModeActive) {
+                        setSelectMode(true)
+                        toggleItem(book)
+                        true
+                    } else {
+                        false
+                    }
                 }
             }
+
             Glide.with(providerContext)
                     .load(book.thumb)
                     .apply(RequestOptions().centerCrop().placeholder(R.drawable.book_image_placeholder))
                     .into(itemView.cell_cover_image)
-
 
             if (selectModeActive) {
                 if (selectedBooks[position]) {

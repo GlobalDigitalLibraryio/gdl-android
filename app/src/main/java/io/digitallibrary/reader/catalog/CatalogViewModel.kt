@@ -3,19 +3,23 @@ package io.digitallibrary.reader.catalog
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
 import android.arch.lifecycle.ViewModel
+import android.arch.paging.LivePagedListBuilder
+import android.arch.paging.PagedList
 import android.content.SharedPreferences
-import android.util.Log
 import io.digitallibrary.reader.Gdl
 import io.digitallibrary.reader.utilities.LanguageUtil
 
 class CatalogViewModel : ViewModel() {
 
-    private var categories: MediatorLiveData<List<Selection>> = MediatorLiveData()
+    private var selections: MediatorLiveData<List<Selection>> = MediatorLiveData()
     private var dbSelections: LiveData<List<Selection>>? = null
-    private var books: MutableMap<String, LiveData<List<Book>>> = HashMap()
+
+    private var books: MutableMap<String, LiveData<PagedList<Book>>> = HashMap()
     private var book: LiveData<Book>? = null
 
-    private var downloadedBooks: LiveData<List<Book>>? = null
+    val downloadedBooks: LiveData<PagedList<Book>> by lazy {
+        LivePagedListBuilder(Gdl.database.bookDao().getLivePagedDownloadedBooks(), 40).build()
+    }
 
     private var langListener: SharedPreferences.OnSharedPreferenceChangeListener
 
@@ -23,11 +27,11 @@ class CatalogViewModel : ViewModel() {
         langListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             if (key === LanguageUtil.getLangPrefKey()) {
                 dbSelections?.let {
-                    categories.removeSource(it)
+                    selections.removeSource(it)
                 }
                 dbSelections = Gdl.database.selectionDao().getLiveSelections(LanguageUtil.getCurrentLanguage())
                 dbSelections?.let {
-                    categories.addSource(it, { categories.postValue(it) })
+                    selections.addSource(it, { selections.postValue(it) })
                 }
             }
         }
@@ -43,15 +47,15 @@ class CatalogViewModel : ViewModel() {
         if (dbSelections == null) {
             dbSelections = Gdl.database.selectionDao().getLiveSelections(LanguageUtil.getCurrentLanguage())
             dbSelections?.let {
-                categories.addSource(it, { categories.postValue(it) })
+                selections.addSource(it, { selections.postValue(it) })
             }
         }
-        return categories
+        return selections
     }
 
-    fun getBooks(selectionLink: String): LiveData<List<Book>> {
+    fun getBooks(selectionLink: String): LiveData<PagedList<Book>> {
         if (!books.containsKey(selectionLink)) {
-            books[selectionLink] = Gdl.database.bookDao().getLiveBooks(selectionLink)
+            books[selectionLink] = LivePagedListBuilder(Gdl.database.bookDao().getLivePagedBooks(selectionLink), 20).build()
         }
         return books[selectionLink]!!
     }
@@ -65,12 +69,5 @@ class CatalogViewModel : ViewModel() {
             book = Gdl.database.bookDao().getLiveBook(bookId)
         }
         return book!!
-    }
-
-    fun getDownloadedBooks(): LiveData<List<Book>> {
-        if (downloadedBooks == null) {
-            downloadedBooks = Gdl.database.bookDao().getLiveDownloadedBooks()
-        }
-        return downloadedBooks!!
     }
 }

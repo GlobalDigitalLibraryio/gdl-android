@@ -25,7 +25,6 @@ class SelectionsAdapter(val fragment: Fragment, val callback: Callback) : Recycl
     }
 
     private var selections: List<Selection> = emptyList()
-    private var currentLanguage: String = ""
 
     interface Callback {
         fun onSelectionClicked(selection: Selection) {}
@@ -107,7 +106,7 @@ class SelectionsAdapter(val fragment: Fragment, val callback: Callback) : Recycl
             recyclerView.adapter = adapter
 
             ViewModelProviders.of(fragment).get(CatalogViewModel::class.java).getBooks(selection.rootLink).observe(fragment, Observer {
-                it?.let { adapter.updateBooks(it) }
+                it?.let { adapter.submitList(it) }
             })
 
             itemView.feed_more.setOnClickListener { callback.onSelectionClicked(selection) }
