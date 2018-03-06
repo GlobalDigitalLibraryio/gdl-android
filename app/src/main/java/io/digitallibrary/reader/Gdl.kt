@@ -119,5 +119,9 @@ class Gdl : Application() {
         fun screenGetHeightPixels(): Int {
             return rr.displayMetrics.heightPixels
         }
+
+        fun screenGetWidthPixels(): Int {
+            return rr.displayMetrics.widthPixels
+        }
     }
 }
