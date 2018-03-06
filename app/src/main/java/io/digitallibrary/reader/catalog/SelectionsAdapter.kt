@@ -59,7 +59,7 @@ class SelectionsAdapter(val fragment: Fragment, val callback: Callback) : Recycl
         return TYPE_SELECTION
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (getItemViewType(position)) {
             TYPE_HEADER -> {
                 val headerHolder = holder as HeaderViewHolder

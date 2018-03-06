@@ -6,12 +6,13 @@ import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
-import com.google.android.flexbox.FlexboxLayoutManager
-import com.google.android.flexbox.JustifyContent
+import io.digitallibrary.reader.Gdl
 import io.digitallibrary.reader.R
 import kotlinx.android.synthetic.main.fragment_my_library.*
 
@@ -24,16 +25,20 @@ class MyLibraryFragment : Fragment() {
 
     private lateinit var adapter: BooksAdapter
     private var canStartAnotherActivity = true
+    private lateinit var layoutManager: GridLayoutManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_my_library, container, false)
 
         val viewModel = ViewModelProviders.of(this).get(CatalogViewModel::class.java)
 
+        val displayWidth = Gdl.readerAppServices.screenGetWidthPixels()
+        val bookWidth = resources.getDimension(R.dimen.catalog_book_width)
+
         val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view)
-        val layoutManager = FlexboxLayoutManager(context)
-        layoutManager.justifyContent = JustifyContent.CENTER
+        layoutManager = GridLayoutManager(context, (displayWidth / bookWidth).toInt())
         recyclerView.layoutManager = layoutManager
+
         adapter = BooksAdapter(context!!, object : BooksAdapter.Callback {
             override fun onBookClicked(book: Book) {
                 if (canStartAnotherActivity) {
@@ -83,6 +88,13 @@ class MyLibraryFragment : Fragment() {
         })
 
         return view
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        val displayWidth = Gdl.readerAppServices.screenGetWidthPixels()
+        val bookWidth = resources.getDimension(R.dimen.catalog_book_width)
+        layoutManager.spanCount = (displayWidth / bookWidth).toInt()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

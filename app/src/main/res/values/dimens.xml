@@ -3,4 +3,5 @@
     <dimen name="button_standard_height">38dp</dimen>
     <dimen name="button_standard_width">180dp</dimen>
     <dimen name="button_standard_text_size">16sp</dimen>
+    <dimen name="catalog_book_width">101dp</dimen>
 </resources>

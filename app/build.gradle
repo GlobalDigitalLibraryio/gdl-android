@@ -81,9 +81,6 @@ dependencies {
     // Time parsing (backported java 8 time lib)
     implementation 'org.threeten:threetenbp:1.3.6'
 
-    // Layout for catalog grid
-    implementation 'com.google.android:flexbox:0.3.2'
-
     // NYPL dependencies (io7m should be replaced by kotlin)
     implementation 'com.io7m.jnull:io7m-jnull-core:1.0.2'
     implementation 'com.io7m.junreachable:io7m-junreachable-core:1.0.2'
