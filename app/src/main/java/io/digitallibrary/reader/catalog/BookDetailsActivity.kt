@@ -122,7 +122,7 @@ class BookDetailsActivity : AppCompatActivity() {
         })
     }
 
-    private fun updateActionButtons(activateTranstions: Boolean = false) {
+    private fun updateActionButtons(activateTransitions: Boolean = false) {
         launch(UI) {
             when (getDownloadStatus()) {
                 STATUS_NOT_DOWNLOADED -> {
@@ -162,7 +162,7 @@ class BookDetailsActivity : AppCompatActivity() {
                     book_download_button.visibility = GONE
                 }
             }
-            if (activateTranstions) {
+            if (activateTransitions) {
                 button_container.layoutTransition = LayoutTransition()
             }
         }
@@ -208,9 +208,9 @@ class BookDetailsActivity : AppCompatActivity() {
         return getDownloadStatus() == STATUS_DOWNLOADING
     }
 
-    private fun updateDownloadingState(activateTranstions: Boolean = false) {
+    private fun updateDownloadingState(activateTransitions: Boolean = false) {
         launch(CommonPool) {
-            updateActionButtons(activateTranstions)
+            updateActionButtons(activateTransitions)
             var isDownloading = isDownloading()
             while (isDownloading && !paused) {
                 isDownloading = isDownloading()
