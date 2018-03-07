@@ -58,8 +58,8 @@ class MyLibraryFragment : Fragment() {
         var initialView = true
         val shortDuration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
 
-        viewModel.getDownloadedBooks().observe(this, Observer {
-            it?.let { adapter.updateBooks(it) }
+        viewModel.downloadedBooks.observe(this, Observer {
+            it?.let { adapter.submitList(it) }
             activity?.invalidateOptionsMenu()
             if (initialView) {
                 // initial state is set without animations
@@ -133,7 +133,9 @@ class MyLibraryFragment : Fragment() {
         val confirmDialog = AlertDialog.Builder(activity).create()
         confirmDialog.setMessage(getString(R.string.my_library_confirm_delete_books))
         confirmDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.dialog_action_delete), { _, _ ->
-            deleteBooks(adapter.getSelectedBooks())
+            adapter.forEachSelected {
+                deleteBook(it)
+            }
             adapter.setSelectMode(false)
         })
         confirmDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.dialog_action_cancel), { _, _ -> })
@@ -155,7 +157,7 @@ class MyLibraryFragment : Fragment() {
             menu?.findItem(R.id.my_library_action_edit_cancel)?.isVisible = false
             menu?.findItem(R.id.my_library_action_edit_select_all)?.isVisible = false
             menu?.findItem(R.id.my_library_action_edit_delete)?.isVisible = false
-            menu?.findItem(R.id.my_library_action_edit)?.isVisible = adapter.size() > 0
+            menu?.findItem(R.id.my_library_action_edit)?.isVisible = adapter.itemCount > 0
         }
         super.onPrepareOptionsMenu(menu)
     }

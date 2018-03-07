@@ -66,12 +66,11 @@ class CatalogActivity : AppCompatActivity() {
                     canStartAnotherActivity = false
                 }
             }
-        }
-        )
+        })
         recyclerView.adapter = adapter
 
         viewModel.getBooks(selectionLink).observe(this, Observer {
-            it?.let { adapter.updateBooks(it) }
+            it?.let { adapter.submitList(it) }
         })
     }
 

@@ -1,6 +1,7 @@
 package io.digitallibrary.reader.catalog
 
 import android.arch.lifecycle.LiveData
+import android.arch.paging.DataSource
 import android.arch.persistence.room.*
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -101,10 +102,10 @@ abstract class BookDao {
             "ON books.id = book_selections_map.book_id " +
             "WHERE book_selections_map.selection_link = :selectionLink " +
             "ORDER BY book_selections_map.view_order")
-    abstract fun getLiveBooks(selectionLink: String): LiveData<List<Book>>
+    abstract fun getLivePagedBooks(selectionLink: String): DataSource.Factory<Int, Book>
 
     @Query("SELECT * FROM books WHERE downloaded IS NOT NULL")
-    abstract fun getLiveDownloadedBooks(): LiveData<List<Book>>
+    abstract fun getLivePagedDownloadedBooks(): DataSource.Factory<Int, Book>
 
     @Query("SELECT COUNT(id) FROM books WHERE language_link = :languageLink LIMIT 1")
     abstract fun haveLanguage(languageLink: String): Boolean
