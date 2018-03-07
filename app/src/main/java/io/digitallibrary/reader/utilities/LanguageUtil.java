@@ -11,17 +11,23 @@ public class LanguageUtil {
     private static final String TAG = "LanguageUtil";
 
     private static final String PREF_ID_CURRENT_LANG = "io.digitallibrary.reader.LANG";
+    private static final String PREF_ID_CURRENT_LANG_DISP_TXT = "io.digitallibrary.reader.LANG_DISP_TXT";
 
+    /**
+     * Get the Pref key you can listen to for language changes
+     *
+     * @return Language pref key
+     */
     public static String getLangPrefKey() {
         return PREF_ID_CURRENT_LANG;
     }
 
     /**
-     * Get the currently selected languageLink. Defaults to English if none is selected.
+     * Get the currently selected language link. Defaults to English if none is selected.
      *
-     * @return The root rootLink to the currently selected languageLink.
+     * @return The root link to the currently selected language.
      */
-    public static String getCurrentLanguage() {
+    public static String getCurrentLanguageLink() {
         Prefs p = Gdl.Companion.getSharedPrefs();
         String currentLanguageRootLink = p.getString(PREF_ID_CURRENT_LANG);
         if (currentLanguageRootLink != null && currentLanguageRootLink.length() > 0) {
@@ -32,13 +38,29 @@ public class LanguageUtil {
     }
 
     /**
-     * Set the current book languageLink. This will trigger a new parse operation on the
-     * new languageLink.
+     * Get the currently selected language display text. Defaults to English if none is selected.
      *
-     * @param languageRootLink The root rootLink to the wanted languageLink.
+     * @return The display text for the currently selected language.
      */
-    public static void setLanguage(String languageRootLink) {
+    public static String getCurrentLanguageDisplayText() {
+        Prefs p = Gdl.Companion.getSharedPrefs();
+        String currentLanguageRootLink = p.getString(PREF_ID_CURRENT_LANG_DISP_TXT);
+        if (currentLanguageRootLink != null && currentLanguageRootLink.length() > 0) {
+            return currentLanguageRootLink;
+        } else {
+            return OpdsParser.INITIAL_LANGUAGE_TEXT;
+        }
+    }
+
+    /**
+     * Set the current book language. This will trigger a new parse operation on the
+     * new language.
+     *
+     * @param languageRootLink The root link to the wanted language.
+     */
+    public static void setLanguage(String languageRootLink, String languageDisplayText) {
         Prefs p = Gdl.Companion.getSharedPrefs();
         p.putString(PREF_ID_CURRENT_LANG, languageRootLink);
+        p.putString(PREF_ID_CURRENT_LANG_DISP_TXT, languageDisplayText);
     }
 }

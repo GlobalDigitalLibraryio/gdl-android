@@ -21,7 +21,6 @@
         <!-- Main entry point for the application. -->
         <activity
             android:name=".SplashActivity"
-            android:configChanges="orientation|screenSize"
             android:contentDescription="@string/app_name"
             android:label="@string/app_short_name"
             android:theme="@style/SplashTheme">
@@ -66,7 +65,6 @@
 
         <activity
             android:name=".SelectLanguageActivity"
-            android:configChanges="orientation|screenSize"
             android:theme="@style/Settings" />
 
         <activity

@@ -29,7 +29,7 @@ class CatalogViewModel : ViewModel() {
                 dbSelections?.let {
                     selections.removeSource(it)
                 }
-                dbSelections = Gdl.database.selectionDao().getLiveSelections(LanguageUtil.getCurrentLanguage())
+                dbSelections = Gdl.database.selectionDao().getLiveSelections(LanguageUtil.getCurrentLanguageLink())
                 dbSelections?.let {
                     selections.addSource(it, { selections.postValue(it) })
                 }
@@ -45,7 +45,7 @@ class CatalogViewModel : ViewModel() {
 
     fun getSelections(): LiveData<List<Selection>> {
         if (dbSelections == null) {
-            dbSelections = Gdl.database.selectionDao().getLiveSelections(LanguageUtil.getCurrentLanguage())
+            dbSelections = Gdl.database.selectionDao().getLiveSelections(LanguageUtil.getCurrentLanguageLink())
             dbSelections?.let {
                 selections.addSource(it, { selections.postValue(it) })
             }
