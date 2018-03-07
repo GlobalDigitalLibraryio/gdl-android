@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
@@ -43,19 +44,20 @@ class SelectLanguageActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setTitle(R.string.languages_selection_title)
 
-        var currentLanguageText = ""
-        val languages: MutableList<Language> = ArrayList()
+        var selectedLangPosition = -1
 
-        val langItemsAdapter = object : ArrayAdapter<String>(this@SelectLanguageActivity, R.layout.item_language_row, R.id.language_name) {
+        val langItemsAdapter = object : ArrayAdapter<Language>(this@SelectLanguageActivity, R.layout.item_language_row, R.id.language_name) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val v = super.getView(position, convertView, parent)
-                if (getItem(position) == currentLanguageText) {
+                if (position == selectedLangPosition) {
                     v.isSelected = true
                     v.findViewById<View>(R.id.checked).visibility = View.VISIBLE
                     v.findViewById<TextView>(R.id.language_name).setTextColor(ContextCompat.getColor(context, R.color.gdl_green))
+                    v.findViewById<TextView>(R.id.language_name).text = getItem(position).languageName
                 } else {
                     v.findViewById<View>(R.id.checked).visibility = View.INVISIBLE
                     v.findViewById<TextView>(R.id.language_name).setTextColor(ContextCompat.getColor(context, R.color.dark_text))
+                    v.findViewById<TextView>(R.id.language_name).text = getItem(position).languageName
                 }
                 return v
             }
@@ -63,45 +65,46 @@ class SelectLanguageActivity : AppCompatActivity() {
 
         language_list.adapter = langItemsAdapter
 
-        ViewModelProviders.of(this).get(LanguagesViewModel::class.java).currentLanguageText.observe(this, Observer {
-            it?.let { currentLanguageText = it }
-        })
-
         val shortDuration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
         ViewModelProviders.of(this).get(LanguagesViewModel::class.java).languages.observe(this, Observer {
             it?.let {
-                if (it.isEmpty()) {
-                    spinner.visibility = View.VISIBLE
-                    spinner.alpha = 0f
-                    spinner.animate().alpha(1f).setDuration(shortDuration).setListener(null)
-                    language_list.animate().alpha(0f).setDuration(shortDuration).setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator?) {
-                            super.onAnimationEnd(animation)
-                            language_list.visibility = View.GONE
-                        }
-                    })
-                } else {
-                    language_list.visibility = View.VISIBLE
-                    language_list.alpha = 0f
-                    language_list.animate().alpha(1f).setDuration(shortDuration).setListener(null)
-                    spinner.animate().alpha(0f).setDuration(shortDuration).setListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator?) {
-                            super.onAnimationEnd(animation)
-                            spinner.visibility = View.GONE
-                        }
-                    })
-                }
+                val fadeFromView = if (it.isEmpty()) { language_list } else { spinner }
+                val fadeToView = if (it.isEmpty()) { spinner } else { language_list }
 
-                languages.clear()
-                languages.addAll(it)
+                fadeFromView.animate().alpha(0f).setDuration(shortDuration).setListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+                        fadeFromView.visibility = View.GONE
+                    }
+                })
+
+                fadeToView.visibility = View.VISIBLE
+                fadeToView.alpha = 0f
+                fadeToView.animate().alpha(1f).setDuration(shortDuration).setListener(null)
+
+                val currentLink = LanguageUtil.getCurrentLanguageLink()
+                selectedLangPosition = it.indexOfFirst { it.link == currentLink }
+
                 langItemsAdapter.clear()
-                langItemsAdapter.addAll(it.map { it.languageName })
+                langItemsAdapter.addAll(it)
                 langItemsAdapter.notifyDataSetChanged()
+
+                // Need to wait for the view to be drawn, before we know if we have to scroll
+                val layoutListener = object : ViewTreeObserver.OnGlobalLayoutListener {
+                    override fun onGlobalLayout() {
+                        language_list.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                        if (language_list.lastVisiblePosition < selectedLangPosition + 2) {
+                            language_list.smoothScrollToPosition(selectedLangPosition + 2)
+                        } else if (language_list.firstVisiblePosition > selectedLangPosition - 2) {
+                            language_list.smoothScrollToPosition(selectedLangPosition - 2)
+                        }                    }
+                }
+                language_list.viewTreeObserver.addOnGlobalLayoutListener(layoutListener)
             }
         })
 
         language_list.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            LanguageUtil.setLanguage(languages[position].link)
+            LanguageUtil.setLanguage(langItemsAdapter.getItem(position).link, langItemsAdapter.getItem(position).languageName)
             Gdl.fetchOpdsFeed()
             val intent = Intent(LANGUAGE_SELECTED)
             LocalBroadcastManager.getInstance(Gdl.appContext).sendBroadcast(intent)

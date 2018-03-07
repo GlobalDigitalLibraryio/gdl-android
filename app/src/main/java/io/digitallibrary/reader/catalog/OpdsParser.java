@@ -752,7 +752,7 @@ public class OpdsParser {
      *                 Will be called on the UI thread.
      */
     public void start(Callback callback) {
-        String langLink = LanguageUtil.getCurrentLanguage();
+        String langLink = LanguageUtil.getCurrentLanguageLink();
         ProgressMonitor.LanguageTasksMonitor task = progressMonitor.getLanguageTask(langLink);
         task.ensureHaveStarted(callback);
     }
