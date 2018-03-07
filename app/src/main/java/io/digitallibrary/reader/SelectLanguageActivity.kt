@@ -44,6 +44,8 @@ class SelectLanguageActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setTitle(R.string.languages_selection_title)
 
+        // -1 means not set
+        // Correct value will be set when languages is added to the adapter
         var selectedLangPosition = -1
 
         val langItemsAdapter = object : ArrayAdapter<Language>(this@SelectLanguageActivity, R.layout.item_language_row, R.id.language_name) {
@@ -68,8 +70,8 @@ class SelectLanguageActivity : AppCompatActivity() {
         val shortDuration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
         ViewModelProviders.of(this).get(LanguagesViewModel::class.java).languages.observe(this, Observer {
             it?.let {
-                val fadeFromView = if (it.isEmpty()) { language_list } else { spinner }
-                val fadeToView = if (it.isEmpty()) { spinner } else { language_list }
+                val fadeFromView = if (it.isEmpty()) language_list else spinner
+                val fadeToView = if (it.isEmpty()) spinner else language_list
 
                 fadeFromView.animate().alpha(0f).setDuration(shortDuration).setListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator?) {
@@ -93,11 +95,14 @@ class SelectLanguageActivity : AppCompatActivity() {
                 val layoutListener = object : ViewTreeObserver.OnGlobalLayoutListener {
                     override fun onGlobalLayout() {
                         language_list.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                        if (language_list.lastVisiblePosition < selectedLangPosition + 2) {
-                            language_list.smoothScrollToPosition(selectedLangPosition + 2)
-                        } else if (language_list.firstVisiblePosition > selectedLangPosition - 2) {
-                            language_list.smoothScrollToPosition(selectedLangPosition - 2)
-                        }                    }
+                        if (selectedLangPosition != -1) {
+                            if (language_list.lastVisiblePosition < selectedLangPosition + 2) {
+                                language_list.smoothScrollToPosition(selectedLangPosition + 2)
+                            } else if (language_list.firstVisiblePosition > selectedLangPosition - 2) {
+                                language_list.smoothScrollToPosition(selectedLangPosition - 2)
+                            }
+                        }
+                    }
                 }
                 language_list.viewTreeObserver.addOnGlobalLayoutListener(layoutListener)
             }
