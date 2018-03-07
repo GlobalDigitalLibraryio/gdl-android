@@ -17,6 +17,8 @@ data class Book(
         var id: String = "",
         var title: String? = null,
         var downloaded: String? = null,
+        @ColumnInfo(name = "downloaded_datetime")
+        var downloadedDateTime: OffsetDateTime? = null,
         @ColumnInfo(name = "reading_level")
         var readingLevel: Int? = null,
         @ColumnInfo(name = "language_link")
@@ -67,6 +69,7 @@ abstract class BookDao {
             if (id == -1L) {
                 getBook(newBook.id)?.let { oldBook ->
                     newBook.downloaded = oldBook.downloaded
+                    newBook.downloadedDateTime= oldBook.downloadedDateTime
                     newBook.readingPosition = oldBook.readingPosition
                 }
                 update(newBook)
@@ -104,7 +107,7 @@ abstract class BookDao {
             "ORDER BY book_selections_map.view_order")
     abstract fun getLivePagedBooks(selectionLink: String): DataSource.Factory<Int, Book>
 
-    @Query("SELECT * FROM books WHERE downloaded IS NOT NULL")
+    @Query("SELECT * FROM books WHERE downloaded IS NOT NULL ORDER BY DATETIME(downloaded_datetime) DESC")
     abstract fun getLivePagedDownloadedBooks(): DataSource.Factory<Int, Book>
 
     @Query("SELECT COUNT(id) FROM books WHERE language_link = :languageLink LIMIT 1")
