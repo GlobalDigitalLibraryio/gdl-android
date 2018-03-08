@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "2247deb35ba2e4d497ca34c4dbb80922",
+    "identityHash": "d35e61491643dae3279aef35278d8d49",
     "entities": [
       {
         "tableName": "selections",
@@ -44,7 +44,7 @@
       },
       {
         "tableName": "books",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT, `downloaded` TEXT, `reading_level` INTEGER, `language_link` TEXT, `license` TEXT, `author` TEXT, `publisher` TEXT, `reading_position` TEXT, `image` TEXT, `thumb` TEXT, `epub_link` TEXT, `pdf_link` TEXT, `description` TEXT, `updated` TEXT, `created` TEXT, `published` TEXT, `version` INTEGER, `state` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT, `downloaded` TEXT, `downloaded_datetime` TEXT, `reading_level` INTEGER, `language_link` TEXT, `license` TEXT, `author` TEXT, `publisher` TEXT, `reading_position` TEXT, `image` TEXT, `thumb` TEXT, `epub_link` TEXT, `pdf_link` TEXT, `description` TEXT, `updated` TEXT, `created` TEXT, `published` TEXT, `version` INTEGER, `state` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -61,6 +61,12 @@
           {
             "fieldPath": "downloaded",
             "columnName": "downloaded",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "downloadedDateTime",
+            "columnName": "downloaded_datetime",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -327,7 +333,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"2247deb35ba2e4d497ca34c4dbb80922\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"d35e61491643dae3279aef35278d8d49\")"
     ]
   }
 }

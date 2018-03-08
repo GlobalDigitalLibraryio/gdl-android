@@ -7,6 +7,7 @@ import android.content.Intent
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
+import org.threeten.bp.OffsetDateTime
 
 class DownloadBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -30,6 +31,7 @@ class DownloadBroadcastReceiver : BroadcastReceiver() {
                             if (localUri != null) {
                                 Gdl.database.bookDao().getBook(it)?.let {
                                     it.downloaded = localUri.toString()
+                                    it.downloadedDateTime = OffsetDateTime.now()
                                     Gdl.database.bookDao().update(it)
                                 }
                             }

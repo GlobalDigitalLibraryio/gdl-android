@@ -59,31 +59,37 @@ class MyLibraryFragment : Fragment() {
         val shortDuration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
 
         viewModel.downloadedBooks.observe(this, Observer {
-            it?.let { adapter.submitList(it) }
+            val oldIsEmpty = adapter.itemCount == 0
+            val newIsEmpty = it?.isEmpty() == true
+
+            adapter.submitList(it)
             activity?.invalidateOptionsMenu()
+
             if (initialView) {
                 // initial state is set without animations
-                if (it?.isNotEmpty() == true) {
-                    recycler_view.visibility = View.VISIBLE
-                } else {
+                if (newIsEmpty) {
                     empty_message.visibility = View.VISIBLE
+                } else {
+                    recycler_view.visibility = View.VISIBLE
                 }
                 initialView = false
             } else {
-                // animate between states
-                val fadeFromView = if (it?.isNotEmpty() == true) { empty_message } else { recycler_view }
-                val fadeToView = if (it?.isNotEmpty() == true) { recycler_view } else { empty_message }
+                // Only animate when we have to
+                if (oldIsEmpty != newIsEmpty) {
+                    val fadeFromView = if (newIsEmpty) recycler_view else empty_message
+                    val fadeToView = if (newIsEmpty) empty_message else recycler_view
 
-                fadeFromView.animate().alpha(0f).setDuration(shortDuration).setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator?) {
-                        super.onAnimationEnd(animation)
-                        fadeFromView.visibility = View.GONE
-                    }
-                })
+                    fadeFromView.animate().alpha(0f).setDuration(shortDuration).setListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator?) {
+                            super.onAnimationEnd(animation)
+                            fadeFromView.visibility = View.GONE
+                        }
+                    })
 
-                fadeToView.visibility = View.VISIBLE
-                fadeToView.alpha = 0f
-                fadeToView.animate().alpha(1f).setDuration(shortDuration).setListener(null)
+                    fadeToView.visibility = View.VISIBLE
+                    fadeToView.alpha = 0f
+                    fadeToView.animate().alpha(1f).setDuration(shortDuration).setListener(null)
+                }
             }
         })
 

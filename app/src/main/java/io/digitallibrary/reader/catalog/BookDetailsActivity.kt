@@ -142,7 +142,7 @@ class BookDetailsActivity : AppCompatActivity() {
                     book_read_book.visibility = GONE
                     book_delete_book.visibility = GONE
                     book_downloading.visibility = VISIBLE
-                    book_download_cancel.visibility = GONE
+                    book_download_cancel.visibility = VISIBLE
                     book_download_button.visibility = GONE
                 }
                 STATUS_FAILED -> {

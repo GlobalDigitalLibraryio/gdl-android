@@ -31,6 +31,7 @@ fun deleteBook(book: Book) {
         }
 
         book.downloaded = null
+        book.downloadedDateTime = null
         Gdl.database.bookDao().update(book)
         Gdl.database.bookDownloadDao().delete(book.id)
     }
