@@ -31,7 +31,7 @@ import okhttp3.Response;
 public class OpdsParser {
     private static final String TAG = "OpdsParser";
 
-    // This sets the default languageLink
+    // This sets the default language
     public static final String INITIAL_LANGUAGE_TEXT = "English";
     public static final String INITIAL_LANGUAGE = "https://opds.staging.digitallibrary.io/eng/root.xml";
     private static final String INITIAL_REQUEST_URL = INITIAL_LANGUAGE;
@@ -60,7 +60,7 @@ public class OpdsParser {
     private static final String LINK_ATTR_FACET_IS_ACTIVE_VALUE_FALSE = "false";
 
     // Entries
-    // id, title, updated, and rootLink same as in acquisition root
+    // id, title, updated, and root same as in acquisition root
     private static final String AUTHOR = "author";
     private static final String AUTHOR_NAME = "name";
     private static final String LICENSE = "dc:license";
@@ -140,7 +140,7 @@ public class OpdsParser {
 
                 lock.lock();
                 try {
-                    tasks.remove(this);
+                    tasks.remove(languageLink);
                 } finally {
                     lock.unlock();
                 }
@@ -189,7 +189,7 @@ public class OpdsParser {
 
                 lock.lock();
                 try {
-                    tasks.remove(this);
+                    tasks.remove(languageLink);
                 } finally {
                     lock.unlock();
                 }
@@ -210,6 +210,7 @@ public class OpdsParser {
                         ParseFacetsTask updateJob = new ParseFacetsTask(this);
                         addTask(updateJob);
                         updateJob.execute(languageLink);
+
                     }
                 } finally {
                     lock.unlock();
@@ -269,6 +270,7 @@ public class OpdsParser {
                 try {
                     response = client.newCall(request).execute();
                 } catch (IOException e) {
+                    Log.e(TAG, "HTTP I/O error for url: " + url);
                     e.printStackTrace();
                     taskMonitor.failed(Error.HTTP_IO_ERROR, e.getMessage());
                     return null;
@@ -276,6 +278,7 @@ public class OpdsParser {
 
                 if (!response.isSuccessful()) {
                     // Response not in [200..300)
+                    Log.e(TAG, "HTTP request (" + url + ") failed with response code " + response.code());
                     taskMonitor.failed(Error.HTTP_REQUEST_FAILED, null);
                     return null;
                 }
@@ -329,6 +332,9 @@ public class OpdsParser {
                                 }
                                 eventType = xpp.next();
                             }
+                        } else if (eventType == XmlPullParser.START_TAG && xpp.getName().equals(ENTRY)) {
+                            // We are past the facets, so stop parsing
+                            break;
                         }
                         eventType = xpp.next();
                     }
@@ -345,6 +351,8 @@ public class OpdsParser {
                         Language old = oldLanguages.get(l.getLink());
 
                         if (old != null) {
+                            // Need to copy over the updated field, as it's not from the OPDS feed
+                            l.setUpdated(old.getUpdated());
                             if (!l.equals(old)) {
                                 updatedLanguages.add(l);
                             }
@@ -471,6 +479,7 @@ public class OpdsParser {
                 try {
                     response = client.newCall(request).execute();
                 } catch (IOException e) {
+                    Log.e(TAG, "HTTP IO error for url: " + url);
                     e.printStackTrace();
                     taskMonitor.failed(Error.HTTP_IO_ERROR, e.getMessage());
                     return null;
@@ -478,6 +487,7 @@ public class OpdsParser {
 
                 if (!response.isSuccessful()) {
                     // Response not in [200..300)
+                    Log.e(TAG, "HTTP request (" + url + ") failed with response code " + response.code());
                     taskMonitor.failed(Error.HTTP_REQUEST_FAILED, null);
                     return null;
                 }
@@ -655,6 +665,7 @@ public class OpdsParser {
                         newJob.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, usd);
                     }
                 } catch (XmlPullParserException | IOException e) {
+                    Log.e(TAG, "Parsing " + url + " failed");
                     e.printStackTrace();
                     taskMonitor.failed(Error.XML_PARSING_ERROR, null);
                     return null;
@@ -682,6 +693,7 @@ public class OpdsParser {
 
         @Override
         protected Void doInBackground(Void... voids) {
+            Log.v(TAG, "PostUpdateTask for " + taskMonitor.languageLink + " running");
             // If taskMonitor.version isn't set, we haven't updated the books
             if (taskMonitor.version != -1) {
                 // Delete old not downloaded books
