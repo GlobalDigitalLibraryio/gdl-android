@@ -33,7 +33,7 @@ public class LanguageUtil {
         if (currentLanguageRootLink != null && currentLanguageRootLink.length() > 0) {
             return currentLanguageRootLink;
         } else {
-            return OpdsParser.INITIAL_LANGUAGE;
+            return null;
         }
     }
 
@@ -48,7 +48,7 @@ public class LanguageUtil {
         if (currentLanguageRootLink != null && currentLanguageRootLink.length() > 0) {
             return currentLanguageRootLink;
         } else {
-            return OpdsParser.INITIAL_LANGUAGE_TEXT;
+            return null;
         }
     }
 
@@ -60,7 +60,7 @@ public class LanguageUtil {
      */
     public static void setLanguage(String languageRootLink, String languageDisplayText) {
         Prefs p = Gdl.Companion.getSharedPrefs();
-        p.putString(PREF_ID_CURRENT_LANG, languageRootLink);
         p.putString(PREF_ID_CURRENT_LANG_DISP_TXT, languageDisplayText);
+        p.putString(PREF_ID_CURRENT_LANG, languageRootLink);
     }
 }

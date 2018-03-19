@@ -31,10 +31,8 @@ import okhttp3.Response;
 public class OpdsParser {
     private static final String TAG = "OpdsParser";
 
-    // This sets the default language
-    public static final String INITIAL_LANGUAGE_TEXT = "English";
-    public static final String INITIAL_LANGUAGE = "https://opds.staging.digitallibrary.io/eng/root.xml";
-    private static final String INITIAL_REQUEST_URL = INITIAL_LANGUAGE;
+    // Default language is decided by the backend
+    private static final String INITIAL_REQUEST_URL = "https://api.staging.digitallibrary.io/book-api/opds/root.xml";
 
     // TAGS - acquisition root
     private static final String ID = "id";
@@ -242,9 +240,10 @@ public class OpdsParser {
                 OkHttpClient client = Gdl.Companion.getHttpClient();
                 LanguageDao langDao = Gdl.Companion.getDatabase().languageDao();
                 SelectionDao selectionDao = Gdl.Companion.getDatabase().selectionDao();
-                String languageLink = INITIAL_LANGUAGE;
 
                 String url = INITIAL_REQUEST_URL;
+
+                String languageLink = null;
 
                 if (langLinks.length > 0) {
                     String langRoot = langLinks[0];
@@ -254,13 +253,17 @@ public class OpdsParser {
                     }
                 }
 
+                if (languageLink != null) {
+                    url = languageLink;
+
+                    Language oldLang = langDao.getLanguage(languageLink);
+                    if (oldLang != null) {
+                        oldUpdated = oldLang.getUpdated();
+                    }
+                }
+
                 // We do not care about the books before we parse each selection
                 url += "?page-size=0";
-
-                Language oldLang = langDao.getLanguage(languageLink);
-                if (oldLang != null) {
-                    oldUpdated = oldLang.getUpdated();
-                }
 
                 Request request = new Request.Builder().url(url).build();
                 Response response;
@@ -311,6 +314,11 @@ public class OpdsParser {
                                         l.setViewOrder(++langCounter);
                                         if (activeValue.equals(LINK_ATTR_FACET_IS_ACTIVE_VALUE_TRUE)) {
                                             currentLanguage = href;
+                                            if (languageLink == null) {
+                                                // Set default language if we don't have it
+                                                LanguageUtil.setLanguage(href, title);
+                                                taskMonitor.languageLink = href;
+                                            }
                                         }
                                         languages.add(l);
                                     } else if (groupValue.equals(LINK_ATTR_FACET_GROUP_VALUE_SELECTION)) {
