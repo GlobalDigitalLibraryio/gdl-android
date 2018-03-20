@@ -45,9 +45,11 @@ class CatalogViewModel : ViewModel() {
 
     fun getSelections(): LiveData<List<Selection>> {
         if (dbSelections == null) {
-            dbSelections = Gdl.database.selectionDao().getLiveSelections(LanguageUtil.getCurrentLanguageLink())
-            dbSelections?.let {
-                selections.addSource(it, { selections.postValue(it) })
+            LanguageUtil.getCurrentLanguageLink()?.let { currentLangLink ->
+                dbSelections = Gdl.database.selectionDao().getLiveSelections(currentLangLink)
+                dbSelections?.let { liveSelection ->
+                    selections.addSource(liveSelection, { updatedSelection -> selections.postValue(updatedSelection) })
+                }
             }
         }
         return selections
