@@ -166,6 +166,8 @@ public final class ReaderActivity extends Activity
     protected void onCreate(final @Nullable Bundle state) {
         Log.d(TAG, "starting");
 
+        setTheme(Gdl.Companion.getThemeId());
+
         super.onCreate(state);
         this.setContentView(R.layout.activity_reader);
 

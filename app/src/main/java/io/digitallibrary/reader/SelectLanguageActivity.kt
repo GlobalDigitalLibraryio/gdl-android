@@ -17,9 +17,12 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import io.digitallibrary.reader.catalog.Language
-import io.digitallibrary.reader.utilities.LanguageUtil
+import io.digitallibrary.reader.utilities.SelectionsUtil
 import kotlinx.android.synthetic.main.activity_select_language.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
 
 class SelectLanguageActivity : AppCompatActivity() {
     companion object {
@@ -38,6 +41,7 @@ class SelectLanguageActivity : AppCompatActivity() {
     }
 
     override fun onCreate(state: Bundle?) {
+        setTheme(Gdl.getSettingsThemeId())
         super.onCreate(state)
         setContentView(R.layout.activity_select_language)
         setSupportActionBar(toolbar)
@@ -84,7 +88,7 @@ class SelectLanguageActivity : AppCompatActivity() {
                 fadeToView.alpha = 0f
                 fadeToView.animate().alpha(1f).setDuration(shortDuration).setListener(null)
 
-                val currentLink = LanguageUtil.getCurrentLanguageLink()
+                val currentLink = SelectionsUtil.getCurrentLanguageLink()
                 selectedLangPosition = it.indexOfFirst { it.link == currentLink }
 
                 langItemsAdapter.clear()
@@ -109,7 +113,14 @@ class SelectLanguageActivity : AppCompatActivity() {
         })
 
         language_list.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            LanguageUtil.setLanguage(langItemsAdapter.getItem(position).link, langItemsAdapter.getItem(position).languageName)
+            SelectionsUtil.setLanguage(langItemsAdapter.getItem(position).link, langItemsAdapter.getItem(position).languageName)
+            // Try to get default category, if we don't have any yet, the OPDS parser will set one
+            launch(UI) {
+                val categories = async { Gdl.database.categoryDao().getCategories(langItemsAdapter.getItem(position).link) }.await()
+                if (categories.isNotEmpty()) {
+                    SelectionsUtil.setCategory(categories[0].link, categories[0].title)
+                }
+            }
             Gdl.fetchOpdsFeed()
             val intent = Intent(LANGUAGE_SELECTED)
             LocalBroadcastManager.getInstance(Gdl.appContext).sendBroadcast(intent)

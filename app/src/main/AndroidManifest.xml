@@ -15,8 +15,7 @@
         android:contentDescription="@string/app_name"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:largeHeap="true"
-        android:theme="@style/GdlTheme">
+        android:largeHeap="true">
 
         <!-- Main entry point for the application. -->
         <activity
@@ -45,14 +44,13 @@
             android:name=".GdlActivity"
             android:configChanges="orientation|screenSize"
             android:contentDescription="@string/selections_title"
-            android:label="@string/selections_title"
-            android:theme="@style/GdlTheme" />
+            android:label="@string/selections_title" />
 
         <activity
             android:name=".HandleIntentsActivity"
             android:contentDescription="@string/app_name"
             android:label="@string/app_short_name"
-            android:theme="@style/Theme.AppCompat.Translucent">
+            android:theme="@style/GdlTranslucent">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -64,40 +62,36 @@
         </activity>
 
         <activity
-            android:name=".SelectLanguageActivity"
-            android:theme="@style/Settings" />
+            android:name=".SelectLanguageActivity" />
 
         <activity
             android:name=".reader.ReaderActivity"
             android:configChanges="orientation|screenSize"
             android:contentDescription="@string/reader"
-            android:label="@string/reader"
-            android:theme="@style/GdlTheme" />
+            android:label="@string/reader" />
         <activity
             android:name=".reader.ReaderSettingsActivity"
             android:configChanges="orientation|screenSize"
             android:contentDescription="@string/reader_accessibility_settings"
             android:label="@string/reader_accessibility_settings"
-            android:theme="@style/Theme.AppCompat.Translucent" />
+            android:theme="@style/GdlTranslucent" />
         <activity
             android:name=".reader.ReaderTOCActivity"
             android:configChanges="orientation|screenSize"
             android:contentDescription="@string/reader_toc"
             android:label="@string/reader_toc"
-            android:theme="@style/Theme.AppCompat.Translucent" />
+            android:theme="@style/GdlTranslucent" />
 
         <activity
             android:name=".catalog.CatalogActivity"
             android:configChanges="orientation|screenSize"
             android:contentDescription="@string/selections_title"
-            android:label="@string/selections_title"
-            android:theme="@style/GdlTheme" />
+            android:label="@string/selections_title" />
         <activity
             android:name=".catalog.BookDetailsActivity"
             android:configChanges="orientation|screenSize"
             android:contentDescription="@string/selections_title"
-            android:label="@string/selections_title"
-            android:theme="@style/GdlTheme" />
+            android:label="@string/selections_title" />
 
         <receiver
             android:name=".DownloadBroadcastReceiver"

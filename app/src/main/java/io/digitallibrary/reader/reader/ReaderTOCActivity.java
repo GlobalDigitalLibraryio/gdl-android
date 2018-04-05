@@ -11,6 +11,7 @@ import android.view.View;
 import com.io7m.jnull.NullCheck;
 import com.io7m.jnull.Nullable;
 
+import io.digitallibrary.reader.Gdl;
 import io.digitallibrary.reader.reader.ReaderTOC.TOCElement;
 
 /**
@@ -71,6 +72,7 @@ public final class ReaderTOCActivity extends AppCompatActivity implements Reader
 
     @Override
     protected void onCreate(final @Nullable Bundle state) {
+        setTheme(Gdl.Companion.getTranslucentThemeId());
         super.onCreate(state);
 
         Log.d(TAG, "onCreate");

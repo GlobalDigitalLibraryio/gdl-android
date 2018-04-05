@@ -16,7 +16,6 @@
     <!-- Book details -->
     <string name="book_details_license">License</string>
     <string name="book_details_authors">Authors</string>
-    <string name="book_details_level">Level %1$d</string>
     <string name="book_details_publisher">From %1$s</string>
     <string name="book_details_published">Published</string>
     <string name="book_details_action_read">Read</string>

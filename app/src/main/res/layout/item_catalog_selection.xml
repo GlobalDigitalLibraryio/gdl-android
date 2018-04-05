@@ -23,7 +23,6 @@
             android:paddingTop="5dp"
             android:text="@string/selections_unknown_feed"
             android:textAllCaps="true"
-            android:textColor="@color/dark_text"
             android:textSize="16sp" />
 
         <Button
@@ -42,7 +41,7 @@
             android:layout_marginTop="5dp"
             android:text="@string/selections_more_feed"
             android:textAllCaps="true"
-            android:textColor="@color/gdl_links"
+            android:textColor="?android:textColorLink"
             android:textSize="14sp" />
 
     </RelativeLayout>
