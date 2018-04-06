@@ -33,7 +33,7 @@ public class OpdsParser {
     private static final String TAG = "OpdsParser";
 
     // Default language is decided by the backend
-    private static final String INITIAL_REQUEST_URL = "https://api.test.digitallibrary.io/book-api/opds/root.xml";
+    private static final String INITIAL_REQUEST_URL = "https://api.staging.digitallibrary.io/book-api/opds/v1/root.xml";
 
     // TAGS - acquisition root
     private static final String ID = "id";
