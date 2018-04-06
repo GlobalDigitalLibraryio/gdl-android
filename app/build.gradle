@@ -17,7 +17,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
-        // Save room schemas in /schemas so we can save the history in git
+        // Save room schemas in /schemas so we can see the history in git
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
@@ -40,6 +40,10 @@ kotlin {
     }
 }
 
+kapt {
+    mapDiagnosticLocations = true
+}
+
 repositories {
     maven {
         url "https://nexus.librarysimplified.org:8443/nexus/content/repositories/releases-no-drm/"
@@ -47,14 +51,6 @@ repositories {
 }
 
 dependencies {
-//    implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-//    implementation 'com.google.dagger:dagger:2.14.1'
-//    annotationProcessor 'com.google.dagger:dagger-compiler:2.14.1'
-//    implementation 'com.google.dagger:dagger-android:2.14.1'
-//    implementation 'com.google.dagger:dagger-android-support:2.14.1'
-//    annotationProcessor 'com.google.dagger:dagger-android-processor:2.14.1'
-
     // Android support libraries
     implementation 'com.android.support:appcompat-v7:27.1.0'
     implementation 'com.android.support:cardview-v7:27.1.0'
@@ -62,9 +58,9 @@ dependencies {
     implementation 'com.android.support:support-v4:27.1.0'
 
     // Android Architecture Components
-    implementation "android.arch.lifecycle:extensions:1.1.0"
+    implementation "android.arch.lifecycle:extensions:1.1.1"
     implementation "android.arch.persistence.room:runtime:1.0.0"
-    implementation "android.arch.paging:runtime:1.0.0-alpha6"
+    implementation "android.arch.paging:runtime:1.0.0-alpha7"
     kapt "android.arch.persistence.room:compiler:1.0.0"
 
     // Kotlin

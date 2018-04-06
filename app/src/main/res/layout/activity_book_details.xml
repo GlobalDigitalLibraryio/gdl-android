@@ -49,7 +49,6 @@
                             android:gravity="center"
                             android:maxLines="2"
                             android:text="@string/placeholder_short_title"
-                            android:textColor="@color/dark_text"
                             android:textSize="26sp" />
 
                         <TextView
@@ -60,7 +59,6 @@
                             android:gravity="center"
                             android:maxLines="1"
                             android:text="@string/placeholder_publisher"
-                            android:textColor="@color/dark_text"
                             android:textSize="14sp" />
 
                         <TextView
@@ -70,7 +68,6 @@
                             android:layout_marginTop="15dp"
                             android:gravity="center"
                             android:text="@string/placeholder_description"
-                            android:textColor="@color/dark_text"
                             android:textSize="12sp" />
 
                         <Button
@@ -151,7 +148,6 @@
                                 android:layout_marginStart="10dp"
                                 android:text="@string/book_details_downloading"
                                 android:textAllCaps="true"
-                                android:textColor="@color/dark_text"
                                 android:textSize="@dimen/button_standard_text_size" />
                         </LinearLayout>
 
@@ -241,7 +237,6 @@
                                 android:layout_marginTop="15dp"
                                 android:text="@string/book_details_published"
                                 android:textAllCaps="true"
-                                android:textColor="@color/dark_text"
                                 android:textSize="12sp"
                                 android:textStyle="bold" />
 
@@ -252,31 +247,32 @@
                                 android:layout_marginEnd="15dp"
                                 android:layout_marginStart="15dp"
                                 android:text="@string/placeholder_date"
-                                android:textColor="@color/dark_text"
                                 android:textSize="12sp" />
                         </LinearLayout>
 
                         <RelativeLayout
                             android:id="@+id/book_level_container"
-                            android:layout_width="90dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="30dp"
                             android:layout_alignParentEnd="true"
                             android:layout_marginTop="15dp"
-                            android:background="@drawable/level_background">
+                            android:background="#00BA6E">
 
                             <RelativeLayout
+                                android:id="@+id/triangle"
                                 android:layout_width="30dp"
                                 android:layout_height="30dp"
                                 android:background="@drawable/level_background_triangle"
                                 android:rotation="90" />
 
                             <TextView
+                                android:layout_toEndOf="@+id/triangle"
                                 android:id="@+id/book_level"
+                                android:layout_marginEnd="15dp"
+                                android:layout_marginStart="-5dp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"
-                                android:layout_centerInParent="true"
-                                android:paddingEnd="15dp"
+                                android:layout_centerVertical="true"
                                 android:shadowColor="#33000000"
                                 android:shadowDx="2"
                                 android:shadowDy="2"
@@ -300,7 +296,6 @@
                         android:layout_marginTop="15dp"
                         android:text="@string/book_details_authors"
                         android:textAllCaps="true"
-                        android:textColor="@color/dark_text"
                         android:textSize="12sp"
                         android:textStyle="bold" />
 
@@ -312,7 +307,6 @@
                         android:layout_marginEnd="15dp"
                         android:layout_marginStart="15dp"
                         android:text="@string/placeholder_long_author"
-                        android:textColor="@color/dark_text"
                         android:textSize="12sp" />
 
                     <TextView
@@ -323,7 +317,6 @@
                         android:layout_marginStart="15dp"
                         android:text="@string/book_details_license"
                         android:textAllCaps="true"
-                        android:textColor="@color/dark_text"
                         android:textSize="12sp"
                         android:textStyle="bold" />
 
@@ -335,7 +328,6 @@
                         android:layout_marginEnd="15dp"
                         android:layout_marginStart="15dp"
                         android:text="@string/placeholder_description"
-                        android:textColor="@color/dark_text"
                         android:textSize="12sp" />
 
                 </LinearLayout>

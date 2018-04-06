@@ -2,15 +2,15 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d35e61491643dae3279aef35278d8d49",
+    "identityHash": "bdf22c28a3d38c55bbb28944189218c0",
     "entities": [
       {
         "tableName": "selections",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`root_link` TEXT NOT NULL, `title` TEXT, `language_link` TEXT, `view_order` INTEGER, PRIMARY KEY(`root_link`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`link` TEXT NOT NULL, `title` TEXT, `category_link` TEXT, `view_order` INTEGER, PRIMARY KEY(`link`), FOREIGN KEY(`category_link`) REFERENCES `categories`(`link`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
-            "fieldPath": "rootLink",
-            "columnName": "root_link",
+            "fieldPath": "link",
+            "columnName": "link",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -21,8 +21,8 @@
             "notNull": false
           },
           {
-            "fieldPath": "languageLink",
-            "columnName": "language_link",
+            "fieldPath": "categoryLink",
+            "columnName": "category_link",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -35,16 +35,28 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "root_link"
+            "link"
           ],
           "autoGenerate": false
         },
         "indices": [],
-        "foreignKeys": []
+        "foreignKeys": [
+          {
+            "table": "categories",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "category_link"
+            ],
+            "referencedColumns": [
+              "link"
+            ]
+          }
+        ]
       },
       {
         "tableName": "books",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT, `downloaded` TEXT, `downloaded_datetime` TEXT, `reading_level` INTEGER, `language_link` TEXT, `license` TEXT, `author` TEXT, `publisher` TEXT, `reading_position` TEXT, `image` TEXT, `thumb` TEXT, `epub_link` TEXT, `pdf_link` TEXT, `description` TEXT, `updated` TEXT, `created` TEXT, `published` TEXT, `version` INTEGER, `state` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT, `downloaded` TEXT, `downloaded_datetime` TEXT, `reading_level` TEXT, `language_link` TEXT, `license` TEXT, `author` TEXT, `publisher` TEXT, `reading_position` TEXT, `image` TEXT, `thumb` TEXT, `epub_link` TEXT, `pdf_link` TEXT, `description` TEXT, `updated` TEXT, `created` TEXT, `published` TEXT, `version` INTEGER, `state` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -73,7 +85,7 @@
           {
             "fieldPath": "readingLevel",
             "columnName": "reading_level",
-            "affinity": "INTEGER",
+            "affinity": "TEXT",
             "notNull": false
           },
           {
@@ -215,18 +227,18 @@
         ]
       },
       {
-        "tableName": "book_selections_map",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`book_id` TEXT NOT NULL, `selection_link` TEXT NOT NULL, `view_order` INTEGER, `language_link` TEXT, `version` INTEGER, PRIMARY KEY(`book_id`, `selection_link`), FOREIGN KEY(`book_id`) REFERENCES `books`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`selection_link`) REFERENCES `selections`(`root_link`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "tableName": "selection_book",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`selection_link` TEXT NOT NULL, `book_id` TEXT NOT NULL, `view_order` INTEGER, `language_link` TEXT, `version` INTEGER, PRIMARY KEY(`book_id`, `selection_link`), FOREIGN KEY(`book_id`) REFERENCES `books`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`selection_link`) REFERENCES `selections`(`link`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
-            "fieldPath": "bookId",
-            "columnName": "book_id",
+            "fieldPath": "selectionLink",
+            "columnName": "selection_link",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "selectionLink",
-            "columnName": "selection_link",
+            "fieldPath": "bookId",
+            "columnName": "book_id",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -287,10 +299,48 @@
               "selection_link"
             ],
             "referencedColumns": [
-              "root_link"
+              "link"
             ]
           }
         ]
+      },
+      {
+        "tableName": "categories",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`link` TEXT NOT NULL, `title` TEXT, `language_link` TEXT, `view_order` INTEGER, PRIMARY KEY(`link`))",
+        "fields": [
+          {
+            "fieldPath": "link",
+            "columnName": "link",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "languageLink",
+            "columnName": "language_link",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "viewOrder",
+            "columnName": "view_order",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "link"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       },
       {
         "tableName": "languages",
@@ -333,7 +383,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"d35e61491643dae3279aef35278d8d49\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"bdf22c28a3d38c55bbb28944189218c0\")"
     ]
   }
 }

@@ -19,11 +19,12 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import io.digitallibrary.reader.Gdl;
-import io.digitallibrary.reader.utilities.LanguageUtil;
+import io.digitallibrary.reader.utilities.SelectionsUtil;
 import io.digitallibrary.reader.utilities.UIThread;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /**
  * Parser for the GDL OPDS feed.
@@ -32,7 +33,7 @@ public class OpdsParser {
     private static final String TAG = "OpdsParser";
 
     // Default language is decided by the backend
-    private static final String INITIAL_REQUEST_URL = "https://api.staging.digitallibrary.io/book-api/opds/root.xml";
+    private static final String INITIAL_REQUEST_URL = "https://api.staging.digitallibrary.io/book-api/opds/v1/root.xml";
 
     // TAGS - acquisition root
     private static final String ID = "id";
@@ -51,6 +52,7 @@ public class OpdsParser {
     // Facet links
     private static final String LINK_ATTR_REL_VALUE_FACET = "http://opds-spec.org/facet";
     private static final String LINK_ATTR_FACET_GROUP = "opds:facetGroup";
+    private static final String LINK_ATTR_FACET_GROUP_VALUE_CATEGORY = "Category";
     private static final String LINK_ATTR_FACET_GROUP_VALUE_SELECTION = "Selection";
     private static final String LINK_ATTR_FACET_GROUP_VALUE_LANGUAGE = "Languages";
     private static final String LINK_ATTR_FACET_IS_ACTIVE = "opds:activeFacet";
@@ -91,7 +93,7 @@ public class OpdsParser {
         private final ReentrantLock lock = new ReentrantLock();
         private Map<String, LanguageTasksMonitor> tasks = new HashMap<>(10);
 
-        public LanguageTasksMonitor getLanguageTask(String languageLink) {
+        LanguageTasksMonitor getLanguageTask(String languageLink) {
             LanguageTasksMonitor task = tasks.get(languageLink);
             if (task == null) {
                 task = new LanguageTasksMonitor(languageLink);
@@ -103,7 +105,7 @@ public class OpdsParser {
         /**
          * Class to keep track of all tasks that needs to run to update selections and books
          * for one language. Synchronises all parsing threads.
-         *
+         * <p>
          * Also contains some data needed by all tasks.
          */
         private class LanguageTasksMonitor {
@@ -114,12 +116,31 @@ public class OpdsParser {
             private long version = -1;
             private String languageLink;
             private OffsetDateTime updated;
+            private OffsetDateTime previousUpdated;
+            private boolean shouldDeleteOldBooks = false;
+
+            private String updateLangLink = null;
+            private String updateLangDispText = null;
+            private String updateCategoryLink = null;
+            private String updateCategoryDispText = null;
 
             LanguageTasksMonitor(String languageLink) {
                 this.languageLink = languageLink;
             }
 
-            public void failed(final Error error, final String message) {
+            void updateLanguageLink(String newLanguageLink) {
+                lock.lock();
+                try {
+                    tasks.remove(languageLink);
+                    languageLink = newLanguageLink;
+                    tasks.put(languageLink, this);
+                } finally {
+                    lock.unlock();
+                }
+            }
+
+            void failed(final Error error, final String message) {
+                Log.e(TAG, "Parsing language " + languageLink + " failed with error: " + error + " and msg: " + message);
                 lock.lock();
                 haveError = true;
                 List<Callback> cs = callbacks;
@@ -144,7 +165,7 @@ public class OpdsParser {
                 }
             }
 
-            public void addTask(AsyncTask task) {
+            void addTask(AsyncTask task) {
                 lock.lock();
                 try {
                     subTasks.add(task);
@@ -153,7 +174,7 @@ public class OpdsParser {
                 }
             }
 
-            public void removeTask(AsyncTask task) {
+            void removeTask(AsyncTask task) {
                 lock.lock();
                 try {
                     subTasks.remove(task);
@@ -165,7 +186,7 @@ public class OpdsParser {
                 }
             }
 
-            public boolean isRunning() {
+            boolean isRunning() {
                 lock.lock();
                 try {
                     return subTasks.size() > 0;
@@ -175,7 +196,7 @@ public class OpdsParser {
             }
 
             // Called from onPostExecute from the PostUpdateTask and runs on the UI thread
-            public void finish() {
+            void finish() {
                 lock.lock();
                 List<Callback> cs = callbacks;
                 callbacks = new ArrayList<>(10);
@@ -205,9 +226,9 @@ public class OpdsParser {
                         callbacks.add(callback);
                     }
                     if (!isRunning()) {
-                        ParseFacetsTask updateJob = new ParseFacetsTask(this);
+                        ParseLanguagesAndCategoriesTask updateJob = new ParseLanguagesAndCategoriesTask(this);
                         addTask(updateJob);
-                        updateJob.execute(languageLink);
+                        updateJob.execute();
 
                     }
                 } finally {
@@ -223,42 +244,34 @@ public class OpdsParser {
      * language. This task runs alone, but will start multiple ParseSelectionPageTask in parallel
      * for each selection.
      */
-    private static class ParseFacetsTask extends AsyncTask<String, Void, Void> {
+    private static class ParseLanguagesAndCategoriesTask extends AsyncTask<Void, Void, Void> {
         private ProgressMonitor.LanguageTasksMonitor taskMonitor;
-        private String currentLanguage = null;
-        private List<Language> languages = new ArrayList<>(20);
-        private List<Selection> selections = new ArrayList<>(10);
-        private OffsetDateTime oldUpdated = null;
 
-        ParseFacetsTask(ProgressMonitor.LanguageTasksMonitor taskMonitor) {
+        ParseLanguagesAndCategoriesTask(ProgressMonitor.LanguageTasksMonitor taskMonitor) {
             this.taskMonitor = taskMonitor;
         }
 
         @Override
-        protected Void doInBackground(String... langLinks) {
+        protected Void doInBackground(Void... voids) {
             try {
                 OkHttpClient client = Gdl.Companion.getHttpClient();
                 LanguageDao langDao = Gdl.Companion.getDatabase().languageDao();
-                SelectionDao selectionDao = Gdl.Companion.getDatabase().selectionDao();
+                CategoryDao categoryDao = Gdl.Companion.getDatabase().categoryDao();
+
+                List<Language> languages = new ArrayList<>(20);
+                List<Category> categories = new ArrayList<>(10);
 
                 String url = INITIAL_REQUEST_URL;
-
-                String languageLink = null;
-
-                if (langLinks.length > 0) {
-                    String langRoot = langLinks[0];
-                    if (langRoot != null) {
-                        url = langRoot;
-                        languageLink = langRoot;
-                    }
+                // If we didn't get a url, this is the first time we parse this language
+                // If so, we'll get the URL from the facets
+                if (taskMonitor.languageLink != null) {
+                    url = taskMonitor.languageLink;
                 }
 
-                if (languageLink != null) {
-                    url = languageLink;
-
-                    Language oldLang = langDao.getLanguage(languageLink);
+                if (taskMonitor.languageLink != null) {
+                    Language oldLang = langDao.getLanguage(taskMonitor.languageLink);
                     if (oldLang != null) {
-                        oldUpdated = oldLang.getUpdated();
+                        taskMonitor.previousUpdated = oldLang.getUpdated();
                     }
                 }
 
@@ -268,7 +281,7 @@ public class OpdsParser {
                 Request request = new Request.Builder().url(url).build();
                 Response response;
 
-                Log.v(TAG, "ParseFacetsTask calling url: " + url);
+                Log.v(TAG, "ParseLanguagesAndCategoriesTask calling url: " + url);
 
                 try {
                     response = client.newCall(request).execute();
@@ -290,10 +303,16 @@ public class OpdsParser {
                     // Save the XmlPullParserFactory in the taskMonitor, so we don't recreate it later.
                     taskMonitor.xmlPullParserFactory = XmlPullParserFactory.newInstance();
                     XmlPullParser xpp = taskMonitor.xmlPullParserFactory.newPullParser();
-                    xpp.setInput(response.body().charStream());
+                    ResponseBody responseBody = response.body();
+                    if (responseBody == null) {
+                        taskMonitor.failed(Error.HTTP_IO_ERROR, "Could not get response body");
+                        return null;
+                    }
+                    xpp.setInput(responseBody.charStream());
 
                     int langCounter = 0;
-                    int selectionCounter = 0;
+                    int categoryCounter = 0;
+                    boolean haveActiveCategory = SelectionsUtil.getCurrentCategoryLink() != null;
 
                     // Parse facets
                     int eventType = xpp.getEventType();
@@ -313,22 +332,43 @@ public class OpdsParser {
                                         l.setLink(href);
                                         l.setViewOrder(++langCounter);
                                         if (activeValue.equals(LINK_ATTR_FACET_IS_ACTIVE_VALUE_TRUE)) {
-                                            currentLanguage = href;
-                                            if (languageLink == null) {
+                                            if (taskMonitor.languageLink == null) {
                                                 // Set default language if we don't have it
-                                                LanguageUtil.setLanguage(href, title);
-                                                taskMonitor.languageLink = href;
+                                                taskMonitor.updateLanguageLink(href);
+
+                                                // Update selected language after we save it to the db
+                                                taskMonitor.updateLangLink = href;
+                                                taskMonitor.updateLangDispText = title;
+
+                                            } else if (!taskMonitor.languageLink.equals(href)) {
+                                                taskMonitor.failed(Error.XML_PARSING_ERROR, "Active language facet doesn't match current language");
+                                                return null;
                                             }
                                         }
                                         languages.add(l);
-                                    } else if (groupValue.equals(LINK_ATTR_FACET_GROUP_VALUE_SELECTION)) {
-                                        Selection c = new Selection();
+                                    } else if (groupValue.equals(LINK_ATTR_FACET_GROUP_VALUE_CATEGORY)) {
+                                        if (taskMonitor.languageLink == null) {
+                                            // We should not be missing language here
+                                            taskMonitor.failed(Error.XML_PARSING_ERROR, "Missing active language after parsing categories");
+                                            return null;
+                                        }
+                                        Category c = new Category();
                                         // Languages should appear before selection
-                                        c.setLanguageLink(currentLanguage);
-                                        c.setRootLink(href);
+                                        c.setLanguageLink(taskMonitor.languageLink);
+                                        c.setLink(href);
                                         c.setTitle(title);
-                                        c.setViewOrder(++selectionCounter);
-                                        selections.add(c);
+                                        c.setViewOrder(++categoryCounter);
+                                        categories.add(c);
+
+                                        // Set the first category as active, if we don't already have an active one
+                                        if (!haveActiveCategory) {
+
+                                            // Update selected category after we save it to the db
+                                            taskMonitor.updateCategoryLink = href;
+                                            taskMonitor.updateCategoryDispText = title;
+
+                                            haveActiveCategory = true;
+                                        }
                                     }
                                 }
                             }
@@ -345,6 +385,12 @@ public class OpdsParser {
                             break;
                         }
                         eventType = xpp.next();
+                    }
+
+                    if (taskMonitor.languageLink == null) {
+                        // We should not be missing language here
+                        taskMonitor.failed(Error.XML_PARSING_ERROR, "Missing active language after parsing facets");
+                        return null;
                     }
 
                     List<Language> oldLanguagesList = langDao.getLanguages();
@@ -374,22 +420,175 @@ public class OpdsParser {
                         langDao.updateLanguages(newLanguages, new ArrayList<>(oldLanguages.values()), updatedLanguages);
                     }
 
-                    List<Selection> oldSelectionList = selectionDao.getSelections(languageLink);
-                    Map<String, Selection> oldSelections = new HashMap<>(oldSelectionList.size());
-                    for (Selection s : oldSelectionList) {
-                        oldSelections.put(s.getRootLink(), s);
+                    List<Category> oldCategoriesList = categoryDao.getCategories(taskMonitor.languageLink);
+                    Map<String, Category> oldCategories = new HashMap<>(oldCategoriesList.size());
+                    for (Category c : oldCategoriesList) {
+                        oldCategories.put(c.getLink(), c);
+                    }
+                    List<Category> newCategories = new ArrayList<>(categories.size());
+                    List<Category> updatedCategories = new ArrayList<>(categories.size());
+
+                    for (Category c : categories) {
+                        Category old = oldCategories.get(c.getLink());
+
+                        if (old != null) {
+                            if (!c.equals(old)) {
+                                updatedCategories.add(c);
+                            }
+                            oldCategories.remove(c.getLink());
+                        } else {
+                            newCategories.add(c);
+                        }
+                    }
+
+                    if (!(newCategories.isEmpty() && oldCategories.isEmpty() && updatedCategories.isEmpty())) {
+                        categoryDao.updateCategories(newCategories, new ArrayList<>(oldCategories.values()), updatedCategories);
+                    }
+
+                    if (taskMonitor.updateLangLink != null) {
+                        SelectionsUtil.setLanguage(taskMonitor.languageLink, taskMonitor.updateLangDispText);
+                    }
+
+                    if (taskMonitor.updateCategoryLink != null) {
+                        SelectionsUtil.setCategory(taskMonitor.updateCategoryLink, taskMonitor.updateCategoryDispText);
+                    }
+
+                    taskMonitor.version = Gdl.Companion.getDatabase().bookDao().maxVersion(taskMonitor.languageLink) + 1;
+
+                    for (Category c : categories) {
+                        ParseSelectionsTask parseJob = new ParseSelectionsTask(taskMonitor);
+                        taskMonitor.addTask(parseJob);
+                        // Want these to run in parallel
+                        parseJob.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, c.getLink());
+                    }
+
+                } catch (XmlPullParserException | IOException e) {
+                    e.printStackTrace();
+                    taskMonitor.failed(Error.XML_PARSING_ERROR, null);
+                    return null;
+                } finally {
+                    response.close();
+                }
+                return null;
+            } finally {
+                taskMonitor.removeTask(this);
+            }
+        }
+    }
+
+    /**
+     * Task that parsers the facets part of the root of a OPDS feed for one specific language.
+     * This will update the database with the full language list, and the selections for the supplied
+     * language. This task runs alone, but will start multiple ParseSelectionPageTask in parallel
+     * for each selection.
+     */
+    private static class ParseSelectionsTask extends AsyncTask<String, Void, Void> {
+        private ProgressMonitor.LanguageTasksMonitor taskMonitor;
+
+        ParseSelectionsTask(ProgressMonitor.LanguageTasksMonitor taskMonitor) {
+            this.taskMonitor = taskMonitor;
+        }
+
+        @Override
+        protected Void doInBackground(String... categoryLinkInput) {
+            try {
+                OkHttpClient client = Gdl.Companion.getHttpClient();
+                SelectionDao selectionDao = Gdl.Companion.getDatabase().selectionDao();
+
+                List<Selection> selections = new ArrayList<>(10);
+
+                String categoryLink;
+                String url;
+
+                if (categoryLinkInput.length > 0) {
+                    categoryLink = categoryLinkInput[0];
+                    url = categoryLink;
+                } else {
+                    throw new IllegalArgumentException("Missing category link for ParseSelectionsTask");
+                }
+
+                // We do not care about the books before we parse each selection
+                url += "?page-size=0";
+
+                Request request = new Request.Builder().url(url).build();
+                Response response;
+
+                Log.v(TAG, "ParseSelectionsTask calling url: " + url);
+
+                try {
+                    response = client.newCall(request).execute();
+                } catch (IOException e) {
+                    Log.e(TAG, "HTTP I/O error for url: " + url);
+                    e.printStackTrace();
+                    taskMonitor.failed(Error.HTTP_IO_ERROR, e.getMessage());
+                    return null;
+                }
+
+                if (!response.isSuccessful()) {
+                    // Response not in [200..300)
+                    Log.e(TAG, "HTTP request (" + url + ") failed with response code " + response.code());
+                    taskMonitor.failed(Error.HTTP_REQUEST_FAILED, null);
+                    return null;
+                }
+
+                try {
+                    // Save the XmlPullParserFactory in the taskMonitor, so we don't recreate it later.
+                    taskMonitor.xmlPullParserFactory = XmlPullParserFactory.newInstance();
+                    XmlPullParser xpp = taskMonitor.xmlPullParserFactory.newPullParser();
+                    ResponseBody responseBody = response.body();
+                    if (responseBody == null) {
+                        taskMonitor.failed(Error.HTTP_IO_ERROR, "could not get response body");
+                        return null;
+                    }
+                    xpp.setInput(responseBody.charStream());
+
+                    int selectionCounter = 0;
+
+                    // Parse facets
+                    int eventType = xpp.getEventType();
+                    while (eventType != XmlPullParser.END_DOCUMENT) {
+                        if (eventType == XmlPullParser.START_TAG && xpp.getName().equals(LINK)) {
+                            String rel = xpp.getAttributeValue(null, LINK_ATTR_REL);
+                            if (rel != null && rel.equals(LINK_ATTR_REL_VALUE_FACET)) {
+                                String groupValue = xpp.getAttributeValue(null, LINK_ATTR_FACET_GROUP);
+                                if (groupValue.equals(LINK_ATTR_FACET_GROUP_VALUE_SELECTION)) {
+                                    String title = xpp.getAttributeValue(null, LINK_ATTR_TITLE);
+                                    String activeValue = xpp.getAttributeValue(null, LINK_ATTR_FACET_IS_ACTIVE);
+                                    String href = xpp.getAttributeValue(null, LINK_ATTR_HREF);
+
+                                    if (!(title == null || activeValue == null || href == null)) {
+                                        Selection s = new Selection();
+                                        s.setLink(href);
+                                        s.setTitle(title);
+                                        s.setViewOrder(++selectionCounter);
+                                        s.setCategoryLink(categoryLink);
+                                        selections.add(s);
+                                    }
+                                }
+                            }
+                        } else if (eventType == XmlPullParser.START_TAG && xpp.getName().equals(ENTRY)) {
+                            // We are past the facets, so stop parsing
+                            break;
+                        }
+                        eventType = xpp.next();
+                    }
+
+                    List<Selection> oldSelectionsList = selectionDao.getSelections(categoryLink);
+                    Map<String, Selection> oldSelections = new HashMap<>(oldSelectionsList.size());
+                    for (Selection s : oldSelectionsList) {
+                        oldSelections.put(s.getLink(), s);
                     }
                     List<Selection> newSelections = new ArrayList<>(selections.size());
                     List<Selection> updatedSelections = new ArrayList<>(selections.size());
 
                     for (Selection s : selections) {
-                        Selection old = oldSelections.get(s.getRootLink());
+                        Selection old = oldSelections.get(s.getLink());
 
                         if (old != null) {
                             if (!s.equals(old)) {
                                 updatedSelections.add(s);
                             }
-                            oldSelections.remove(s.getRootLink());
+                            oldSelections.remove(s.getLink());
                         } else {
                             newSelections.add(s);
                         }
@@ -399,14 +598,12 @@ public class OpdsParser {
                         selectionDao.updateSelections(newSelections, new ArrayList<>(oldSelections.values()), updatedSelections);
                     }
 
-                    if (taskMonitor.updated != null && taskMonitor.updated.equals(oldUpdated)) {
-                        // We are done - we are not setting taskMonitor.version, so
-                        // we can check for that in PostUpdateTask
+                    if (taskMonitor.updated != null && taskMonitor.previousUpdated != null && taskMonitor.updated.equals(taskMonitor.previousUpdated)) {
                         Log.v(TAG, "No need to update");
                         return null;
-                     }
-
-                    taskMonitor.version = Gdl.Companion.getDatabase().bookDao().maxVersion(languageLink) + 1;
+                    } else {
+                        taskMonitor.shouldDeleteOldBooks = true;
+                    }
 
                     for (Selection s : selections) {
                         ParseSelectionPageTask parseJob = new ParseSelectionPageTask(taskMonitor);
@@ -451,9 +648,7 @@ public class OpdsParser {
      */
     private static class ParseSelectionPageTask extends AsyncTask<ParseSelectionPageData, Void, Void> {
         private ProgressMonitor.LanguageTasksMonitor taskMonitor;
-        private List<Book> books = new ArrayList<>(20);
-        private List<BookSelectionMap> bookSelectionMaps = new ArrayList<>(20);
-        private String next = null;
+
 
         ParseSelectionPageTask(ProgressMonitor.LanguageTasksMonitor taskMonitor) {
             this.taskMonitor = taskMonitor;
@@ -463,6 +658,9 @@ public class OpdsParser {
         protected Void doInBackground(ParseSelectionPageData... parseSelectionPageDatas) {
             try {
                 OkHttpClient client = Gdl.Companion.getHttpClient();
+                final List<Book> books = new ArrayList<>(20);
+                final List<SelectionBook> selectionBooks = new ArrayList<>(20);
+                String next = null;
                 Response response;
 
                 if (parseSelectionPageDatas.length == 0) {
@@ -477,7 +675,7 @@ public class OpdsParser {
                 if (parseSelectionPageData.url != null) {
                     url = parseSelectionPageData.url;
                 } else {
-                    url = selection.getRootLink();
+                    url = selection.getLink();
                 }
 
                 Log.v(TAG, "ParseSelectionPageTask calling url: " + url);
@@ -502,7 +700,12 @@ public class OpdsParser {
 
                 try {
                     XmlPullParser xpp = taskMonitor.xmlPullParserFactory.newPullParser();
-                    xpp.setInput(response.body().charStream());
+                    ResponseBody responseBody = response.body();
+                    if (responseBody == null) {
+                        taskMonitor.failed(Error.HTTP_IO_ERROR, "could not get response body");
+                        return null;
+                    }
+                    xpp.setInput(responseBody.charStream());
 
                     // Parse facets
                     int eventType = xpp.getEventType();
@@ -512,7 +715,7 @@ public class OpdsParser {
                             xpp.next();
 
                             Book b = new Book();
-                            b.setLanguageLink(selection.getLanguageLink());
+                            b.setLanguageLink(taskMonitor.languageLink);
                             b.setVersion(taskMonitor.version);
 
                             while (!(eventType == XmlPullParser.END_TAG && xpp.getName().equals(ENTRY))) {
@@ -599,7 +802,7 @@ public class OpdsParser {
                                             if (levelType != null && levelType.equals(LEVEL_ATTR_TYPE_LEVEL)) {
                                                 String level = xpp.getAttributeValue(null, LEVEL_ATTR_TARGET);
                                                 if (level != null) {
-                                                    b.setReadingLevel(Integer.parseInt(level));
+                                                    b.setReadingLevel(level);
                                                 }
                                             }
                                             break;
@@ -637,13 +840,13 @@ public class OpdsParser {
 
                             books.add(b);
 
-                            BookSelectionMap bsm = new BookSelectionMap();
+                            SelectionBook bsm = new SelectionBook();
                             bsm.setBookId(b.getId());
-                            bsm.setLanguageLink(selection.getLanguageLink());
-                            bsm.setSelectionLink(selection.getRootLink());
+                            bsm.setLanguageLink(taskMonitor.languageLink);
+                            bsm.setSelectionLink(selection.getLink());
                             bsm.setViewOrder(viewOrderCounter++);
                             bsm.setVersion(taskMonitor.version);
-                            bookSelectionMaps.add(bsm);
+                            selectionBooks.add(bsm);
 
                         } else if (eventType == XmlPullParser.START_TAG && xpp.getName().equals(LINK)) {
                             String rel = xpp.getAttributeValue(null, LINK_ATTR_REL);
@@ -661,7 +864,7 @@ public class OpdsParser {
                         @Override
                         public void run() {
                             Gdl.Companion.getDatabase().bookDao().insertOrUpdate(books);
-                            Gdl.Companion.getDatabase().bookSelectionMapDao().insertOrUpdate(bookSelectionMaps);
+                            Gdl.Companion.getDatabase().selectionBooksDao().insertOrUpdate(selectionBooks);
                         }
                     });
 
@@ -689,7 +892,7 @@ public class OpdsParser {
 
     /**
      * Task that runs when all OPDS feeds have been parsed.
-     *
+     * <p>
      * Cleans up and calls callbacks.
      */
     private static class PostUpdateTask extends AsyncTask<Void, Void, Void> {
@@ -703,7 +906,7 @@ public class OpdsParser {
         protected Void doInBackground(Void... voids) {
             Log.v(TAG, "PostUpdateTask for " + taskMonitor.languageLink + " running");
             // If taskMonitor.version isn't set, we haven't updated the books
-            if (taskMonitor.version != -1) {
+            if (taskMonitor.version != -1 && taskMonitor.languageLink != null && taskMonitor.shouldDeleteOldBooks) {
                 // Delete old not downloaded books
                 BookDao bookDao = Gdl.Companion.getDatabase().bookDao();
                 bookDao.deleteOldNotDownloaded(taskMonitor.languageLink, taskMonitor.version);
@@ -712,16 +915,18 @@ public class OpdsParser {
                     b.setState(Catalog_dbKt.BOOK_STATE_REMOVED_FROM_GDL);
                     bookDao.update(b);
                 }
-                Gdl.Companion.getDatabase().bookSelectionMapDao().deleteOld(taskMonitor.languageLink, taskMonitor.version);
+                Gdl.Companion.getDatabase().selectionBooksDao().deleteOld(taskMonitor.languageLink, taskMonitor.version);
 
                 if (taskMonitor.updated != null) {
                     LanguageDao langDao = Gdl.Companion.getDatabase().languageDao();
                     Language lang = langDao.getLanguage(taskMonitor.languageLink);
-                    lang.setUpdated(taskMonitor.updated);
-                    langDao.update(lang);
+                    if (lang != null) {
+                        lang.setUpdated(taskMonitor.updated);
+                        langDao.update(lang);
+                    }
                 }
 
-                Gdl.Companion.getDatabase().bookSelectionMapDao().deleteOld(taskMonitor.languageLink, taskMonitor.version);
+                Gdl.Companion.getDatabase().selectionBooksDao().deleteOld(taskMonitor.languageLink, taskMonitor.version);
             }
             return null;
         }
@@ -754,7 +959,8 @@ public class OpdsParser {
 
         /**
          * Called when parsing current language failed.
-         * @param error Type of {@link Error}
+         *
+         * @param error   Type of {@link Error}
          * @param message Might be a message describing the error, or null.
          */
         void onError(Error error, @Nullable String message);
@@ -762,7 +968,7 @@ public class OpdsParser {
 
     /**
      * Fetch, parse, and save the OPDS feed for the currently selected language.
-     *
+     * <p>
      * If a job to parse current language is already started, this will not start a
      * new one, but it will still call the callback when the already running job is
      * finished.
@@ -772,7 +978,7 @@ public class OpdsParser {
      *                 Will be called on the UI thread.
      */
     public void start(Callback callback) {
-        String langLink = LanguageUtil.getCurrentLanguageLink();
+        String langLink = SelectionsUtil.getCurrentLanguageLink();
         ProgressMonitor.LanguageTasksMonitor task = progressMonitor.getLanguageTask(langLink);
         task.ensureHaveStarted(callback);
     }

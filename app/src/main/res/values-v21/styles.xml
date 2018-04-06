@@ -4,19 +4,41 @@
     <style name="GdlTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+
         <item name="colorPrimary">@color/gdl_blue</item>
         <item name="colorPrimaryDark">@color/gdl_dark</item>
-        <item name="colorAccent">@color/gdl_blue</item>
+        <item name="colorAccent">@color/gdl_blue_accent</item>
+
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/disabled_text</item>
+
+        <item name="android:textColor">@color/dark_text</item>
+        <item name="android:textColorLink">@color/gdl_links</item>
+
         <item name="colorControlNormal">@color/white</item>
         <item name="colorControlHighlight">@color/navigation_selected</item>
-        <item name="android:textColor">@color/gdl_links</item>
-        <item name="android:textColorPrimary">@color/dark_text</item>
         <item name="android:actionMenuTextColor">@color/white</item>
+        <!--Need without android namespace to support lower api versions-->
+        <item name="actionMenuTextColor">@color/white</item>
+
+        <item name="android:scrollbarSize">4dp</item>
+        <item name="android:scrollbarThumbVertical">@color/gdl_blue</item>
+        <item name="android:scrollbarTrackVertical">@color/scrollbar_bg</item>
+
+        <item name="android:alertDialogTheme">@style/GdlAlertDialog</item>
     </style>
 
-    <style name="Header" parent="GdlTheme">
-        <item name="android:textColor">@color/dark_text</item>
-        <item name="android:textColorPrimary">@color/white</item>
+    <style name="GdlAlertDialog" parent="android:Theme.Material.Light.Dialog.Alert">
+        <item name="colorAccent">@color/gdl_links</item>
+        <item name="android:textColorPrimary">@color/dark_text</item>
+        <item name="android:textColor">@color/gdl_links</item>
+    </style>
+
+    <style name="GdlThemeClassroom" parent="GdlTheme">
+        <item name="colorPrimary">@color/gdl_classroom</item>
+        <item name="colorPrimaryDark">@color/gdl_classroom_dark</item>
+        <item name="colorAccent">@color/gdl_classroom_accent</item>
+        <item name="android:scrollbarThumbVertical">@color/gdl_classroom</item>
     </style>
 
     <style name="Settings" parent="GdlTheme">
@@ -26,6 +48,11 @@
         <item name="android:actionMenuTextColor">@color/dark_text</item>
     </style>
 
+    <style name="SettingsClassroom" parent="Settings">
+        <item name="colorPrimaryDark">@color/gdl_classroom_dark</item>
+        <item name="android:scrollbarThumbVertical">@color/gdl_classroom</item>
+    </style>
+
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowBackground">@drawable/splash</item>
         <item name="colorPrimaryDark">@color/gdl_dark</item>
@@ -33,17 +60,22 @@
 
     <style name="NavigationDrawer" parent="GdlTheme">
         <item name="android:textSize">14sp</item>
-        <item name="colorPrimary">@color/dark_text</item>
         <item name="android:textColorPrimary">@color/dark_text</item>
+        <item name="colorPrimary">@color/dark_text</item>
         <item name="colorControlHighlight">@color/navigation_selected</item>
         <item name="listPreferredItemPaddingLeft">72dp</item>
     </style>
 
-    <style name="Theme.AppCompat.Translucent" parent="GdlTheme">
+    <style name="GdlTranslucent" parent="GdlTheme">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
+    </style>
+
+    <style name="GdlTranslucentClassroom" parent="GdlTranslucent">
+        <item name="colorPrimaryDark">@color/gdl_classroom_dark</item>
+        <item name="android:scrollbarThumbVertical">@color/gdl_classroom</item>
     </style>
 
 </resources>

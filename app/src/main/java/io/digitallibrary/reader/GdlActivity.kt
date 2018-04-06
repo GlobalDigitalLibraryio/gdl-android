@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
 import android.os.Bundle
+import android.support.design.widget.TabLayout
 import android.support.v4.app.FragmentManager
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.ActionBarDrawerToggle
@@ -16,12 +17,17 @@ import android.util.Log
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import io.digitallibrary.reader.catalog.*
+import io.digitallibrary.reader.utilities.SelectionsUtil
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.experimental.CommonPool
 import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.launch
+import kotlin.properties.Delegates
+
 
 /**
  * The type of non-reader activities in the app.
@@ -37,7 +43,7 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
             LANGUAGE,
             MY_LIBRARY,
             CATALOG,
-            CATEGORIES;
+            SELECTIONS;
 
             companion object {
                 fun default(): NavChoices {
@@ -48,7 +54,10 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
     }
 
     private lateinit var mDrawerToggle: ActionBarDrawerToggle
-    private var broadcastReceiver: BroadcastReceiver? = null
+    private lateinit var broadcastReceiver: BroadcastReceiver
+    private lateinit var currentCategorySelections: List<Selection>
+    private lateinit var categories: List<Category>
+    private var themeId: Int by Delegates.notNull()
 
     override fun onBackStackChanged() {
         Log.i(TAG, "onBackStackChanged c: " + supportFragmentManager.backStackEntryCount)
@@ -89,12 +98,34 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
         }
     }
 
-    private lateinit var selections: List<Selection>
+    private fun getThemeColor(attr: Int, forTheme: Int): Int {
+        val themeAttr = theme.obtainStyledAttributes(forTheme, intArrayOf(attr))
+        val color = themeAttr.getColor(0, 0)
+        themeAttr.recycle()
+        return color
+    }
+
+    private fun checkIfNeedToUpdateTheme() {
+        val newThemeId = Gdl.getThemeId()
+        if (themeId != newThemeId) {
+            val primary = getThemeColor(R.attr.colorPrimary,newThemeId)
+            val primaryDark = getThemeColor(R.attr.colorPrimaryDark, newThemeId)
+            val accent = getThemeColor(R.attr.colorAccent, newThemeId)
+
+            toolbar.setBackgroundColor(primary)
+            tabs.setBackgroundColor(primary)
+            tabs.setSelectedTabIndicatorColor(accent)
+            window.statusBarColor = primaryDark
+
+            themeId = newThemeId
+            setTheme(themeId)
+        }
+    }
 
     override fun onCreate(state: Bundle?) {
+        themeId = Gdl.getThemeId()
+        setTheme(themeId)
         super.onCreate(state)
-        Log.v(TAG, "onCreate")
-
         setContentView(R.layout.activity_main)
 
         setSupportActionBar(toolbar)
@@ -120,16 +151,40 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
         }
 
         try {
-            LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver!!, IntentFilter(SelectLanguageActivity.LANGUAGE_SELECTED))
+            LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, IntentFilter(SelectLanguageActivity.LANGUAGE_SELECTED))
         } catch (e: NullPointerException) {
             Log.e(TAG, "Error setting up local broadcast receiver")
             e.printStackTrace()
         }
 
-        ViewModelProviders.of(this).get(CatalogViewModel::class.java).getSelections().observe(this, Observer {
+        ViewModelProviders.of(this).get(CatalogViewModel::class.java).getCurrentCategorySelections().observe(this, Observer {
             it?.let {
-                selections = it
+                currentCategorySelections = it
                 updateMenuCategories(it)
+                checkIfNeedToUpdateTheme()
+            }
+        })
+
+        ViewModelProviders.of(this).get(CatalogViewModel::class.java).getCategories().observe(this, Observer {
+            it?.let {
+                categories = it
+                updateTabCategories(it)
+                checkIfNeedToUpdateTheme()
+            }
+        })
+
+        tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                val cat = tab?.tag as Category
+                SelectionsUtil.setCategory(cat.link, cat.title)
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                // do nothing
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+                // do nothing
             }
         })
 
@@ -160,10 +215,10 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
                             }
                         }
                     }
-                    NavChoices.CATEGORIES.ordinal -> {
-                        val selection = selections[it.itemId - 10]
+                    NavChoices.SELECTIONS.ordinal -> {
+                        val selection = currentCategorySelections[it.itemId - 10]
                         val intent = Intent(applicationContext, CatalogActivity::class.java)
-                        intent.putExtra("selection_link", selection.rootLink)
+                        intent.putExtra("selection_link", selection.link)
                         startActivity(intent)
                     }
                 }
@@ -178,12 +233,10 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
         if (id >= 0) {
             launch(CommonPool) {
                 Gdl.database.bookDownloadDao().getBookDownload(id)?.let {
-                    it.bookId?.let {
-                        Gdl.database.bookDao().getBook(it)?.let {
-                            val intent = Intent(applicationContext, BookDetailsActivity::class.java)
-                            intent.putExtra("book_id", it.id)
-                            startActivity(intent)
-                        }
+                    Gdl.database.bookDao().getBook(it.bookId)?.let {
+                        val intent = Intent(applicationContext, BookDetailsActivity::class.java)
+                        intent.putExtra("book_id", it.id)
+                        startActivity(intent)
                     }
                 }
             }
@@ -192,10 +245,30 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
 
     private fun updateMenuCategories(selections: List<Selection>) {
         val menu: Menu = navigation.menu
-        menu.removeGroup(NavChoices.CATEGORIES.ordinal)
+        menu.removeGroup(NavChoices.SELECTIONS.ordinal)
         selections.forEachIndexed { index, selection ->
-            menu.add(NavChoices.CATEGORIES.ordinal, index + 10, NavChoices.CATEGORIES.ordinal, selection.title)
+            menu.add(NavChoices.SELECTIONS.ordinal, index + 10, NavChoices.SELECTIONS.ordinal, selection.title)
         }
+    }
+
+    private fun updateTabCategories(categories: List<Category>) {
+        if (categories.size > 1) {
+            tabs.visibility = View.VISIBLE
+            tabs.removeAllTabs()
+            val activeCategoryLink = SelectionsUtil.getCurrentCategoryLink()
+            categories.forEach {
+                val tab = tabs.newTab()
+                tab.text = it.title
+                tab.tag = it
+                tabs.addTab(tab)
+                if (it.link == activeCategoryLink) {
+                    tab.select()
+                }
+            }
+        } else {
+            tabs.visibility = View.GONE
+        }
+        checkIfNeedToUpdateTheme()
     }
 
     private fun setCurrentFragment(navChoice: NavChoices) {
@@ -204,13 +277,26 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
                 val f = MyLibraryFragment()
                 // Need to call commitAllowingStateLoss instead of just commit to avoid crash on old Android versions
                 supportFragmentManager.beginTransaction().replace(R.id.content_frame, f).commitAllowingStateLoss()
+                tabs.visibility = View.GONE
                 setTitle(R.string.my_library_title)
             }
             GdlActivity.Companion.NavChoices.CATALOG -> {
                 val f = CatalogFragment()
                 // Need to call commitAllowingStateLoss instead of just commit to avoid crash on old Android versions
                 supportFragmentManager.beginTransaction().replace(R.id.content_frame, f).commitAllowingStateLoss()
-                setTitle(R.string.selections_title)
+                setTitle(R.string.app_name)
+                launch(UI) {
+                    async {
+                        val link = SelectionsUtil.getCurrentLanguageLink()
+                        if (link != null) {
+                            Gdl.database.categoryDao().getCategories(link)
+                        } else {
+                            null
+                        }
+                    }.await()?.let {
+                        updateTabCategories(it)
+                    }
+                }
             }
             else -> {
                 throw IllegalArgumentException("NavChoice $navChoice does not have a fragment")
@@ -219,7 +305,7 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
     }
 
     private fun setCheckedItem(menuItem: MenuItem) {
-        (0 until navigation.menu.size() - 1)
+        (0 until navigation.menu.size())
                 .map { navigation.menu.getItem(it) }
                 .forEach { it.isChecked = it == menuItem }
     }
@@ -247,10 +333,7 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
         }
 
         try {
-            if (broadcastReceiver != null) {
-                LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver!!)
-                broadcastReceiver = null
-            }
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver)
         } catch (e: NullPointerException) {
             Log.e(TAG, "Error removing local broadcast receiver")
             e.printStackTrace()

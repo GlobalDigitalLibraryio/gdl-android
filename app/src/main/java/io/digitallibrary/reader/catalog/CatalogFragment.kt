@@ -31,7 +31,7 @@ class CatalogFragment : Fragment() {
             override fun onSelectionClicked(selection: Selection) {
                 if (canStartAnotherActivity) {
                     val intent = Intent(activity, CatalogActivity::class.java)
-                    intent.putExtra("selection_link", selection.rootLink)
+                    intent.putExtra("selection_link", selection.link)
                     startActivity(intent)
                     canStartAnotherActivity = false
                 }
@@ -68,7 +68,7 @@ class CatalogFragment : Fragment() {
         }) }
         swipe_refresh_layout.setColorSchemeResources(R.color.gdl_links,  R.color.gdl_green)
 
-        ViewModelProviders.of(this).get(CatalogViewModel::class.java).getSelections().observe(this, Observer {
+        ViewModelProviders.of(this).get(CatalogViewModel::class.java).getCurrentCategorySelections().observe(this, Observer {
             it?.let { adapter.updateCategories(it) }
         })
     }

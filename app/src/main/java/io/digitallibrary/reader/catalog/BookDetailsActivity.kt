@@ -6,8 +6,10 @@ import android.app.DownloadManager
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.v4.content.FileProvider
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.View.GONE
@@ -27,8 +29,6 @@ import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 import java.io.File
 import java.net.URI
-import android.content.Intent
-import android.support.v4.content.FileProvider
 
 
 class BookDetailsActivity : AppCompatActivity() {
@@ -69,11 +69,13 @@ class BookDetailsActivity : AppCompatActivity() {
     private var book: Book? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(Gdl.getThemeId())
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_book_details)
+
         val bookId = intent.getStringExtra("book_id")
         val viewModel = ViewModelProviders.of(this).get(CatalogViewModel::class.java)
 
-        setContentView(R.layout.activity_book_details)
 
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -98,7 +100,7 @@ class BookDetailsActivity : AppCompatActivity() {
                             book_description.text = it.description
                             if (it.readingLevel != null) {
                                 book_level_container.visibility = VISIBLE
-                                book_level.text = getString(R.string.book_details_level, it.readingLevel)
+                                book_level.text = it.readingLevel
                             } else {
                                 book_level_container.visibility = GONE
                             }

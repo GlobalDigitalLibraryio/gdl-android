@@ -37,11 +37,12 @@ class CatalogActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(Gdl.getThemeId())
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_catalog)
+
         val selectionLink = intent.getStringExtra("selection_link")
         val viewModel = ViewModelProviders.of(this).get(CatalogViewModel::class.java)
-
-        setContentView(R.layout.activity_catalog)
 
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

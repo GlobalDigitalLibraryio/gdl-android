@@ -105,7 +105,7 @@ class SelectionsAdapter(val fragment: Fragment, val callback: Callback) : Recycl
             })
             recyclerView.adapter = adapter
 
-            ViewModelProviders.of(fragment).get(CatalogViewModel::class.java).getBooks(selection.rootLink).observe(fragment, Observer {
+            ViewModelProviders.of(fragment).get(CatalogViewModel::class.java).getBooks(selection.link).observe(fragment, Observer {
                 it?.let { adapter.submitList(it) }
             })
 

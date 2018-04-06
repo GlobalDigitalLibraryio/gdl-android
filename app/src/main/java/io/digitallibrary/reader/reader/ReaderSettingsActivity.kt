@@ -13,6 +13,8 @@ class ReaderSettingsActivity : AppCompatActivity() {
     private lateinit var settings: ReaderSettingsType
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(Gdl.getTranslucentThemeId())
+
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_reader_settings)

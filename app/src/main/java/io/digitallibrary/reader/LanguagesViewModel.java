@@ -9,7 +9,7 @@ import android.content.SharedPreferences;
 import java.util.List;
 
 import io.digitallibrary.reader.catalog.Language;
-import io.digitallibrary.reader.utilities.LanguageUtil;
+import io.digitallibrary.reader.utilities.SelectionsUtil;
 
 public class LanguagesViewModel extends ViewModel {
 
@@ -35,15 +35,15 @@ public class LanguagesViewModel extends ViewModel {
     }
 
     private void updateLanguageText() {
-        currentLanguageText.postValue(LanguageUtil.getCurrentLanguageDisplayText());
-        currentLanguageLink = LanguageUtil.getCurrentLanguageLink();
+        currentLanguageText.postValue(SelectionsUtil.getCurrentLanguageDisplayText());
+        currentLanguageLink = SelectionsUtil.getCurrentLanguageLink();
     }
 
     public LanguagesViewModel() {
         langListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                if (key.equals(LanguageUtil.getLangPrefKey())) {
+                if (key.equals(SelectionsUtil.getLangPrefKey())) {
                     updateLanguageText();
                 }
             }

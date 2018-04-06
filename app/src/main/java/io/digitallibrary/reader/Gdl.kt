@@ -9,6 +9,7 @@ import android.util.Log
 import io.digitallibrary.reader.catalog.CatalogDatabase
 import io.digitallibrary.reader.catalog.OpdsParser
 import io.digitallibrary.reader.reader.*
+import io.digitallibrary.reader.utilities.SelectionsUtil
 import okhttp3.OkHttpClient
 import java.io.IOException
 import java.net.ServerSocket
@@ -19,10 +20,6 @@ import java.util.concurrent.ThreadFactory
 
 /**
  * Global application state.
- */
-
-/**
- * Construct the application.
  */
 class Gdl : Application() {
     companion object {
@@ -74,6 +71,30 @@ class Gdl : Application() {
 
             return Executors.newFixedThreadPool(count, named)
         }
+
+        fun getThemeId(): Int {
+            return if ((SelectionsUtil.getCurrentCategoryLink() ?: "").contains("category/classroom_books")) {
+                R.style.GdlThemeClassroom
+            } else {
+                R.style.GdlTheme
+            }
+        }
+
+        fun getSettingsThemeId(): Int {
+            return if ((SelectionsUtil.getCurrentCategoryLink() ?: "").contains("category/classroom_books")) {
+                R.style.SettingsClassroom
+            } else {
+                R.style.Settings
+            }
+        }
+
+        fun getTranslucentThemeId(): Int {
+            return if ((SelectionsUtil.getCurrentCategoryLink() ?: "").contains("category/classroom_books")) {
+                R.style.GdlTranslucentClassroom
+            } else {
+                R.style.GdlTranslucent
+            }
+        }
     }
 
     override fun onCreate() {
@@ -82,7 +103,7 @@ class Gdl : Application() {
         Gdl.INSTANCE = this
         database = Room.databaseBuilder<CatalogDatabase>(this, CatalogDatabase::class.java, "catalog_db").build()
         httpClient = OkHttpClient()
-        httpClient.dispatcher().maxRequestsPerHost = 8
+        httpClient.dispatcher().maxRequestsPerHost = 20
         opdsOpdsParser = OpdsParser()
     }
 
