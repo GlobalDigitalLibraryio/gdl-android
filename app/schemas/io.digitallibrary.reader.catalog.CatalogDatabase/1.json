@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "bdf22c28a3d38c55bbb28944189218c0",
+    "identityHash": "b6b698199ea909b16653bd0cd702b13c",
     "entities": [
       {
         "tableName": "selections",
@@ -56,7 +56,7 @@
       },
       {
         "tableName": "books",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT, `downloaded` TEXT, `downloaded_datetime` TEXT, `reading_level` TEXT, `language_link` TEXT, `license` TEXT, `author` TEXT, `publisher` TEXT, `reading_position` TEXT, `image` TEXT, `thumb` TEXT, `epub_link` TEXT, `pdf_link` TEXT, `description` TEXT, `updated` TEXT, `created` TEXT, `published` TEXT, `version` INTEGER, `state` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT, `downloaded` TEXT, `downloaded_datetime` TEXT, `reading_level` TEXT, `language_link` TEXT, `license` TEXT, `publisher` TEXT, `reading_position` TEXT, `image` TEXT, `thumb` TEXT, `epub_link` TEXT, `pdf_link` TEXT, `description` TEXT, `updated` TEXT, `created` TEXT, `published` TEXT, `version` INTEGER, `state` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -97,12 +97,6 @@
           {
             "fieldPath": "license",
             "columnName": "license",
-            "affinity": "TEXT",
-            "notNull": false
-          },
-          {
-            "fieldPath": "author",
-            "columnName": "author",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -187,6 +181,56 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "contributors",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`author_id` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `book_id` TEXT NOT NULL, `type` TEXT, FOREIGN KEY(`book_id`) REFERENCES `books`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "authorId",
+            "columnName": "author_id",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bookId",
+            "columnName": "book_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "author_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "books",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "book_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       },
       {
         "tableName": "book_downloads",
@@ -383,7 +427,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"bdf22c28a3d38c55bbb28944189218c0\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"b6b698199ea909b16653bd0cd702b13c\")"
     ]
   }
 }

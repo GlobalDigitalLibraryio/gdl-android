@@ -20,6 +20,7 @@ class CatalogViewModel : ViewModel() {
 
     private val books: MutableMap<String, LiveData<PagedList<Book>>> = HashMap()
     private var book: LiveData<Book>? = null
+    private var bookContributors: LiveData<List<Contributor>>? = null
 
     val downloadedBooks: LiveData<PagedList<Book>> by lazy {
         LivePagedListBuilder(Gdl.database.bookDao().getLivePagedDownloadedBooks(), 40).build()
@@ -90,5 +91,12 @@ class CatalogViewModel : ViewModel() {
             book = Gdl.database.bookDao().getLiveBook(bookId)
         }
         return book!!
+    }
+
+    fun getBookContributors(bookId: String): LiveData<List<Contributor>> {
+        if (bookContributors?.value?.get(0)?.bookId != bookId) {
+            bookContributors = Gdl.database.bookDao().getLiveContributors(bookId)
+        }
+        return bookContributors!!
     }
 }

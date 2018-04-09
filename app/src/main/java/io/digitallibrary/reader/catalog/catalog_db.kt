@@ -24,7 +24,6 @@ data class Book(
         @ColumnInfo(name = "language_link")
         var languageLink: String? = null,
         var license: String? = null,
-        var author: String? = null,
         var publisher: String? = null,
         @ColumnInfo(name = "reading_position")
         var readingPosition: String? = null,
@@ -56,6 +55,13 @@ abstract class BookDao {
     @Delete
     abstract fun delete(books: List<Book>)
 
+    @Insert
+    abstract fun insert(contributors: List<Contributor>)
+
+    @Query("DELETE FROM contributors WHERE book_id = :bookId")
+    abstract fun deleteContributors(bookId: String)
+
+
     /**
      * Insert if book doesn't already exist.
      * Update if book id exists in db.
@@ -63,8 +69,10 @@ abstract class BookDao {
      * and copy them to the new book, so we don't overwrite any data we need.
      */
     @Transaction
-    open fun insertOrUpdate(books: List<Book>) {
-        books.forEach { newBook ->
+    open fun insertOrUpdate(books: List<BookWithContributors>) {
+        books.forEach { newBookWithContributors ->
+            val newBook = newBookWithContributors.book
+            val contributors = newBookWithContributors.contributors
             val id = insert(newBook)
             if (id == -1L) {
                 getBook(newBook.id)?.let { oldBook ->
@@ -73,7 +81,9 @@ abstract class BookDao {
                     newBook.readingPosition = oldBook.readingPosition
                 }
                 update(newBook)
+                deleteContributors(newBook.id)
             }
+            insert(contributors)
         }
     }
 
@@ -89,18 +99,21 @@ abstract class BookDao {
     @Query("SELECT * FROM books WHERE id = :bookId")
     abstract fun getLiveBook(bookId: String): LiveData<Book>
 
-    @Query(value = "SELECT id, title, downloaded, reading_level, books.language_link, license, author, " +
-            "publisher, reading_position, image, thumb, epub_link, pdf_link, description, updated, " +
-            "created, published, books.version, state " +
+    @Query("SELECT * FROM contributors WHERE book_id = :bookId")
+    abstract fun getLiveContributors(bookId: String): LiveData<List<Contributor>>
+
+    @Query(value = "SELECT id, title, downloaded, downloaded_datetime, reading_level, " +
+            "books.language_link, license, publisher, reading_position, image, thumb, " +
+            "epub_link, pdf_link, description, updated, created, published, books.version, state " +
             "FROM books JOIN selection_book " +
             "ON books.id = selection_book.book_id " +
             "WHERE selection_book.selection_link = :selectionLink " +
             "ORDER BY selection_book.view_order")
     abstract fun getBooks(selectionLink: String): List<Book>
 
-    @Query(value = "SELECT id, title, downloaded, reading_level, books.language_link, license, author, " +
-            "publisher, reading_position, image, thumb, epub_link, pdf_link, description, updated, " +
-            "created, published, books.version, state " +
+    @Query(value = "SELECT id, title, downloaded, downloaded_datetime, reading_level, " +
+            "books.language_link, license, publisher, reading_position, image, thumb, " +
+            "epub_link, pdf_link, description, updated, created, published, books.version, state " +
             "FROM books JOIN selection_book " +
             "ON books.id = selection_book.book_id " +
             "WHERE selection_book.selection_link = :selectionLink " +
@@ -116,6 +129,32 @@ abstract class BookDao {
     @Query("SELECT MAX(version) FROM books WHERE language_link = :languageLink")
     abstract fun maxVersion(languageLink: String): Long
 }
+
+/**
+ * Table for book contributors.
+ */
+@Entity(tableName = "contributors",
+        foreignKeys = [
+            ForeignKey(entity = Book::class,
+                    parentColumns = ["id"],
+                    childColumns = ["book_id"],
+                    onDelete = ForeignKey.CASCADE)
+        ])
+data class Contributor(
+        @PrimaryKey(autoGenerate = true)
+        @ColumnInfo(name = "author_id")
+        var authorId: Long? = null,
+        var name: String = "",
+        @ColumnInfo(name = "book_id")
+        var bookId: String = "",
+        // Type can be: Author, Illustrator, Translator, Photographer, Contributor
+        var type: String? = ""
+)
+
+data class BookWithContributors(
+    var book: Book,
+    var contributors: List<Contributor>
+)
 
 @Entity(tableName = "categories")
 data class Category(
@@ -369,7 +408,7 @@ object TimeTypeConverters {
 }
 
 @TypeConverters(TimeTypeConverters::class)
-@Database(entities = [Selection::class, Book::class, BookDownload::class, SelectionBook::class, Category::class, Language::class], version = 1)
+@Database(entities = [Selection::class, Book::class, Contributor::class, BookDownload::class, SelectionBook::class, Category::class, Language::class], version = 1)
 abstract class CatalogDatabase : RoomDatabase() {
     abstract fun bookDao(): BookDao
     abstract fun selectionDao(): SelectionDao
