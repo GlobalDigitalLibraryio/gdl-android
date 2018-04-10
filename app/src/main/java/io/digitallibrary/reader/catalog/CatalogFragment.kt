@@ -5,9 +5,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import io.digitallibrary.reader.Gdl
 import io.digitallibrary.reader.R
 import io.digitallibrary.reader.SelectLanguageActivity
@@ -71,6 +69,27 @@ class CatalogFragment : Fragment() {
         ViewModelProviders.of(this).get(CatalogViewModel::class.java).getCurrentCategorySelections().observe(this, Observer {
             it?.let { adapter.updateCategories(it) }
         })
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater?.inflate(R.menu.catalog_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.gdl_activity_select_language -> {
+                val i = Intent(context, SelectLanguageActivity::class.java)
+                startActivity(i)
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
     }
 
     override fun onResume() {
