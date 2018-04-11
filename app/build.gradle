@@ -12,8 +12,8 @@ android {
         // Lower to 19 (or 16) and add < 21 views
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 17
-        versionName "0.90"
+        versionCode 18
+        versionName "0.90.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
