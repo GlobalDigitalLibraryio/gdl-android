@@ -72,7 +72,6 @@
 
                         <Button
                             android:id="@+id/book_download_retry"
-                            android:visibility="gone"
                             style="?android:attr/borderlessButtonStyle"
                             android:layout_width="@dimen/button_standard_width"
                             android:layout_height="@dimen/button_standard_height"
@@ -85,22 +84,22 @@
                             android:shadowRadius="2"
                             android:text="@string/book_details_action_download_error_retry"
                             android:textColor="@color/white"
-                            android:textSize="@dimen/button_standard_text_size" />
+                            android:textSize="@dimen/button_standard_text_size"
+                            android:visibility="gone" />
 
                         <Button
                             android:id="@+id/book_download_dismiss"
-                            android:visibility="gone"
                             style="?android:attr/borderlessButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="@dimen/button_standard_height"
                             android:layout_gravity="center_horizontal"
                             android:text="@string/book_details_action_download_error_dismiss"
                             android:textAllCaps="false"
-                            android:textColor="@color/red_dark" />
+                            android:textColor="@color/red_dark"
+                            android:visibility="gone" />
 
                         <Button
                             android:id="@+id/book_read_book"
-                            android:visibility="gone"
                             style="?android:attr/borderlessButtonStyle"
                             android:layout_width="@dimen/button_standard_width"
                             android:layout_height="@dimen/button_standard_height"
@@ -113,28 +112,29 @@
                             android:shadowRadius="2"
                             android:text="@string/book_details_action_read"
                             android:textColor="@color/white"
-                            android:textSize="@dimen/button_standard_text_size" />
+                            android:textSize="@dimen/button_standard_text_size"
+                            android:visibility="gone" />
 
                         <Button
                             android:id="@+id/book_delete_book"
-                            android:visibility="gone"
                             style="?android:attr/borderlessButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="@dimen/button_standard_height"
                             android:layout_gravity="center_horizontal"
                             android:text="@string/book_details_action_delete_book"
                             android:textAllCaps="false"
-                            android:textColor="@color/red_dark" />
+                            android:textColor="@color/red_dark"
+                            android:visibility="gone" />
 
                         <LinearLayout
                             android:id="@+id/book_downloading"
-                            android:visibility="gone"
                             android:layout_width="@dimen/button_standard_width"
                             android:layout_height="@dimen/button_standard_height"
                             android:layout_gravity="center_horizontal"
                             android:layout_marginTop="15dp"
                             android:background="@drawable/button_gray"
-                            android:gravity="center_vertical">
+                            android:gravity="center_vertical"
+                            android:visibility="gone">
 
                             <ProgressBar
                                 android:layout_width="20dp"
@@ -153,18 +153,17 @@
 
                         <Button
                             android:id="@+id/book_download_cancel"
-                            android:visibility="gone"
                             style="?android:attr/borderlessButtonStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="@dimen/button_standard_height"
                             android:layout_gravity="center_horizontal"
                             android:text="@string/book_details_action_cancel_downloading"
                             android:textAllCaps="false"
-                            android:textColor="@color/red_dark" />
+                            android:textColor="@color/red_dark"
+                            android:visibility="gone" />
 
                         <Button
                             android:id="@+id/book_download_button"
-                            android:visibility="gone"
                             style="?android:attr/borderlessButtonStyle"
                             android:layout_width="@dimen/button_standard_width"
                             android:layout_height="@dimen/button_standard_height"
@@ -177,7 +176,8 @@
                             android:shadowRadius="2"
                             android:text="@string/book_details_action_download"
                             android:textColor="@color/white"
-                            android:textSize="@dimen/button_standard_text_size" />
+                            android:textSize="@dimen/button_standard_text_size"
+                            android:visibility="gone" />
                     </LinearLayout>
                 </android.support.v7.widget.CardView>
 
@@ -266,13 +266,13 @@
                                 android:rotation="90" />
 
                             <TextView
-                                android:layout_toEndOf="@+id/triangle"
                                 android:id="@+id/book_level"
-                                android:layout_marginEnd="15dp"
-                                android:layout_marginStart="-5dp"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_centerVertical="true"
+                                android:layout_marginEnd="15dp"
+                                android:layout_marginStart="-5dp"
+                                android:layout_toEndOf="@+id/triangle"
                                 android:shadowColor="#33000000"
                                 android:shadowDx="2"
                                 android:shadowDy="2"
@@ -297,17 +297,110 @@
                         android:text="@string/book_details_authors"
                         android:textAllCaps="true"
                         android:textSize="12sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:visibility="gone" />
 
                     <TextView
                         android:id="@+id/book_authors"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="15dp"
                         android:layout_marginEnd="15dp"
                         android:layout_marginStart="15dp"
                         android:text="@string/placeholder_long_author"
-                        android:textSize="12sp" />
+                        android:textSize="12sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/book_illustrator_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="15dp"
+                        android:text="@string/book_details_illustrators"
+                        android:textAllCaps="true"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/book_illustrator"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginStart="15dp"
+                        android:text="@string/placeholder_long_author"
+                        android:textSize="12sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/book_translator_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="15dp"
+                        android:text="@string/book_details_translators"
+                        android:textAllCaps="true"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/book_translator"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginStart="15dp"
+                        android:text="@string/placeholder_long_author"
+                        android:textSize="12sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/book_photographer_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="15dp"
+                        android:text="@string/book_details_photographers"
+                        android:textAllCaps="true"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/book_photographer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginStart="15dp"
+                        android:text="@string/placeholder_long_author"
+                        android:textSize="12sp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/book_contributor_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginStart="15dp"
+                        android:layout_marginTop="15dp"
+                        android:text="@string/book_details_contributors"
+                        android:textAllCaps="true"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/book_contributor"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginStart="15dp"
+                        android:text="@string/placeholder_long_author"
+                        android:textSize="12sp"
+                        android:visibility="gone" />
 
                     <TextView
                         android:id="@+id/book_license_header"
@@ -315,6 +408,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="15dp"
                         android:layout_marginStart="15dp"
+                        android:layout_marginTop="15dp"
                         android:text="@string/book_details_license"
                         android:textAllCaps="true"
                         android:textSize="12sp"

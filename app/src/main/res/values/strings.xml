@@ -15,7 +15,21 @@
 
     <!-- Book details -->
     <string name="book_details_license">License</string>
+
+    <!--Singular-->
+    <string name="book_details_author">Author</string>
+    <string name="book_details_illustrator">Illustrator</string>
+    <string name="book_details_translator">Translator</string>
+    <string name="book_details_photographer">Photographer</string>
+    <string name="book_details_contributor">Contributor</string>
+
+    <!--Plural-->
     <string name="book_details_authors">Authors</string>
+    <string name="book_details_illustrators">Illustrators</string>
+    <string name="book_details_translators">Translators</string>
+    <string name="book_details_photographers">Photographers</string>
+    <string name="book_details_contributors">Contributors</string>
+
     <string name="book_details_publisher">From %1$s</string>
     <string name="book_details_published">Published</string>
     <string name="book_details_action_read">Read</string>

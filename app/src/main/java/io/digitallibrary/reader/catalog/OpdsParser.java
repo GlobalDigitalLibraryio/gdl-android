@@ -63,6 +63,9 @@ public class OpdsParser {
     // id, title, updated, and root same as in acquisition root
     private static final String AUTHOR = "author";
     private static final String AUTHOR_NAME = "name";
+    private static final String CONTRIBUTOR = "contributor";
+    private static final String CONTRIBUTOR_ATTR_TYPE = "type";
+    private static final String CONTRIBUTOR_NAME = "name";
     private static final String LICENSE = "dc:license";
     private static final String PUBLISHER = "dc:publisher";
     private static final String CREATED = "dc:created";
@@ -658,7 +661,7 @@ public class OpdsParser {
         protected Void doInBackground(ParseSelectionPageData... parseSelectionPageDatas) {
             try {
                 OkHttpClient client = Gdl.Companion.getHttpClient();
-                final List<Book> books = new ArrayList<>(20);
+                final List<BookWithContributors> books = new ArrayList<>(20);
                 final List<SelectionBook> selectionBooks = new ArrayList<>(20);
                 String next = null;
                 Response response;
@@ -714,7 +717,9 @@ public class OpdsParser {
                             // Skip past entry start tag
                             xpp.next();
 
+                            List<Contributor> cs = new ArrayList<>();
                             Book b = new Book();
+                            BookWithContributors bwc = new BookWithContributors(b, cs);
                             b.setLanguageLink(taskMonitor.languageLink);
                             b.setVersion(taskMonitor.version);
 
@@ -777,24 +782,39 @@ public class OpdsParser {
                                             }
                                             break;
                                         case AUTHOR:
-                                            StringBuilder author = null;
                                             while (!(eventType == XmlPullParser.END_TAG && xpp.getName().equals(tagName))) {
-                                                if (eventType == XmlPullParser.START_TAG && xpp.getName().equals(AUTHOR_NAME)) {
-                                                    while (!(eventType == XmlPullParser.END_TAG && xpp.getName().equals(AUTHOR_NAME))) {
-                                                        if (eventType == XmlPullParser.TEXT) {
-                                                            if (author != null) {
-                                                                author.append(", ").append(xpp.getText());
-                                                            } else {
-                                                                author = new StringBuilder(xpp.getText());
-                                                            }
-                                                        }
-                                                        eventType = xpp.next();
+                                                while (!(eventType == XmlPullParser.END_TAG && xpp.getName().equals(AUTHOR_NAME))) {
+                                                    if (eventType == XmlPullParser.TEXT) {
+                                                        String name = xpp.getText();
+                                                        Contributor c = new Contributor();
+                                                        c.setBookId(b.getId());
+                                                        c.setName(name);
+                                                        c.setType("Author");
+                                                        cs.add(c);
                                                     }
+                                                    eventType = xpp.next();
                                                 }
                                                 eventType = xpp.next();
                                             }
-                                            if (author != null) {
-                                                b.setAuthor(author.toString());
+                                            break;
+                                        case CONTRIBUTOR:
+                                            while (!(eventType == XmlPullParser.END_TAG && xpp.getName().equals(tagName))) {
+                                                String type = xpp.getAttributeValue(null, CONTRIBUTOR_ATTR_TYPE);
+                                                String name = null;
+                                                while (!(eventType == XmlPullParser.END_TAG && xpp.getName().equals(CONTRIBUTOR_NAME))) {
+                                                    if (eventType == XmlPullParser.TEXT) {
+                                                        name = xpp.getText();
+                                                    }
+                                                    eventType = xpp.next();
+                                                }
+                                                if (name != null) {
+                                                    Contributor c = new Contributor();
+                                                    c.setBookId(b.getId());
+                                                    c.setName(name);
+                                                    c.setType(type);
+                                                    cs.add(c);
+                                                }
+                                                eventType = xpp.next();
                                             }
                                             break;
                                         case LEVEL:
@@ -838,7 +858,7 @@ public class OpdsParser {
                                 eventType = xpp.next();
                             }
 
-                            books.add(b);
+                            books.add(bwc);
 
                             SelectionBook bsm = new SelectionBook();
                             bsm.setBookId(b.getId());
