@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.TabLayout
 import android.support.v4.app.FragmentManager
@@ -43,7 +44,9 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
             LANGUAGE,
             MY_LIBRARY,
             CATALOG,
-            SELECTIONS;
+            SELECTIONS,
+            ABOUT,
+            LICENSE;
 
             companion object {
                 fun default(): NavChoices {
@@ -94,6 +97,8 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
             NavChoices.LANGUAGE -> getString(R.string.navigation_choice_select_language)
             NavChoices.MY_LIBRARY -> getString(R.string.navigation_choice_my_library)
             NavChoices.CATALOG -> getString(R.string.navigation_choice_selections)
+            NavChoices.ABOUT -> getString(R.string.navigation_choice_about_gdl)
+            NavChoices.LICENSE -> getString(R.string.navigation_choice_license)
             else -> throw IllegalArgumentException("NavChoice $navChoice does not have a menu text")
         }
     }
@@ -196,6 +201,8 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
             val catalog = menu.add(NavChoices.CATALOG.ordinal, NavChoices.CATALOG.ordinal, NavChoices.CATALOG.ordinal, getNavText(NavChoices.CATALOG))
             catalog.isCheckable = true
             catalog.isChecked = true
+            menu.add(NavChoices.ABOUT.ordinal, NavChoices.ABOUT.ordinal, NavChoices.ABOUT.ordinal, getNavText(NavChoices.ABOUT))
+            menu.add(NavChoices.ABOUT.ordinal, NavChoices.LICENSE.ordinal, NavChoices.LICENSE.ordinal, getNavText(NavChoices.LICENSE))
 
             navigation.setNavigationItemSelectedListener {
                 when (it.groupId) {
@@ -216,10 +223,22 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
                         }
                     }
                     NavChoices.SELECTIONS.ordinal -> {
-                        val selection = currentCategorySelections[it.itemId - 10]
+                        val selection = currentCategorySelections[it.itemId]
                         val intent = Intent(applicationContext, CatalogActivity::class.java)
                         intent.putExtra("selection_link", selection.link)
                         startActivity(intent)
+                    }
+                    NavChoices.ABOUT.ordinal -> {
+                        when (it.itemId) {
+                            NavChoices.ABOUT.ordinal -> {
+                                val i = Intent(Intent.ACTION_VIEW, Uri.parse("https://home.digitallibrary.io/about/"))
+                                startActivity(i)
+                            }
+                            NavChoices.LICENSE.ordinal -> {
+                                val i = Intent(Intent.ACTION_VIEW, Uri.parse("https://blog.digitallibrary.io/cc/"))
+                                startActivity(i)
+                            }
+                        }
                     }
                 }
                 drawer_layout.closeDrawers()
@@ -247,7 +266,7 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
         val menu: Menu = navigation.menu
         menu.removeGroup(NavChoices.SELECTIONS.ordinal)
         selections.forEachIndexed { index, selection ->
-            menu.add(NavChoices.SELECTIONS.ordinal, index + 10, NavChoices.SELECTIONS.ordinal, selection.title)
+            menu.add(NavChoices.SELECTIONS.ordinal, index, NavChoices.SELECTIONS.ordinal, selection.title)
         }
     }
 

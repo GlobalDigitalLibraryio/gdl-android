@@ -72,6 +72,8 @@
     <string name="navigation_choice_selections">Selections</string>
     <string name="navigation_choice_my_library">My Library</string>
     <string name="navigation_choice_select_language">Book Language</string>
+    <string name="navigation_choice_about_gdl">About GDL</string>
+    <string name="navigation_choice_license">Licensing and reuse</string>
 
     <!-- My library -->
     <string name="my_library_title">My Library</string>
