@@ -15,6 +15,7 @@ public class SelectionsUtil {
     private static final String PREF_ID_CURRENT_LANG_DISP_TXT = "io.digitallibrary.reader.LANG_DISP_TXT";
     private static final String PREF_ID_CURRENT_CATEGORY = "io.digitallibrary.reader.CATEGORY";
     private static final String PREF_ID_CURRENT_CATEGORY_DISP_TXT = "io.digitallibrary.reader.CATEGORY_DISP_TXT";
+    private static final String PREF_ID_CURRENT_BACKEND_ENVIRONMENT = "io.digitallibrary.reader.BACKEND_ENVIRONMENT";
 
     /**
      * Get the Pref key you can listen to for language changes
@@ -105,4 +106,24 @@ public class SelectionsUtil {
         p.putString(PREF_ID_CURRENT_CATEGORY_DISP_TXT, categoryDisplayText);
         p.putString(PREF_ID_CURRENT_CATEGORY, categoryLink);
     }
+
+    /**
+     * Get the currently selected backend environment.
+     *
+     * @return The initial link to the opds feed
+     */
+    public static String getBackendEnvironment() {
+        return getPref(PREF_ID_CURRENT_BACKEND_ENVIRONMENT);
+    }
+
+    /**
+     * Set the backend environment.
+     *
+     * @param link The initial link to the opds feed
+     */
+    public static void setBackendEnvironment(String link) {
+        Prefs p = Gdl.Companion.getSharedPrefs();
+        p.putString(PREF_ID_CURRENT_BACKEND_ENVIRONMENT, link);
+    }
+
 }

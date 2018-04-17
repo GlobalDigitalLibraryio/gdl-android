@@ -5,13 +5,16 @@ import android.animation.AnimatorListenerAdapter
 import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.res.Configuration
+import android.media.Image
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.*
+import android.widget.ImageView
 import io.digitallibrary.reader.Gdl
 import io.digitallibrary.reader.R
 import kotlinx.android.synthetic.main.fragment_my_library.*
@@ -54,6 +57,24 @@ class MyLibraryFragment : Fragment() {
             }
         }, true)
         recyclerView.adapter = adapter
+
+        var clickCounter = 0
+        view.findViewById<ImageView>(R.id.empty_icon).setOnClickListener {
+            if (++clickCounter == 6) {
+                clickCounter = 0
+                val dialog = AlertDialog.Builder(context)
+                dialog.setTitle("Select backend environment")
+                dialog.setItems(arrayOf("Test", "Staging", "Prod")) { _, which ->
+                    when (which) {
+                        0 -> Gdl.changeBackendEnvironment(OpdsParser.INITIAL_REQUEST_URL_TEST)
+                        1 -> Gdl.changeBackendEnvironment(OpdsParser.INITIAL_REQUEST_URL_STAGING)
+                        2 -> Gdl.changeBackendEnvironment(OpdsParser.INITIAL_REQUEST_URL_PROD)
+                    }
+                }
+                dialog.create()
+                dialog.show()
+            }
+        }
 
         var initialView = true
         val shortDuration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()

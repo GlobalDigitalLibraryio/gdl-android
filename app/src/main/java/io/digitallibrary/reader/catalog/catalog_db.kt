@@ -123,6 +123,9 @@ abstract class BookDao {
     @Query("SELECT * FROM books WHERE downloaded IS NOT NULL ORDER BY DATETIME(downloaded_datetime) DESC")
     abstract fun getLivePagedDownloadedBooks(): DataSource.Factory<Int, Book>
 
+    @Query("SELECT * FROM books WHERE downloaded IS NOT NULL")
+    abstract fun getDownloadedBooks(): List<Book>
+
     @Query("SELECT COUNT(id) FROM books WHERE language_link = :languageLink LIMIT 1")
     abstract fun haveLanguage(languageLink: String): Boolean
 
@@ -392,6 +395,41 @@ abstract class LanguageDao {
     abstract fun getLiveLanguages(): LiveData<List<Language>>
 }
 
+@Dao
+abstract class CommonDao {
+    @Query("DELETE FROM selections")
+    abstract fun deleteSelections()
+
+    @Query("DELETE FROM books")
+    abstract fun deleteBooks()
+
+    @Query("DELETE FROM contributors")
+    abstract fun deleteContributors()
+
+    @Query("DELETE FROM book_downloads")
+    abstract fun deleteBookDownloads()
+
+    @Query("DELETE FROM selection_book")
+    abstract fun deleteSelectionBook()
+
+    @Query("DELETE FROM categories")
+    abstract fun deleteCategory()
+
+    @Query("DELETE FROM languages")
+    abstract fun deleteLanguages()
+
+    @Transaction
+    open fun deleteAll() {
+        deleteSelections()
+        deleteBooks()
+        deleteContributors()
+        deleteBookDownloads()
+        deleteSelectionBook()
+        deleteCategory()
+        deleteLanguages()
+    }
+}
+
 object TimeTypeConverters {
     private val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
@@ -419,4 +457,5 @@ abstract class CatalogDatabase : RoomDatabase() {
     abstract fun selectionBooksDao(): SelectionBookDao
     abstract fun bookDownloadDao(): BookDownloadDao
     abstract fun languageDao(): LanguageDao
+    abstract fun commonDao(): CommonDao
 }
