@@ -126,6 +126,9 @@ abstract class BookDao {
     @Query("SELECT COUNT(id) FROM books WHERE language_link = :languageLink LIMIT 1")
     abstract fun haveLanguage(languageLink: String): Boolean
 
+    @Query("SELECT COUNT(id) FROM books LIMIT 1")
+    abstract fun haveAnyBooks(): Boolean
+
     @Query("SELECT MAX(version) FROM books WHERE language_link = :languageLink")
     abstract fun maxVersion(languageLink: String): Long
 }

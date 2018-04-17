@@ -30,7 +30,7 @@ class MyLibraryFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_my_library, container, false)
 
-        val viewModel = ViewModelProviders.of(this).get(CatalogViewModel::class.java)
+        val viewModel = ViewModelProviders.of(activity!!).get(CatalogViewModel::class.java)
 
         val displayWidth = Gdl.readerAppServices.screenGetWidthPixels()
         val bookWidth = resources.getDimension(R.dimen.catalog_book_width)
@@ -88,7 +88,7 @@ class MyLibraryFragment : Fragment() {
 
                     fadeToView.visibility = View.VISIBLE
                     fadeToView.alpha = 0f
-                    fadeToView.animate().alpha(1f).setDuration(shortDuration).setListener(null)
+                    fadeToView.animate().setListener(null).alpha(1f).setDuration(shortDuration)
                 }
             }
         })
