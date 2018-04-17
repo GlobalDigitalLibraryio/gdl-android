@@ -4,6 +4,7 @@ import android.app.Application
 import android.arch.persistence.room.Room
 import android.content.Context
 import android.content.res.Resources
+import android.net.ConnectivityManager
 import android.os.Process
 import android.util.Log
 import io.digitallibrary.reader.catalog.CatalogDatabase
@@ -17,7 +18,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 
-
 /**
  * Global application state.
  */
@@ -30,14 +30,14 @@ class Gdl : Application() {
 
         lateinit var database: CatalogDatabase
         lateinit var httpClient: OkHttpClient
-        lateinit var opdsOpdsParser: OpdsParser
+        lateinit var opdsParser: OpdsParser
 
         val appContext: Context by lazy {
             INSTANCE.applicationContext
         }
 
         fun fetchOpdsFeed(callback: OpdsParser.Callback? = null) {
-            opdsOpdsParser.start(callback)
+            opdsParser.start(callback)
         }
 
         val sharedPrefs: Prefs by lazy {
@@ -46,6 +46,12 @@ class Gdl : Application() {
 
         val readerAppServices: ReaderAppServices by lazy {
             ReaderAppServices(appContext, appContext.resources)
+        }
+
+        fun isNetworkAvailable(): Boolean {
+            val connectivityManager = appContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetworkInfo = connectivityManager.activeNetworkInfo
+            return activeNetworkInfo != null && activeNetworkInfo.isConnected
         }
 
         private fun namedThreadPool(count: Int, base: String, priority: Int): ExecutorService {
@@ -104,7 +110,7 @@ class Gdl : Application() {
         database = Room.databaseBuilder<CatalogDatabase>(this, CatalogDatabase::class.java, "catalog_db").build()
         httpClient = OkHttpClient()
         httpClient.dispatcher().maxRequestsPerHost = 20
-        opdsOpdsParser = OpdsParser()
+        opdsParser = OpdsParser()
     }
 
     class ReaderAppServices(context: Context, private val rr: Resources) {

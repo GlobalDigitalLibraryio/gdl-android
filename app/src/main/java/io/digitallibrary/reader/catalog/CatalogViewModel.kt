@@ -2,6 +2,7 @@ package io.digitallibrary.reader.catalog
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MediatorLiveData
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.arch.paging.LivePagedListBuilder
 import android.arch.paging.PagedList
@@ -13,9 +14,11 @@ class CatalogViewModel : ViewModel() {
 
     private val currentCategorySelections: MediatorLiveData<List<Selection>> = MediatorLiveData()
     private var dbCurrentCategorySelections: LiveData<List<Selection>>? = null
+    private var emptySelections: MutableLiveData<List<Selection>> = MutableLiveData()
 
     private val categories: MediatorLiveData<List<Category>> = MediatorLiveData()
     private var dbCategories: LiveData<List<Category>>? = null
+
 
 
     private val books: MutableMap<String, LiveData<PagedList<Book>>> = HashMap()
@@ -35,6 +38,10 @@ class CatalogViewModel : ViewModel() {
             null
         }
         dbCurrentCategorySelections?.let { currentCategorySelections.addSource(it, { currentCategorySelections.postValue(it) }) }
+        if (dbCurrentCategorySelections == null) {
+            // removeSource does not update the observers
+            emptySelections.value = emptyList()
+        }
     }
 
     private fun updateCategories() {
@@ -57,6 +64,8 @@ class CatalogViewModel : ViewModel() {
     }
 
     init {
+        emptySelections.value = emptyList()
+        currentCategorySelections.addSource(emptySelections, { currentCategorySelections.postValue(emptySelections.value) })
         updateCategorySelections()
         updateCategories()
         Gdl.sharedPrefs.registerListener(langAndCategoryChangeListener)

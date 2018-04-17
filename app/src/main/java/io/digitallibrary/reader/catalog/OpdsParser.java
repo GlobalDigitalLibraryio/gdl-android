@@ -298,7 +298,11 @@ public class OpdsParser {
                 if (!response.isSuccessful()) {
                     // Response not in [200..300)
                     Log.e(TAG, "HTTP request (" + url + ") failed with response code " + response.code());
-                    taskMonitor.failed(Error.HTTP_REQUEST_FAILED, null);
+                    if (response.code() == 404) {
+                        taskMonitor.failed(Error.POSSIBLE_OLD_CLIENT, null);
+                    } else {
+                        taskMonitor.failed(Error.HTTP_REQUEST_FAILED, null);
+                    }
                     return null;
                 }
 
@@ -963,9 +967,11 @@ public class OpdsParser {
      * Error types returned by the {@link Callback} given to {@link #start}.
      */
     public enum Error {
+        NO_ERROR,
         HTTP_IO_ERROR,
         HTTP_REQUEST_FAILED,
         XML_PARSING_ERROR,
+        POSSIBLE_OLD_CLIENT,
     }
 
     /**

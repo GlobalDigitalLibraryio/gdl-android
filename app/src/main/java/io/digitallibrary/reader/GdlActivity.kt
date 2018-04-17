@@ -60,6 +60,7 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
     private lateinit var broadcastReceiver: BroadcastReceiver
     private lateinit var currentCategorySelections: List<Selection>
     private lateinit var categories: List<Category>
+    private lateinit var viewModel: CatalogViewModel
     private var themeId: Int by Delegates.notNull()
 
     override fun onBackStackChanged() {
@@ -133,6 +134,8 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
         super.onCreate(state)
         setContentView(R.layout.activity_main)
 
+        viewModel = ViewModelProviders.of(this).get(CatalogViewModel::class.java)
+
         setSupportActionBar(toolbar)
         supportFragmentManager.addOnBackStackChangedListener(this)
 
@@ -162,7 +165,8 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
             e.printStackTrace()
         }
 
-        ViewModelProviders.of(this).get(CatalogViewModel::class.java).getCurrentCategorySelections().observe(this, Observer {
+
+        viewModel.getCurrentCategorySelections().observe(this, Observer {
             it?.let {
                 currentCategorySelections = it
                 updateMenuCategories(it)
@@ -170,7 +174,7 @@ class GdlActivity : AppCompatActivity(), FragmentManager.OnBackStackChangedListe
             }
         })
 
-        ViewModelProviders.of(this).get(CatalogViewModel::class.java).getCategories().observe(this, Observer {
+        viewModel.getCategories().observe(this, Observer {
             it?.let {
                 categories = it
                 updateTabCategories(it)

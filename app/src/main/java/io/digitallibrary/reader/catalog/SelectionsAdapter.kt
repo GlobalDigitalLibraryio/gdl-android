@@ -4,7 +4,6 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.support.v4.app.Fragment
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +15,7 @@ class SelectionsAdapter(val fragment: Fragment, val callback: Callback) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var selections: List<Selection> = emptyList()
+    private var viewModel = ViewModelProviders.of(fragment.activity!!)
 
     interface Callback {
         fun onSelectionClicked(selection: Selection) {}
@@ -23,8 +23,8 @@ class SelectionsAdapter(val fragment: Fragment, val callback: Callback) :
         fun onChangeLanguageClicked() {}
     }
 
-    fun updateCategories(newCategoriesList: List<Selection>) {
-        selections = newCategoriesList
+    fun updateSelections(newSelectionsList: List<Selection>) {
+        selections = newSelectionsList
         notifyDataSetChanged()
     }
 
@@ -56,7 +56,7 @@ class SelectionsAdapter(val fragment: Fragment, val callback: Callback) :
             })
             recyclerView.adapter = adapter
 
-            ViewModelProviders.of(fragment).get(CatalogViewModel::class.java)
+            viewModel.get(CatalogViewModel::class.java)
                 .getBooks(selection.link).observe(fragment, Observer {
                     it?.let { adapter.submitList(it) }
                 })

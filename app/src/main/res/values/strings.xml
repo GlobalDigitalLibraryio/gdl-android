@@ -89,4 +89,15 @@
     <string name="dialog_action_delete">Delete</string>
     <string name="dialog_action_cancel">Cancel</string>
 
+    <!--Error Messages-->
+    <string name="dialog_no_network_first_time_title">No network</string>
+    <string name="dialog_no_network_first_time_message">You need a network connection the first time you use this app.</string>
+    <string name="dialog_action_network_settings">Network settings</string>
+    <string name="error_msg_connection_error_title">Connection error</string>
+    <string name="error_msg_connection_error_message">Can\'t connect to the server. Please make sure you have a working internet connection.</string>
+    <string name="error_msg_server_error_title">Server error</string>
+    <string name="error_msg_server_error_message">Our server encountered a problem.</string>
+    <string name="error_msg_old_client_title">Connection error</string>
+    <string name="error_msg_old_client_message">Please make sure you have the latest version of this app.</string>
+
 </resources>
