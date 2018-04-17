@@ -9,8 +9,11 @@ import android.os.Process
 import android.util.Log
 import io.digitallibrary.reader.catalog.CatalogDatabase
 import io.digitallibrary.reader.catalog.OpdsParser
+import io.digitallibrary.reader.catalog.deleteBook
 import io.digitallibrary.reader.reader.*
 import io.digitallibrary.reader.utilities.SelectionsUtil
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.launch
 import okhttp3.OkHttpClient
 import java.io.IOException
 import java.net.ServerSocket
@@ -99,6 +102,19 @@ class Gdl : Application() {
                 R.style.GdlTranslucentClassroom
             } else {
                 R.style.GdlTranslucent
+            }
+        }
+
+        fun changeBackendEnvironment(link: String) {
+            launch(CommonPool) {
+                SelectionsUtil.setLanguage(null, null)
+                SelectionsUtil.setCategory(null, null)
+                database.bookDao().getDownloadedBooks().forEach {
+                    deleteBook(it)
+                }
+                database.commonDao().deleteAll()
+                SelectionsUtil.setBackendEnvironment(link)
+                fetchOpdsFeed()
             }
         }
     }

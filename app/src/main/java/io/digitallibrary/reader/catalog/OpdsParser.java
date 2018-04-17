@@ -33,7 +33,11 @@ public class OpdsParser {
     private static final String TAG = "OpdsParser";
 
     // Default language is decided by the backend
-    private static final String INITIAL_REQUEST_URL = "https://opds.staging.digitallibrary.io/v1/root.xml";
+    public static final String INITIAL_REQUEST_URL_TEST = "https://opds.test.digitallibrary.io/v1/root.xml";
+    public static final String INITIAL_REQUEST_URL_STAGING = "https://opds.staging.digitallibrary.io/v1/root.xml";
+    public static final String INITIAL_REQUEST_URL_PROD = "https://opds.digitallibrary.io/v1/root.xml";
+    private static final String INITIAL_REQUEST_URL = INITIAL_REQUEST_URL_STAGING;
+
 
     // TAGS - acquisition root
     private static final String ID = "id";
@@ -264,7 +268,11 @@ public class OpdsParser {
                 List<Language> languages = new ArrayList<>(20);
                 List<Category> categories = new ArrayList<>(10);
 
-                String url = INITIAL_REQUEST_URL;
+                String url = SelectionsUtil.getBackendEnvironment();
+                if (url == null) {
+                    url = INITIAL_REQUEST_URL;
+                }
+
                 // If we didn't get a url, this is the first time we parse this language
                 // If so, we'll get the URL from the facets
                 if (taskMonitor.languageLink != null) {
