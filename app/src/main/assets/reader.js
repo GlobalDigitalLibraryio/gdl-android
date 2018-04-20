@@ -18,10 +18,7 @@ function Reader() {
 
     var touch = event.changedTouches[0];
 
-    var maxScreenX = window.orientation === 0 || window.orientation == 180
-                   ? screen.width
-                   : screen.height;
-
+    var maxScreenX = screen.width;
     var relativeDistanceX = (touch.screenX - startX) / maxScreenX;
 
     // Tap to turn.

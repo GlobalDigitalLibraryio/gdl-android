@@ -36,13 +36,11 @@ import java.util.List;
 
 import io.digitallibrary.reader.Gdl;
 import io.digitallibrary.reader.R;
-import io.digitallibrary.reader.catalog.Book;
 import io.digitallibrary.reader.reader.ReaderPaginationChangedEvent.OpenPage;
 import io.digitallibrary.reader.reader.ReaderReadiumViewerSettings.ScrollMode;
 import io.digitallibrary.reader.reader.ReaderReadiumViewerSettings.SyntheticSpreadMode;
 import io.digitallibrary.reader.reader.ReaderTOC.TOCElement;
 import io.digitallibrary.reader.utilities.ErrorDialogUtilities;
-import io.digitallibrary.reader.utilities.FadeUtilities;
 import io.digitallibrary.reader.utilities.UIThread;
 
 /**
@@ -56,16 +54,15 @@ public final class ReaderActivity extends Activity
     private static final String TAG = "ReaderActivity";
     private static final String BOOK_ID = "io.digitallibrary.reader.ReaderActivity.book_id";
     private static final String FILE_ID = "io.digitallibrary.reader.ReaderActivity.file_id";
+    private static final String FULLSCREEN = "io.digitallibrary.reader.ReaderActivity.fullscreen";
 
     private String book_id;
-    private Book book;
     private Container epub_container;
     private ReaderReadiumJavaScriptAPIType readium_js_api;
     private ReaderJavaScriptAPIType simplified_js_api;
     private ViewGroup view_hud;
     private ProgressBar view_loading;
     private TextView view_progress_text;
-    private View view_root;
     private TextView view_title_text;
     private ImageView view_toc;
     private WebView view_web_view;
@@ -75,6 +72,7 @@ public final class ReaderActivity extends Activity
     private ImageView reader_toc;
     private ImageView reader_back;
     private boolean web_view_resized;
+    private boolean fullscreen;
     private ReaderBookLocation current_location;
     private ImageView view_settings;
     private SharedPreferences.OnSharedPreferenceChangeListener brightnessListner;
@@ -89,9 +87,9 @@ public final class ReaderActivity extends Activity
     /**
      * Start a new reader for the given book.
      *
-     * @param from  The parent activity
-     * @param bookId  The unique ID of the book
-     * @param file  The actual EPUB file
+     * @param from   The parent activity
+     * @param bookId The unique ID of the book
+     * @param file   The actual EPUB file
      */
     public static void startActivity(final Activity from, final String bookId, final File file) {
         NullCheck.notNull(file);
@@ -134,29 +132,6 @@ public final class ReaderActivity extends Activity
     }
 
     @Override
-    public void onConfigurationChanged(final @Nullable Configuration c) {
-        super.onConfigurationChanged(c);
-
-        Log.d(TAG, "configuration changed");
-
-        final WebView in_web_view = NullCheck.notNull(this.view_web_view);
-        final TextView in_progress_text = NullCheck.notNull(this.view_progress_text);
-
-        in_web_view.setVisibility(View.INVISIBLE);
-        in_progress_text.setVisibility(View.INVISIBLE);
-
-        this.web_view_resized = true;
-        UIThread.runOnUIThreadDelayed(new Runnable() {
-            @Override
-            public void run() {
-                final ReaderReadiumJavaScriptAPIType readium_js =
-                        NullCheck.notNull(ReaderActivity.this.readium_js_api);
-                readium_js.getCurrentPage(ReaderActivity.this);
-            }
-        }, 300L);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         canStartAnotherActivity = true;
@@ -174,10 +149,10 @@ public final class ReaderActivity extends Activity
         final Intent i = NullCheck.notNull(this.getIntent());
         final Bundle a = NullCheck.notNull(i.getExtras());
 
+        this.fullscreen = state != null && state.getBoolean(FULLSCREEN);
+
         final File in_epub_file = NullCheck.notNull((File) a.getSerializable(ReaderActivity.FILE_ID));
         this.book_id = NullCheck.notNull((String) a.getSerializable(ReaderActivity.BOOK_ID));
-        // TODO: Set this.book (get from room)
-        // this.book
 
         Log.d(TAG, "epub file: " + in_epub_file);
         Log.d(TAG, "book id:   " + this.book_id);
@@ -204,12 +179,14 @@ public final class ReaderActivity extends Activity
                 NullCheck.notNull((TextView) this.findViewById(R.id.reader_title_text));
         final TextView in_progress_text =
                 NullCheck.notNull((TextView) this.findViewById(R.id.reader_position_text));
+        final View in_progress_container =
+                NullCheck.notNull((View) this.findViewById(R.id.reader_progress));
+        final View in_progress_devider =
+                NullCheck.notNull((View) this.findViewById(R.id.reader_progress_divider));
 
         final ProgressBar in_loading =
                 NullCheck.notNull((ProgressBar) this.findViewById(R.id.reader_loading));
         final WebView in_webview = NullCheck.notNull((WebView) this.findViewById(R.id.reader_webview));
-
-        this.view_root = NullCheck.notNull(in_hud.getRootView());
 
         this.reader_background = NullCheck.notNull((FrameLayout) this.findViewById(R.id.reader_background));
         this.reader_settings = NullCheck.notNull((ImageView) this.findViewById(R.id.reader_settings));
@@ -221,7 +198,6 @@ public final class ReaderActivity extends Activity
         in_webview.setVisibility(View.INVISIBLE);
         in_hud.setVisibility(View.VISIBLE);
 
-
         this.view_loading = in_loading;
         this.view_progress_text = in_progress_text;
         this.view_title_text = in_title_text;
@@ -230,6 +206,27 @@ public final class ReaderActivity extends Activity
         this.view_toc = in_toc;
         this.view_settings = in_settings;
         this.web_view_resized = true;
+
+        View decorView = getWindow().getDecorView();
+        if (fullscreen) {
+            decorView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+            this.view_hud.setVisibility(View.INVISIBLE);
+            this.view_title_text.setVisibility(View.VISIBLE);
+            in_progress_devider.setVisibility(View.INVISIBLE);
+            ViewGroup.LayoutParams lp = in_progress_container.getLayoutParams();
+            lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            in_progress_container.setLayoutParams(lp);
+        } else {
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            this.view_hud.setVisibility(View.VISIBLE);
+            this.view_title_text.setVisibility(View.INVISIBLE);
+        }
 
         final WebChromeClient wc_client = new WebChromeClient() {
             @Override
@@ -441,7 +438,7 @@ public final class ReaderActivity extends Activity
         reader_background.setBackgroundColor(cs.getBackgroundColor());
         view_title_text.setTextColor(cs.getForegroundColor());
         view_progress_text.setTextColor(cs.getForegroundColor());
-        switch(cs) {
+        switch (cs) {
             case SCHEME_BLACK_ON_BEIGE:
                 reader_settings.setImageResource(R.drawable.ic_font_download_dark_24dp);
                 reader_toc.setImageResource(R.drawable.ic_format_list_numbered_dark_24dp);
@@ -671,32 +668,11 @@ public final class ReaderActivity extends Activity
 
     @Override
     public void onGestureClickCenter() {
-        final ViewGroup in_hud = NullCheck.notNull(this.view_hud);
-        final TextView in_title = NullCheck.notNull(this.view_title_text);
         UIThread.runOnUIThread(new Runnable() {
             @Override
             public void run() {
-                switch (in_hud.getVisibility()) {
-                    case View.VISIBLE: {
-                        View decorView = getWindow().getDecorView();
-                        // Hide the status bar.
-                        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-                        decorView.setSystemUiVisibility(uiOptions);
-                        FadeUtilities.fadeOut(in_hud, FadeUtilities.DEFAULT_FADE_DURATION);
-                        FadeUtilities.fadeIn(in_title, FadeUtilities.DEFAULT_FADE_DURATION);
-                        break;
-                    }
-                    case View.INVISIBLE:
-                    case View.GONE: {
-                        View decorView = getWindow().getDecorView();
-                        // Show the status bar.
-                        int uiOptions = View.SYSTEM_UI_FLAG_VISIBLE;
-                        decorView.setSystemUiVisibility(uiOptions);
-                        FadeUtilities.fadeIn(in_hud, FadeUtilities.DEFAULT_FADE_DURATION);
-                        FadeUtilities.fadeOut(in_title, FadeUtilities.DEFAULT_FADE_DURATION);
-                        break;
-                    }
-                }
+                fullscreen = !fullscreen;
+                recreate();
             }
         });
     }
@@ -761,5 +737,11 @@ public final class ReaderActivity extends Activity
 
     public void onBackClicked(View view) {
         finish();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(FULLSCREEN, fullscreen);
     }
 }

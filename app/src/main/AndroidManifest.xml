@@ -65,7 +65,6 @@
 
         <activity
             android:name=".reader.ReaderActivity"
-            android:configChanges="orientation|screenSize"
             android:contentDescription="@string/reader"
             android:label="@string/reader" />
         <activity
