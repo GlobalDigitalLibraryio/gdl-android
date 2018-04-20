@@ -247,9 +247,9 @@ public class OpdsParser {
 
     /**
      * Task that parsers the facets part of the root of a OPDS feed for one specific language.
-     * This will update the database with the full language list, and the selections for the supplied
-     * language. This task runs alone, but will start multiple ParseSelectionPageTask in parallel
-     * for each selection.
+     * This will update the database with the full language list, and the categories for the supplied
+     * language. This task runs alone, but will start multiple ParseCategoriesSelectionsTasks in parallel
+     * for each category.
      */
     private static class ParseLanguagesAndCategoriesTask extends AsyncTask<Void, Void, Void> {
         private ProgressMonitor.LanguageTasksMonitor taskMonitor;
@@ -471,7 +471,7 @@ public class OpdsParser {
                     taskMonitor.version = Gdl.Companion.getDatabase().bookDao().maxVersion(taskMonitor.languageLink) + 1;
 
                     for (Category c : categories) {
-                        ParseSelectionsTask parseJob = new ParseSelectionsTask(taskMonitor);
+                        ParseCategoriesSelectionsTask parseJob = new ParseCategoriesSelectionsTask(taskMonitor);
                         taskMonitor.addTask(parseJob);
                         // Want these to run in parallel
                         parseJob.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, c.getLink());
@@ -492,15 +492,14 @@ public class OpdsParser {
     }
 
     /**
-     * Task that parsers the facets part of the root of a OPDS feed for one specific language.
-     * This will update the database with the full language list, and the selections for the supplied
-     * language. This task runs alone, but will start multiple ParseSelectionPageTask in parallel
-     * for each selection.
+     * Task that parsers the facets part of a OPDS feed for one specific category.
+     * This will update the database with all selections for the supplied category.
+     * This task will start multiple ParseSelectionPageTask in parallel for each selection.
      */
-    private static class ParseSelectionsTask extends AsyncTask<String, Void, Void> {
+    private static class ParseCategoriesSelectionsTask extends AsyncTask<String, Void, Void> {
         private ProgressMonitor.LanguageTasksMonitor taskMonitor;
 
-        ParseSelectionsTask(ProgressMonitor.LanguageTasksMonitor taskMonitor) {
+        ParseCategoriesSelectionsTask(ProgressMonitor.LanguageTasksMonitor taskMonitor) {
             this.taskMonitor = taskMonitor;
         }
 
@@ -519,7 +518,7 @@ public class OpdsParser {
                     categoryLink = categoryLinkInput[0];
                     url = categoryLink;
                 } else {
-                    throw new IllegalArgumentException("Missing category link for ParseSelectionsTask");
+                    throw new IllegalArgumentException("Missing category link for ParseCategoriesSelectionsTask");
                 }
 
                 // We do not care about the books before we parse each selection
@@ -528,7 +527,7 @@ public class OpdsParser {
                 Request request = new Request.Builder().url(url).build();
                 Response response;
 
-                Log.v(TAG, "ParseSelectionsTask calling url: " + url);
+                Log.v(TAG, "ParseCategoriesSelectionsTask calling url: " + url);
 
                 try {
                     response = client.newCall(request).execute();
@@ -709,7 +708,7 @@ public class OpdsParser {
                 if (!response.isSuccessful()) {
                     // Response not in [200..300)
                     Log.e(TAG, "HTTP request (" + url + ") failed with response code " + response.code());
-                    taskMonitor.failed(Error.HTTP_REQUEST_FAILED, null);
+                    // Don't set the entire language to failed, as the other selections might still load
                     return null;
                 }
 
@@ -938,7 +937,7 @@ public class OpdsParser {
         protected Void doInBackground(Void... voids) {
             Log.v(TAG, "PostUpdateTask for " + taskMonitor.languageLink + " running");
             // If taskMonitor.version isn't set, we haven't updated the books
-            if (taskMonitor.version != -1 && taskMonitor.languageLink != null && taskMonitor.shouldDeleteOldBooks) {
+            if (taskMonitor.version != -1 && taskMonitor.languageLink != null && taskMonitor.shouldDeleteOldBooks && !taskMonitor.haveError) {
                 // Delete old not downloaded books
                 BookDao bookDao = Gdl.Companion.getDatabase().bookDao();
                 bookDao.deleteOldNotDownloaded(taskMonitor.languageLink, taskMonitor.version);
