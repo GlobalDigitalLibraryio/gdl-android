@@ -64,6 +64,8 @@ public final class ReaderActivity extends Activity
     private ProgressBar view_loading;
     private TextView view_progress_text;
     private TextView view_title_text;
+    private View view_progress_container;
+    private View view_progress_divider;
     private ImageView view_toc;
     private WebView view_web_view;
     private ReaderReadiumViewerSettings viewer_settings;
@@ -181,7 +183,7 @@ public final class ReaderActivity extends Activity
                 NullCheck.notNull((TextView) this.findViewById(R.id.reader_position_text));
         final View in_progress_container =
                 NullCheck.notNull((View) this.findViewById(R.id.reader_progress));
-        final View in_progress_devider =
+        final View in_progress_divider =
                 NullCheck.notNull((View) this.findViewById(R.id.reader_progress_divider));
 
         final ProgressBar in_loading =
@@ -200,6 +202,8 @@ public final class ReaderActivity extends Activity
 
         this.view_loading = in_loading;
         this.view_progress_text = in_progress_text;
+        this.view_progress_container = in_progress_container;
+        this.view_progress_divider = in_progress_divider;
         this.view_title_text = in_title_text;
         this.view_web_view = in_webview;
         this.view_hud = in_hud;
@@ -218,10 +222,10 @@ public final class ReaderActivity extends Activity
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
             this.view_hud.setVisibility(View.INVISIBLE);
             this.view_title_text.setVisibility(View.VISIBLE);
-            in_progress_devider.setVisibility(View.INVISIBLE);
-            ViewGroup.LayoutParams lp = in_progress_container.getLayoutParams();
+            this.view_progress_divider.setVisibility(View.INVISIBLE);
+            ViewGroup.LayoutParams lp = this.view_progress_container.getLayoutParams();
             lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-            in_progress_container.setLayoutParams(lp);
+            this.view_progress_container.setLayoutParams(lp);
         } else {
             decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             this.view_hud.setVisibility(View.VISIBLE);
@@ -305,6 +309,25 @@ public final class ReaderActivity extends Activity
         Gdl.Companion.getSharedPrefs().registerListener(brightnessListner);
         updateBrightness();
         updateColors(settings.getColorScheme());
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            View decorView = getWindow().getDecorView();
+            if (fullscreen) {
+                decorView.setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+            } else {
+                decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            }
+        }
     }
 
     private void updateBrightness() {
