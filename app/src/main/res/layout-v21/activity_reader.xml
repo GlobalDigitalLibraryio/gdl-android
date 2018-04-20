@@ -102,26 +102,30 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/reader_progress"
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/reader_progress"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom">
+
+        <TextView
+            android:id="@+id/reader_position_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="15dp"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="10dp"
+            android:textSize="12sp" />
+
+        <View
+            android:id="@+id/reader_progress_divider"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_alignParentBottom="true">
+            android:layout_height="1dp"
+            android:background="#FFE3E3E3" />
 
-            <TextView
-                android:id="@+id/reader_position_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_marginBottom="10dp"
-                android:textSize="12sp" />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#FFE3E3E3" />
-
-        </RelativeLayout>
     </RelativeLayout>
 
     <!-- The initial loading progress bar -->

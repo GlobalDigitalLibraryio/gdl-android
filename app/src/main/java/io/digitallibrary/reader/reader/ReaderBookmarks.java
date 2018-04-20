@@ -93,6 +93,6 @@ public final class ReaderBookmarks {
                 }
                 Log.d(TAG, "CurrentPage timer run ");
             }
-        }, 3000L);
+        }, 500L);
     }
 }
