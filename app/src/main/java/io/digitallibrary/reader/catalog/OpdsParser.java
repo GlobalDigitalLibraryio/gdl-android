@@ -36,7 +36,7 @@ public class OpdsParser {
     public static final String INITIAL_REQUEST_URL_TEST = "https://opds.test.digitallibrary.io/v1/root.xml";
     public static final String INITIAL_REQUEST_URL_STAGING = "https://opds.staging.digitallibrary.io/v1/root.xml";
     public static final String INITIAL_REQUEST_URL_PROD = "https://opds.digitallibrary.io/v1/root.xml";
-    private static final String INITIAL_REQUEST_URL = INITIAL_REQUEST_URL_STAGING;
+    private static final String INITIAL_REQUEST_URL = INITIAL_REQUEST_URL_PROD;
 
 
     // TAGS - acquisition root
